@@ -1,0 +1,17 @@
+cfg.scn.track = track.hockenheim_record(3, 9.4);
+cfg.scn.track = track.testtrack_1(20);
+cfg.scn.track = track.hockenheim_simple();
+cfg.scn.track = track.Hockenheim1();
+cfg.scn.track = track.Hockenheim2();
+cfg.scn.track = track.Hockenheim3();
+cfg.scn.track = track.Hockenheim4();
+cfg.scn.track = track.testTrack1();
+cfg.scn.track = track.testTrack2();
+cfg.scn.track = track.testTrack3();
+cfg.scn.track = track.testTrack4();
+cfg.scn.track = track.testTrack5();
+cfg.scn.track = track.testTrack6();
+cfg.scn.track = track.testTrack7();
+cfg.scn.track = track.testTrack8();
+cfg.scn.track = track.testTrack9();
+cfg.scn.track = track.testTrack10();

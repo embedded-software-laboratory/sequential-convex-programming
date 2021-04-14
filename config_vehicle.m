@@ -1,0 +1,105 @@
+% Default config for a single vehicle
+
+function cfg_vehicle = config_vehicle(model)
+% Model is handle (will be initialized later on)
+% `@vehicle.linear` or `@vehicle.bicycleBotz`;% model used in optimization problem
+% CAVE all states of model must be contained in the first states of simulation model (in same order)
+% TODO check above
+
+cfg_vehicle = struct;
+
+%% General
+import controller.*
+cfg_vehicle.p.controller = @controller.SL.find_solution; % 'SL' or 'SCR'
+cfg_vehicle.p.iterations = 2;
+cfg_vehicle.p.isBlockingEnabled = false;
+
+cfg_vehicle.model = model;
+cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
+
+cfg_vehicle.isModelLinear = isequal(cfg_vehicle.model, @vehicle.Linear); % TODO isn't working here, handle is instantiated only later: isa(cfg_vehicle.model, 'vehicle.linear');
+cfg_vehicle.isModelSimulationLinear = isequal(cfg_vehicle.model_simulation, @vehicle.Linear); % TODO isn't working here, handle is instantiated only later: isa(cfg_vehicle.model_simulation, 'vehicle.linear');
+
+% obstacles are modeled as rotated rectangles that can move with
+% constant speed and direction.
+
+cfg_vehicle.xStart = @() error('Not configured! Should be size (n_x, 1)');
+
+cfg_vehicle.lengthVal = 0.075; % obstacle's size measured along its direction of movement [m]
+cfg_vehicle.widthVal = 0.045; % obstacle's size measured at right angels to its direction of movement[m]
+
+cfg_vehicle.distSafe2CenterVal_1 = round(sqrt((cfg_vehicle.lengthVal/2)^2 + (cfg_vehicle.widthVal/2)^2),2,'significant');
+cfg_vehicle.distSafe2CenterVal_2 = [0.09;0.06]; % Definition of ellipsis (two semi-axis)
+% TODO why there are two defined above?
+cfg_vehicle.distSafe2CenterVal = cfg_vehicle.distSafe2CenterVal_1;
+
+%% Common Parameters
+cfg_vehicle.p.Hp = 50; % Number of prediction steps
+
+if cfg_vehicle.isModelLinear
+    cfg_vehicle.p.dt = 0.1; % Size of prediction step
+else
+    cfg_vehicle.p.dt = 0.05; % Size of prediction step
+end
+
+% %% paramsV2 MPC properties
+cfg_vehicle.p.idx_steering_angle = 1;   % input steering angle (delta)
+cfg_vehicle.p.idx_motor_torque = 2;     % input motor torque
+
+% TODO if SCR
+if isequal(cfg_vehicle.p.controller, @controller.SCR.find_solution)
+    cfg_vehicle.p.dt = 0.5; % Size of prediction step
+    cfg_vehicle.p.Hp = 20; % Number of prediction steps
+end
+if cfg_vehicle.isModelLinear
+    cfg_vehicle.p.R = 0.05 * eye(2); % Penalty weight for control changes over time
+    cfg_vehicle.p.Q = 1; % Penalty weight for maximization of position on track
+    cfg_vehicle.p.S = 1e5; % was 1e30; % Penalty weight for slack
+else
+    cfg_vehicle.p.R = 350 * eye(2); % Penalty weight for control changes over time
+    cfg_vehicle.p.Q = 1; % Penalty weight for maximization of position on track
+    cfg_vehicle.p.S = 1e30; % Penalty weight for slack
+end
+
+%% Trust region - upper and lower bounds
+cfg_vehicle.p.TR_steeringAngle = 0.40;   % Bounded input: steering angle [rad]
+cfg_vehicle.p.TR_motorTorque = 0.08; 	% Bounded input: motor torque [Nm]
+cfg_vehicle.p.TR_pos = 0.5;     % Bounded state: position in x and y [m]
+cfg_vehicle.p.TR_velX = 2;       % Bounded state: velocity in x [m/s]
+cfg_vehicle.p.TR_velY = 2;       % Bounded state: velocity in y [m/s]
+cfg_vehicle.p.TR_velW = 2*pi;       % Bounded state: velocity in W (yaw rate) [1/s]
+
+%% Physical vehicle properties
+cfg_vehicle.p.vehicleModel_m = 0.041; % vehicle mass [kg]
+cfg_vehicle.p.vehicleModel_Iz = 27.8e-6; % vehicle inertia [kg m^2]
+cfg_vehicle.p.vehicleModel_Lf = 0.029; % front wheel to CoG [m]
+cfg_vehicle.p.vehicleModel_Lr = 0.033; % rear wheel to CoG [m]
+cfg_vehicle.p.vehicleModel_N = 1; % constant for rear wheel longitudinal force: gear ratio / wheel radius [1/m]
+
+cfg_vehicle.p.tireModel_Df = 0.1884;
+cfg_vehicle.p.tireModel_Cf = 1.9669;
+cfg_vehicle.p.tireModel_Bf = 3.0323;
+cfg_vehicle.p.tireModel_Dr = 0.1644;
+cfg_vehicle.p.tireModel_Cr = 1.3709;
+cfg_vehicle.p.tireModel_Br = 4.1165;
+
+%% TODO sl 
+% %% SL Parameters
+% % if strcmp(cfg.controller.name, 'SL')
+    cfg_vehicle.p.trust_region = 3;
+% 
+%     % Acceleration parameters
+    cfg_vehicle.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
+    % Empirically determined maximum accelerations in the forwards, backwards
+    % and lateral directions, for varying speeds.
+    cfg_vehicle.p.a_lateral_max_list = interp1([0 10 43 52 200],[1 14 28 33 33], 0:0.01:120);
+    cfg_vehicle.p.a_forward_max_list = interp1([0 10 20 35 52 79 83 200],[2 13 18 18 15 6 1 1], 0:0.01:120);
+    cfg_vehicle.p.a_backward_max_list = interp1([0 30 40 52 76 200],[11 13 24 30 40 40], 0:0.01:120);
+    cfg_vehicle.p.v_idx = @(v) min(12001,max(1, round(100*v+1) ));
+% %% SCR Parameters
+% elseif strcmp(cfg.controller.name, 'SCR')
+%     % Acceleration parameters
+    cfg_vehicle.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
+    cfg_vehicle.p.a_max = 22;
+% end
+end

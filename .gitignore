@@ -1,0 +1,6 @@
+# Matlab files
+*.asv
+
+
+# custom files
+/output
