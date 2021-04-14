@@ -1,4 +1,4 @@
-function run_simulation(cfg)
+function run(cfg)
 % Main file to run the scenario with any given configuration
 %
 % Used Abbreviations
