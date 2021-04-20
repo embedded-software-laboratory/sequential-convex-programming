@@ -5,6 +5,8 @@
 % - #vehicles
 % - All tracks
 % - Blocking etc dis/enabled
+% cfg_vehicle.p.isBlockingEnabled = false;
+% cfg_vehicle.p.areObstaclesConsidered = false;
 
 
 %% build iterates

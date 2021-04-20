@@ -31,15 +31,15 @@ end
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle_ 2
-vehicle_ = config_vehicle(@vehicle.BicycleBotz);
-% TODO couple with used vehicle_ model nx
-if vehicle_.isModelLinear
-    vehicle_.xStart = [0 -0.05 0.1 0 ];
-else
-    vehicle_.xStart = [0 -0.05 0.1 0 0 0];
-end
-vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity
-cfg.scn.vs{end + 1} = vehicle_;
+% vehicle_ = config_vehicle(@vehicle.BicycleBotz);
+% % TODO couple with used vehicle_ model nx
+% if vehicle_.isModelLinear
+%     vehicle_.xStart = [0 -0.05 0.1 0 ];
+% else
+%     vehicle_.xStart = [0 -0.05 0.1 0 0 0];
+% end
+% vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity
+% cfg.scn.vs{end + 1} = vehicle_;
 
 % % vehicle_ 3
 % vehicle_ = config_vehicle_();

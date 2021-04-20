@@ -117,111 +117,113 @@ for k = 1:p.Hp
     end
 
 
-% TODO: see below outcommented, too
-%         % Override (constrict) track constraint on one side if opponent is significantly alongside and ego has more space (on the inside)
-%         trackCenter2ego_vec = (x(1:2,k) - checkpoint_c.center)' * left_unit_vector;
-%         trackCenter2obst_vec = (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector;
-%         xOpp = trajectories.vehicles{1,2}.x(:,k);
-%         if ( norm(trackCenter2ego_vec,2) < norm(trackCenter2obst_vec,2) ) && ...
-%             ( trajectories.blockingTable(vehNr,1) == 1 ) && ...
-%             ( abs( (x(1:2,k) - xOpp(1:2))' *  checkpoint_c.forward_vector ) <= 0.075 ) && ...
-%             ( j ~= vehNr )
-%             if (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector > 0 % obstacle on left side
-%                 b_ineq(n_rows-1) = left_unit_vector' * (checkpoint_c.left - left_unit_vector * 0.045);
-%             elseif (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector < 0 % obstacle on right side
-%                 b_ineq(n_rows) = -left_unit_vector' * (checkpoint_c.right + left_unit_vector * 0.045);
-%             end
-%         end
-
-
     %% Obstacle constraints and override/contraction of track constraints (only in 2nd iteration, only if obstacles are to be respected)
     % TODO: why only in second iteration
     % TODO: add warning when obstacles enabled, but p.iteration == 1
-    if (iter >= 2) && (sum(ws.obstacleTable(i_vehicle,:)) >= 1)
+    if p.areObstaclesConsidered
         
-        % iterate over all opponents
-        for j = 1:length(cfg.scn.vs)
-            % Extend predicted trajectory of opponent if the opponent's prediction horizon is shorter than the own horizon
-            % TODO: very simplistic approach
-            if k <= size(ws.vs{1, j}.x,2) % Choose correponding trajectory point if prediciton step is within scope
-                xOpp = ws.vs{1, j}.x(:, k);
-            else % If prediction step is not within scope, choose last trajectory point
-                xOpp = ws.vs{1, j}.x(:, end);
-            end    
+        % TODO: see below outcommented, too
+        %         % Override (constrict) track constraint on one side if opponent is significantly alongside and ego has more space (on the inside)
+        %         trackCenter2ego_vec = (x(1:2,k) - checkpoint_c.center)' * left_unit_vector;
+        %         trackCenter2obst_vec = (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector;
+        %         xOpp = trajectories.vehicles{1,2}.x(:,k);
+        %         if ( norm(trackCenter2ego_vec,2) < norm(trackCenter2obst_vec,2) ) && ...
+        %             ( trajectories.blockingTable(vehNr,1) == 1 ) && ...
+        %             ( abs( (x(1:2,k) - xOpp(1:2))' *  checkpoint_c.forward_vector ) <= 0.075 ) && ...
+        %             ( j ~= vehNr )
+        %             if (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector > 0 % obstacle on left side
+        %                 b_ineq(n_rows-1) = left_unit_vector' * (checkpoint_c.left - left_unit_vector * 0.045);
+        %             elseif (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector < 0 % obstacle on right side
+        %                 b_ineq(n_rows) = -left_unit_vector' * (checkpoint_c.right + left_unit_vector * 0.045);
+        %             end
+        %         end
 
-            % Respect only constraints for opponents marked as obstacles
-            if ws.obstacleTable(i_vehicle,j) == 1
-                d = pdist([x(1:2,k)';xOpp(1:2)'],'euclidean'); % calculate distance
-                normal_vector = - (x(1:2,k)-xOpp(1:2))/d; % normal vector in direction from trajectory point to obstacle center
-                V_diff = x(3:4,k) - xOpp(3:4);    % velocity difference between ego and opponent
+        if (iter >= 2) && (sum(ws.obstacleTable(i_vehicle,:)) >= 1)
 
-                if strcmp(cfg.scn.Dsafe,'Circle')
-                    D_vel_1 = sqrt((V_diff(1) * p.dt)^2 + (V_diff(2) * p.dt)^2);  % safety distance due to velocity of objects
-                    D_size_1 = 2*cfg.scn.vs{1,j}.distSafe2CenterVal_1;       % safety distance due to object size
-                    Dsafe_1 = D_vel_1 + D_size_1;
-                    closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_1; % intersection of safe radius and connection between trajectory point and obstacle center
-                elseif strcmp(cfg.scn.Dsafe,'Ellipse')
-                    D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
-                    yaw_ang = x(5,k);
-                    Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
-                    D_size_2 = normal_vector' * (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2);
-                    Dsafe_2 = norm( D_vel_2 + D_size_2 );
-                    closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_2; % intersection of safe radius and connection between trajectory point and obstacle center
-                elseif strcmp(cfg.scn.Dsafe,'CircleImpr')
-                    D_vel_1 = ( normal_vector' * V_diff ) * p.dt; % Improved
-%                         D_vel_1 = 0;
-                    D_size_1 = 2*cfg.scn.vs{1,j}.distSafe2CenterVal_1;
-                    Dsafe_1 = D_vel_1 + D_size_1;
-                    closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_1;
-                elseif strcmp(cfg.scn.Dsafe,'EllipseImpr')
-                    D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
-                    yaw_ang = xOpp(5);
-                    Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
-%                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2) );
-%                         Dsafe_2 = D_vel_2 + D_size_2;
-%                         closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_2;
-                    safety_ellipseA = Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2;
-                    closest_obst_point = xOpp(1:2) + [ safety_ellipseA(1)*(-normal_vector(1)) ; safety_ellipseA(2)*(-normal_vector(2)) ]  - normal_vector * D_vel_2;
+            % iterate over all opponents
+            for j = 1:length(cfg.scn.vs)
+                % Extend predicted trajectory of opponent if the opponent's prediction horizon is shorter than the own horizon
+                % TODO: very simplistic approach
+                if k <= size(ws.vs{1, j}.x,2) % Choose correponding trajectory point if prediciton step is within scope
+                    xOpp = ws.vs{1, j}.x(:, k);
+                else % If prediction step is not within scope, choose last trajectory point
+                    xOpp = ws.vs{1, j}.x(:, end);
+                end    
+
+                % Respect only constraints for opponents marked as obstacles
+                if ws.obstacleTable(i_vehicle,j) == 1
+                    d = pdist([x(1:2,k)';xOpp(1:2)'],'euclidean'); % calculate distance
+                    normal_vector = - (x(1:2,k)-xOpp(1:2))/d; % normal vector in direction from trajectory point to obstacle center
+                    V_diff = x(3:4,k) - xOpp(3:4);    % velocity difference between ego and opponent
+
+                    if strcmp(cfg.scn.Dsafe,'Circle')
+                        D_vel_1 = sqrt((V_diff(1) * p.dt)^2 + (V_diff(2) * p.dt)^2);  % safety distance due to velocity of objects
+                        D_size_1 = 2*cfg.scn.vs{1,j}.distSafe2CenterVal_1;       % safety distance due to object size
+                        Dsafe_1 = D_vel_1 + D_size_1;
+                        closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_1; % intersection of safe radius and connection between trajectory point and obstacle center
+                    elseif strcmp(cfg.scn.Dsafe,'Ellipse')
+                        D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
+                        yaw_ang = x(5,k);
+                        Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
+                        D_size_2 = normal_vector' * (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2);
+                        Dsafe_2 = norm( D_vel_2 + D_size_2 );
+                        closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_2; % intersection of safe radius and connection between trajectory point and obstacle center
+                    elseif strcmp(cfg.scn.Dsafe,'CircleImpr')
+                        D_vel_1 = ( normal_vector' * V_diff ) * p.dt; % Improved
+    %                         D_vel_1 = 0;
+                        D_size_1 = 2*cfg.scn.vs{1,j}.distSafe2CenterVal_1;
+                        Dsafe_1 = D_vel_1 + D_size_1;
+                        closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_1;
+                    elseif strcmp(cfg.scn.Dsafe,'EllipseImpr')
+                        D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
+                        yaw_ang = xOpp(5);
+                        Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
+    %                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2) );
+    %                         Dsafe_2 = D_vel_2 + D_size_2;
+    %                         closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_2;
+                        safety_ellipseA = Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2;
+                        closest_obst_point = xOpp(1:2) + [ safety_ellipseA(1)*(-normal_vector(1)) ; safety_ellipseA(2)*(-normal_vector(2)) ]  - normal_vector * D_vel_2;
+                    end
+
+                    % Identify if trajectory point has already passed the corresponding obstacle trajectory point
+                    left = [0 -1;1 0] * checkpoint_c.forward_vector;
+                    forward = checkpoint_c.forward_vector;
+                    % angle between normal vector of lin. obst. constr. and track forward vector
+                    ang_normal_forward = acosd(dot(normal_vector,forward)/(norm(normal_vector)*norm(forward)));
+                    % angle between normal vector of lin. obst. constr. and track left vector
+                    ang_normal_left = acosd(dot(normal_vector,left)/(norm(normal_vector)*norm(left)));
+                    if ( (ang_normal_forward >= 90) && (ang_normal_left >= 90) ) || ...
+                       ( (ang_normal_forward >= 90) && (ang_normal_left <= 90) )
+                        isOpponentOvertaken = true;
+                    end
+
+                    n_rows = n_rows(end) + (1);
+                    if isOpponentOvertaken % Set obstacle constraint to zero if trajectory point has passed the corresponding obstacle trajectory point in the first iteration
+                        A_ineq(n_rows, idx_slack) = 0;
+                        A_ineq(n_rows, idx_pos(k,:)) = [0 0];
+                        b_ineq(n_rows) = 0;
+
+                        % TODO: see above outcommented, too
+                            % Override (constrict) track constraint on one side if opponent is significantly alongside and ego has more space (on the inside)
+    %                         trackCenter2ego_vec = (x(1:2,k) - checkpoint_c.center)' * left_unit_vector;
+    %                         trackCenter2obst_vec = (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector;
+    %                         if ( norm(trackCenter2ego_vec,2) < norm(trackCenter2obst_vec,2) ) && ...
+    %                             ( abs( (x(1:2,k) - xOpp(1:2))' *  checkpoint_c.forward_vector ) <= 0.075 ) && ...
+    %                             ( j ~= vehNr )
+    %                             if (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector > 0 % obstacle on left side
+    %                                 b_ineq(n_rows-2) = left_unit_vector' * (checkpoint_c.left - left_unit_vector * 0.045);
+    %                             elseif (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector < 0 % obstacle on right side
+    %                                 b_ineq(n_rows-1) = -left_unit_vector' * (checkpoint_c.right + left_unit_vector * 0.045);
+    %                             end
+    %                         end
+
+                    else % Normal obstacle constraint
+                        A_ineq(n_rows, idx_slack) = -1;
+                        A_ineq(n_rows, idx_pos(k,:)) = normal_vector';
+                        b_ineq(n_rows) = normal_vector' * closest_obst_point;
+                    end
+
                 end
-
-                % Identify if trajectory point has already passed the corresponding obstacle trajectory point
-                left = [0 -1;1 0] * checkpoint_c.forward_vector;
-                forward = checkpoint_c.forward_vector;
-                % angle between normal vector of lin. obst. constr. and track forward vector
-                ang_normal_forward = acosd(dot(normal_vector,forward)/(norm(normal_vector)*norm(forward)));
-                % angle between normal vector of lin. obst. constr. and track left vector
-                ang_normal_left = acosd(dot(normal_vector,left)/(norm(normal_vector)*norm(left)));
-                if ( (ang_normal_forward >= 90) && (ang_normal_left >= 90) ) || ...
-                   ( (ang_normal_forward >= 90) && (ang_normal_left <= 90) )
-                    isOpponentOvertaken = true;
-                end
-
-                n_rows = n_rows(end) + (1);
-                if isOpponentOvertaken % Set obstacle constraint to zero if trajectory point has passed the corresponding obstacle trajectory point in the first iteration
-                    A_ineq(n_rows, idx_slack) = 0;
-                    A_ineq(n_rows, idx_pos(k,:)) = [0 0];
-                    b_ineq(n_rows) = 0;
-
-                    % TODO: see above outcommented, too
-                        % Override (constrict) track constraint on one side if opponent is significantly alongside and ego has more space (on the inside)
-%                         trackCenter2ego_vec = (x(1:2,k) - checkpoint_c.center)' * left_unit_vector;
-%                         trackCenter2obst_vec = (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector;
-%                         if ( norm(trackCenter2ego_vec,2) < norm(trackCenter2obst_vec,2) ) && ...
-%                             ( abs( (x(1:2,k) - xOpp(1:2))' *  checkpoint_c.forward_vector ) <= 0.075 ) && ...
-%                             ( j ~= vehNr )
-%                             if (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector > 0 % obstacle on left side
-%                                 b_ineq(n_rows-2) = left_unit_vector' * (checkpoint_c.left - left_unit_vector * 0.045);
-%                             elseif (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector < 0 % obstacle on right side
-%                                 b_ineq(n_rows-1) = -left_unit_vector' * (checkpoint_c.right + left_unit_vector * 0.045);
-%                             end
-%                         end
-
-                else % Normal obstacle constraint
-                    A_ineq(n_rows, idx_slack) = -1;
-                    A_ineq(n_rows, idx_pos(k,:)) = normal_vector';
-                    b_ineq(n_rows) = normal_vector' * closest_obst_point;
-                end
-
             end
         end
     end
@@ -251,7 +253,7 @@ else
     objective_quad(idx_slack, idx_slack) = p.S;
 end
 
-% Blocking: minimize lateral delta to opponent if blocking is recommended
+%% Blocking: minimize lateral delta to opponent if blocking is recommended
 if p.isBlockingEnabled
     n_affectedTrajSteps = 3;
     if ws.blockingTable(i_vehicle,1) == 1
@@ -303,11 +305,12 @@ if isLinear
     bound_lower(idx_pos(1:p.Hp, :)) = (x(1:2, 1:p.Hp) - p.trust_region)'; % TODO was x_previous
 else
     % Bounded inputs
+    % all time
     bound_upper(idx_u(:,1)) =  p.TR_steeringAngle;
     bound_upper(idx_u(:,2)) =  p.TR_motorTorque;
     bound_lower(idx_u(:,1)) = -p.TR_steeringAngle;
     bound_lower(idx_u(:,2)) = -p.TR_motorTorque;
-
+    % last prediction step
     bound_upper(idx_u(end,1)) =  0.15 * p.TR_steeringAngle;
     bound_upper(idx_u(end,2)) =  0.15 * p.TR_motorTorque;
     bound_lower(idx_u(end,1)) = -0.15 * p.TR_steeringAngle;
@@ -315,8 +318,8 @@ else
 
     % Bounded states (trust region for change in position) - kinetic
     for k=1:p.Hp
-        bound_upper(idx_pos(k,:)) = x(1:2,k) + p.TR_pos;
-        bound_lower(idx_pos(k,:)) = x(1:2,k) - p.TR_pos;
+        bound_upper(idx_pos(k,:)) = x(model.ipos, k) + p.TR_pos;
+        bound_lower(idx_pos(k,:)) = x(model.ipos, k) - p.TR_pos;
     end
 
     % Bounded states (trust region for change in velocities) - kinematic

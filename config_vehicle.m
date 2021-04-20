@@ -13,6 +13,7 @@ cfg_vehicle = struct;
 cfg_vehicle.p.controller = controller;
 cfg_vehicle.p.iterations = 2;
 cfg_vehicle.p.isBlockingEnabled = false;
+cfg_vehicle.p.areObstaclesConsidered = false;
 
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
