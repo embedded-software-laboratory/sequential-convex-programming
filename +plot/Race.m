@@ -2,19 +2,33 @@ classdef Race < plot.Base
     %RACE Summary of this class goes here
     %   Detailed explanation goes here
     
+    
+    
     methods
         function plot(obj, scn, ws)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
 
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
-            clf(obj.figure_handle)
-            set(obj.figure_handle,'color',[1 1 1]);
-            set(obj.figure_handle,'Name','Race');
-            hold on
             
-            % plot base track
-            obj.plot_track(scn.track, scn.vs{1}.widthVal)
+            % plot base track initially
+            if ~obj.is_background_plotted
+                % clear old plot
+                clf(obj.figure_handle)
+                
+                set(obj.figure_handle,'color',[1 1 1]);
+                set(obj.figure_handle,'Name','Race');
+                hold on
+            
+                obj.plot_track(scn.track, scn.vs{1}.widthVal)
+                obj.is_background_plotted = true;
+            else
+                 % clear old plot objects
+                for i = 1:length(obj.handles_tmp)
+                    delete(obj.handles_tmp{i})
+                end
+                obj.handles_tmp = {};
+            end
 
             %% Plot vehicle specific elements
             c = ['r','b','g','y','m','c','w','k',];
@@ -27,7 +41,7 @@ classdef Race < plot.Base
                 vehWidth = scn.vs{k}.widthVal;
 
                 %% Planned trajectory
-                plot(x(1,:),x(2,:),'.-','color',c(k),'MarkerSize',7);    
+                obj.handles_tmp{end + 1} = plot(x(1,:),x(2,:),'.-','color',c(k),'MarkerSize',7);    
 
                 %% Vehicle Box
                 if length(x0) < 5
@@ -44,7 +58,7 @@ classdef Race < plot.Base
                 end
                 R = [dist [-dist(2); dist(1)]];
                 vehicleRectangle = R * [vehLength/2 0;0 vehWidth/2] * [1 1 -1 -1;1 -1 -1 1] + repmat(x0(1:2),1,4);
-                fill(vehicleRectangle(1,:),vehicleRectangle(2,:),c(k));
+                obj.handles_tmp{end + 1} = fill(vehicleRectangle(1,:),vehicleRectangle(2,:),c(k));
                 daspect([1 1 1])
 
                 %% Draw obstacle
@@ -68,8 +82,8 @@ classdef Race < plot.Base
                 L = 1; % Length of plotted linear constraints
                 tangent_left = [(lastCP.left + L* lastCP.forward_vector) (lastCP.left - L* lastCP.forward_vector)];
                 tangent_right = [(lastCP.right + L* lastCP.forward_vector) (lastCP.right - L* lastCP.forward_vector)];
-                plot(tangent_left(1,:), tangent_left(2,:),'--','color',c(k),'LineWidth',1)
-                plot(tangent_right(1,:), tangent_right(2,:),'--','color',c(k),'LineWidth',1)
+                obj.handles_tmp{end + 1} = plot(tangent_left(1,:), tangent_left(2,:),'--','color',c(k),'LineWidth',1);
+                obj.handles_tmp{end + 1} = plot(tangent_right(1,:), tangent_right(2,:),'--','color',c(k),'LineWidth',1);
                 
                 %     % Constraints for the last trajectory point (point at
                 %     % prediction/control horizon)
@@ -129,7 +143,7 @@ classdef Race < plot.Base
                             normal_vector = - (x0(1:2)-ws.vs{1,j}.x0(1:2))/d; % normal vector in direction from trajectory point to obstacle center
                             closest_obst_point = ws.vs{1,j}.x0(1:2) - normal_vector * scn.vs{1,j}.distSafe2CenterVal; % intersection of safe radius and connection between trajectory point and obstacle center 
                             tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
-                            plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k),'LineWidth',1)
+                            obj.handles_tmp{end + 1} = plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k),'LineWidth',1);
                         end
                     end
                 end

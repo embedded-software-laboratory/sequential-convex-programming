@@ -26,7 +26,11 @@ for j = 1:length(log.lap)
     % pause to simulate real time
     % FIXME what if different prediction step sizes?
     delta = cfg.scn.vs{1}.p.dt - toc;
-    if delta > 0; pause(delta); end 
+    if delta > 0
+        pause(delta);
+    else
+        warning('Replay is not real-time')
+    end 
 end
 
 disp('run finished')

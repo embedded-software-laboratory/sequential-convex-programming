@@ -1,4 +1,4 @@
-classdef Base
+classdef Base < handle
     % wrapping all functions around a given model as an ODE & its
     % parameters:
     % linearization, discretization, ...
