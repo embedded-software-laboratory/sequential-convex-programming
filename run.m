@@ -207,7 +207,7 @@ cfg.plot.plots_to_draw = NaN;
 save([cfg.outputPath '/log.mat'])
 
 % if error occured in race loop
-if ~isempty(ME)
+if exist('ME', 'var')
     warning('Error in race loop ocurred, rethrowing:')
     rethrow(ME)
 end

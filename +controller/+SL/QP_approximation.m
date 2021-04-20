@@ -237,21 +237,17 @@ assert(n_rows == n_ineq);
 objective_lin(idx_pos(p.Hp,:)) = -p.Q * checkpoints(checkpoint_indices(p.Hp)).forward_vector;
 
 % Minimize control change over time (36)
-objective_quad(idx_u(p.Hp, :), idx_u(p.Hp, :)) = p.R;
+objective_quad(idx_u(1,:), idx_u(1,:)) = p.R;
 for i = 1:p.Hp - 1
-    objective_quad(idx_u(  i, :),idx_u(  i, :)) = 2 * p.R;  
-    objective_quad(idx_u(  i, :),idx_u(i+1, :)) = -p.R; 
-    objective_quad(idx_u(i+1, :),idx_u(  i, :)) = -p.R;
+    objective_quad(idx_u(  i, :), idx_u(  i, :)) = 2 * p.R;  
+    objective_quad(idx_u(  i, :), idx_u(i+1, :)) = -p.R; 
+    objective_quad(idx_u(i+1, :), idx_u(  i, :)) = -p.R;
 end
-objective_quad(idx_u(1,:),idx_u(1,:)) = p.R;
+objective_quad(idx_u(p.Hp, :), idx_u(p.Hp, :)) = p.R;
 
 % Minimize slack var (parameter q in paper?)
-if isLinear
-    objective_lin(idx_slack) = p.S;
-else
-    % TODO: Bassam - warum hier slack bei quad nötig? 
-    objective_quad(idx_slack, idx_slack) = p.S;
-end
+objective_lin(idx_slack) = p.S;
+%old: objective_quad(idx_slack, idx_slack) = 1e30;
 
 %% Blocking: minimize lateral delta to opponent if blocking is recommended
 if p.isBlockingEnabled

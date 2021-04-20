@@ -52,14 +52,13 @@ if isequal(cfg_vehicle.p.controller, @controller.SCR.find_solution)
     cfg_vehicle.p.dt = 0.5; % Size of prediction step
     cfg_vehicle.p.Hp = 20; % Number of prediction steps
 end
+
+cfg_vehicle.p.S = 1e5; % Penalty weight for slack (was 1e30 for usage in quad objective with BotzBicycle)
+cfg_vehicle.p.Q = 1; % Penalty weight for maximization of position on track
 if cfg_vehicle.isModelLinear
     cfg_vehicle.p.R = 0.05 * eye(2); % Penalty weight for control changes over time
-    cfg_vehicle.p.Q = 1; % Penalty weight for maximization of position on track
-    cfg_vehicle.p.S = 1e5; % was 1e30; % Penalty weight for slack
 else
     cfg_vehicle.p.R = 350 * eye(2); % Penalty weight for control changes over time
-    cfg_vehicle.p.Q = 1; % Penalty weight for maximization of position on track
-    cfg_vehicle.p.S = 1e30; % Penalty weight for slack
 end
 
 %% Trust region - upper and lower bounds
