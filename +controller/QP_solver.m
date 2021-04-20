@@ -10,8 +10,11 @@ if cfg.env.cplex.is_available
         cplexqp(quad_objective,lin_objective,A_ineq,b_ineq,A_eq,b_eq,bound_lower,bound_upper,[],[]);
     
     % Exitflag values: (acc. to
-    % https://www.ibm.com/docs/en/icos/12.7.1.0?topic=functions-cplexqp,
-    % refering to https://www.ibm.com/docs/en/icos/12.7.1.0?topic=functions-cplexmiqcp)
+    % https://www.ibm.com/docs/en/icos/12.9.0?topic=functions-cplexqp,
+    % refering to https://www.ibm.com/docs/en/icos/12.9.0?topic=functions-cplexmiqcp)
+    
+    % "If you want to write the model out to a file, then you need to set:
+    % opt.exportmodel = 'myModel.lp';"
     switch optimization_log.exitflag
         % case ~=1 and >=0: CPLEX qp has problematic solution
         case 6; warning('CPLEX qp exitflag 6: Non-optimal Solution available.');
