@@ -1,16 +1,16 @@
 % Default config for a single vehicle
 
-function cfg_vehicle = config_vehicle(model)
-% Model is handle (will be initialized later on)
-% `@vehicle.linear` or `@vehicle.bicycleBotz`;% model used in optimization problem
-% CAVE all states of model must be contained in the first states of simulation model (in same order)
-% TODO check above
+function cfg_vehicle = config_vehicle(model, controller)
+% loading default controller if no is provided
+if ~exist('controller', 'var')
+    disp('Using default controller as no provided as argument')
+    controller = @controller.SL.find_solution; % 'SL' or 'SCR'
+end
 
 cfg_vehicle = struct;
 
 %% General
-import controller.*
-cfg_vehicle.p.controller = @controller.SL.find_solution; % 'SL' or 'SCR'
+cfg_vehicle.p.controller = controller;
 cfg_vehicle.p.iterations = 2;
 cfg_vehicle.p.isBlockingEnabled = false;
 

@@ -21,6 +21,8 @@ cfg.scn.track = track.Hockenheim4();
 % vehicle_ 1
 vehicle_ = config_vehicle(@vehicle.BicycleBotz);
 % TODO: automate switching number of states depending on model / model nx
+% CAVE all states of model must be contained in the first states of simulation model (in same order)
+% TODO check above
 if vehicle_.isModelLinear
     vehicle_.xStart = [0 0 0.1 0 ];
 else
