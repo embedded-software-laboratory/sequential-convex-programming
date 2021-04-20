@@ -6,6 +6,7 @@ classdef Base < handle
         figure_handle
         handles_tmp % handles of temporary plot objects
         is_background_plotted
+        subplot_handles
     end
     
     methods
@@ -15,6 +16,20 @@ classdef Base < handle
             obj.figure_handle = figure(figure_handle_number); % create or get existing figure
             obj.handles_tmp = {};
             obj.is_background_plotted = false;
+            obj.subplot_handles = {};
+        end
+        
+        function add_tmp_handle(obj, handle)
+            obj.handles_tmp{end + 1} = handle;
+        end
+            
+        
+        function clear_tmp(obj)
+             % clear old plot objects
+            for i = 1:length(obj.handles_tmp)
+                delete(obj.handles_tmp{i})
+            end
+            obj.handles_tmp = {};
         end
     end
     methods (Abstract)

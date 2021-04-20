@@ -29,7 +29,7 @@ for j = 1:length(log.lap)
     if delta > 0
         pause(delta);
     else
-        warning('Replay is not real-time')
+        warning('Replay is currently not real-time')
     end 
 end
 
