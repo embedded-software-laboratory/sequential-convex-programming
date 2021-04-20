@@ -17,8 +17,8 @@ cfg_vehicle.p.isBlockingEnabled = false;
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
 
-cfg_vehicle.isModelLinear = isequal(cfg_vehicle.model, @vehicle.Linear); % TODO isn't working here, handle is instantiated only later: isa(cfg_vehicle.model, 'vehicle.linear');
-cfg_vehicle.isModelSimulationLinear = isequal(cfg_vehicle.model_simulation, @vehicle.Linear); % TODO isn't working here, handle is instantiated only later: isa(cfg_vehicle.model_simulation, 'vehicle.linear');
+cfg_vehicle.isModelLinear = isequal(cfg_vehicle.model, @vehicle.Linear);
+cfg_vehicle.isModelSimulationLinear = isequal(cfg_vehicle.model_simulation, @vehicle.Linear);
 
 % obstacles are modeled as rotated rectangles that can move with
 % constant speed and direction.

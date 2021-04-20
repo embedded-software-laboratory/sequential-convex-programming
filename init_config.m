@@ -1,5 +1,8 @@
 function cfg = init_config(cfg)
 % initializes given cfg
+%
+% Initializes handles and automatic detections
+%
 % Returns: initialized config struct
 
 %% CPLEX Detection

@@ -6,8 +6,6 @@
 %   lap regarding the track center-checkpoints.
 
 function cfg = config_scenario(cfg)
-
-
 cfg.scn.obstacles = {};
 cfg.scn.vs = {};
 
@@ -20,11 +18,6 @@ cfg.scn.track = track.Hockenheim4();
 % TODO SCR only works with hockenheim_simple?
 
 %% Vehicles
-% model is handle (will be initialized later on)
-% `@vehicle.Linear` or `@vehicle.BicycleBotz`;% model used in optimization problem
-% TODO CAVE all states of model must be contained in the first states of simulation model (in same order)
-
-
 % vehicle_ 1
 vehicle_ = config_vehicle(@vehicle.BicycleBotz);
 % TODO: automate switching number of states depending on model / model nx

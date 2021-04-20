@@ -203,6 +203,7 @@ cfg.plot.plots_to_draw = NaN;
 save([cfg.outputPath '/log.mat'])
 end
 
+
 function x0_new = simulate_ode(ws_vehicle, veh_cfg)
     % solve ode for individual vehicle with calculated inputs
     % Inputs:
