@@ -30,9 +30,11 @@ n_ineq = 2 * p.Hp; % 2 track constraints at every time step
 if isLinear
     n_ineq = n_ineq + p.n_acceleration_limits * p.Hp; % acceleration bounds at every time step
 end
-% at first iteration no obstacle constraints are respected
-if ~((sum(ws.obstacleTable(i_vehicle,:)) == 0) || ((sum(ws.obstacleTable(i_vehicle,:)) ~= 0) && (iter == 1)))
-    n_ineq = n_ineq + sum(ws.obstacleTable(i_vehicle,:)) * p.Hp;  % relevant obstacle constraints at every time step
+if p.areObstaclesConsidered
+    % at first iteration no obstacle constraints are respected
+    if ~((sum(ws.obstacleTable(i_vehicle,:)) == 0) || ((sum(ws.obstacleTable(i_vehicle,:)) ~= 0) && (iter == 1)))
+        n_ineq = n_ineq + sum(ws.obstacleTable(i_vehicle,:)) * p.Hp;  % relevant obstacle constraints at every time step
+    end
 end
 
 objective_lin   = zeros(n_vars, 1);
@@ -71,14 +73,9 @@ if isLinear
     % v_{x,y}{Hp} = 0 (b_eq already inited to 0)
     n_rows = n_rows(end) + (1:2);
     A_eq(n_rows, idx_x(k, 3:4)) = eye(2);
-else    
-%     % v_{x,y}{Hp} = 0 (b_eq already inited to 0)
-%     n_rows = n_rows(end) + (1:2);
-%     A_eq(n_rows, idx_x(k, 3:4)) = eye(2);
-% 
-%     % dt/dyaw at Hp = 0 (b_eq already inited to 0)
-%     n_rows = n_rows(end) + 1;
-%     A_eq(n_rows, idx_x(k, 6)) = 1;
+else
+    % terminal constraints are implemented as (softer) lower/upper bounds
+    % on last prediction step below
 end
 
 assert(n_rows(end) == n_eqns);
@@ -297,8 +294,8 @@ if isLinear
 
     % Trust region for change in position
     % Bounded states (trust region for change in position) - kinetic
-    bound_upper(idx_pos(1:p.Hp, :)) = (x(1:2, 1:p.Hp) + p.trust_region)'; % TODO was x_previous
-    bound_lower(idx_pos(1:p.Hp, :)) = (x(1:2, 1:p.Hp) - p.trust_region)'; % TODO was x_previous
+    bound_upper(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) + p.trust_region)'; % TODO was x_previous
+    bound_lower(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) - p.trust_region)'; % TODO was x_previous
 else
     % Bounded inputs
     % all time
@@ -313,7 +310,7 @@ else
     bound_lower(idx_u(end,2)) = -0.15 * p.TR_motorTorque;
 
     % Bounded states (trust region for change in position) - kinetic
-    for k=1:p.Hp
+    for k = 1:p.Hp
         bound_upper(idx_pos(k,:)) = x(model.ipos, k) + p.TR_pos;
         bound_lower(idx_pos(k,:)) = x(model.ipos, k) - p.TR_pos;
     end
@@ -326,6 +323,7 @@ else
     bound_lower(idx_x(:,4)) = -p.TR_velY;
     bound_lower(idx_x(:,6)) = -p.TR_velW;
 
+    % "Terminal Constraints"
     % Bounded states for last prediction step instead of term. constr.
     bound_upper(idx_x(end,3)) = 0.01;
     bound_upper(idx_x(end,4)) = 0.01;
