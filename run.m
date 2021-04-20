@@ -44,153 +44,157 @@ init_control_keys(cfg.plot.plots_to_draw);
 disp('########################')
 disp('#- Starting race loop -#')
 
-while ctl_race_ongoing
-    fprintf('--- Step %i ---\n', step_sim);
-    step_sim = step_sim + 1;
-    timer_loop = tic;
-    
-    % Advance predicted state trajectories by one time step
-    % TODO why u? Wasn't used by SCR (and SL?)
-    for i = 1:length(cfg.scn.vs)
-        ws.vs{i}.x(:,1:end-1) = ws.vs{i}.x(:,2:end);
-%       ws.vs{i}.u(:,1:end-1) = ws.vs{i}.u(:,2:end);
-%       ws.vs{i}.u(:,end) = [0 ; 0]; % trajectory prediction shift leads to stand still for last two predicted trajectory points, only possible if last input is zero
-        ws.vs{i}.u(:,1:end) = ws.vs{i}.u(:,1:end); % no shift of inputs as u1 input is needed for linearization together with x0
-    end
+try
+    while ctl_race_ongoing
+        fprintf('--- Step %i ---\n', step_sim);
+        step_sim = step_sim + 1;
+        timer_loop = tic;
 
-    %% Current CP, position and lap
-    % Get current checkpoints (corresponding to x0) and current laps
-    for i = 1:length(cfg.scn.vs)
-        % update checkpoints
-        cp_curr = utils.find_closest_track_checkpoint_index(...
-            ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track, 1);
-        ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
-        ws.vs{i}.cp_curr = cp_curr;
-        
-        % new lap: advance lap counter
-        % TODO robust lap detection
-        if (ws.vs{i}.cp_prev ~= ws.vs{i}.cp_curr) && ...
-            (ws.vs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
-            (ws.vs{i}.cp_curr / length(cfg.scn.track) < 1)
-            ws.vs{i}.lap_count = ws.vs{i}.lap_count + 1;
+        % Advance predicted state trajectories by one time step
+        % TODO why u? Wasn't used by SCR (and SL?)
+        for i = 1:length(cfg.scn.vs)
+            ws.vs{i}.x(:,1:end-1) = ws.vs{i}.x(:,2:end);
+    %       ws.vs{i}.u(:,1:end-1) = ws.vs{i}.u(:,2:end);
+    %       ws.vs{i}.u(:,end) = [0 ; 0]; % trajectory prediction shift leads to stand still for last two predicted trajectory points, only possible if last input is zero
+            ws.vs{i}.u(:,1:end) = ws.vs{i}.u(:,1:end); % no shift of inputs as u1 input is needed for linearization together with x0
         end
-    end
 
-    % Determine relative positions of racing vehicles corresponding to
-    % current checkpoints and current laps
-    for i = 1:length(cfg.scn.vs)
-        ws.vs{i}.pos = 1;
-        for j = 1:length(cfg.scn.vs)
-            if (ws.vs{i}.cp_curr < ws.vs{1,j}.cp_curr) && ...
-                    (ws.vs{i}.lap_count == ws.vs{1,j}.lap_count) || ...
-                    (ws.vs{i}.lap_count < ws.vs{1,j}.lap_count)
-                ws.vs{i}.pos = ws.vs{i}.pos + 1;
+        %% Current CP, position and lap
+        % Get current checkpoints (corresponding to x0) and current laps
+        for i = 1:length(cfg.scn.vs)
+            % update checkpoints
+            cp_curr = utils.find_closest_track_checkpoint_index(...
+                ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track, 1);
+            ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
+            ws.vs{i}.cp_curr = cp_curr;
+
+            % new lap: advance lap counter
+            % TODO robust lap detection
+            if (ws.vs{i}.cp_prev ~= ws.vs{i}.cp_curr) && ...
+                (ws.vs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
+                (ws.vs{i}.cp_curr / length(cfg.scn.track) < 1)
+                ws.vs{i}.lap_count = ws.vs{i}.lap_count + 1;
             end
         end
-    end
 
-    %% Determine obstacle relationship
-    % Set obstacle-matrix entry to 1 if vehicle of row has to respect
-    % vehicle in column as an obstacle, depending on the relativ
-    % positioning on the race track.
-    CP_halfTrack = length(cfg.scn.track)/2; % get checkpoint index at half of the track
-    for i = 1:length(cfg.scn.vs) % ego vehicle
-        for j = 1:length(cfg.scn.vs) % opposing vehicles
-            if (i ~= j) && (...
-                    ( (ws.vs{i}.cp_curr < ws.vs{1,j}.cp_curr) && ...
-                    ( (ws.vs{1,j}.cp_curr - ws.vs{i}.cp_curr) < CP_halfTrack ) ) || ...
-                    ( (ws.vs{i}.cp_curr >= ws.vs{1,j}.cp_curr) && ...
-                    ( (ws.vs{i}.cp_curr - ws.vs{1,j}.cp_curr) > CP_halfTrack ) ) || ...
-                    (ws.vs{i}.cp_curr == ws.vs{1,j}.cp_curr) )
-               ws.obstacleTable(i,j) = 1;
+        % Determine relative positions of racing vehicles corresponding to
+        % current checkpoints and current laps
+        for i = 1:length(cfg.scn.vs)
+            ws.vs{i}.pos = 1;
+            for j = 1:length(cfg.scn.vs)
+                if (ws.vs{i}.cp_curr < ws.vs{1,j}.cp_curr) && ...
+                        (ws.vs{i}.lap_count == ws.vs{1,j}.lap_count) || ...
+                        (ws.vs{i}.lap_count < ws.vs{1,j}.lap_count)
+                    ws.vs{i}.pos = ws.vs{i}.pos + 1;
+                end
+            end
+        end
+
+        %% Determine obstacle relationship
+        % Set obstacle-matrix entry to 1 if vehicle of row has to respect
+        % vehicle in column as an obstacle, depending on the relativ
+        % positioning on the race track.
+        CP_halfTrack = length(cfg.scn.track)/2; % get checkpoint index at half of the track
+        for i = 1:length(cfg.scn.vs) % ego vehicle
+            for j = 1:length(cfg.scn.vs) % opposing vehicles
+                if (i ~= j) && (...
+                        ( (ws.vs{i}.cp_curr < ws.vs{1,j}.cp_curr) && ...
+                        ( (ws.vs{1,j}.cp_curr - ws.vs{i}.cp_curr) < CP_halfTrack ) ) || ...
+                        ( (ws.vs{i}.cp_curr >= ws.vs{1,j}.cp_curr) && ...
+                        ( (ws.vs{i}.cp_curr - ws.vs{1,j}.cp_curr) > CP_halfTrack ) ) || ...
+                        (ws.vs{i}.cp_curr == ws.vs{1,j}.cp_curr) )
+                   ws.obstacleTable(i,j) = 1;
+                else
+                   ws.obstacleTable(i,j) = 0;
+                end
+            end
+        end
+
+        %% Determine Defending Relationship -> Blocking
+        for i = 1:length(cfg.scn.vs) % ego vehicle
+            for j = 1:length(cfg.scn.vs) % opposing vehicles
+               if (i ~= j) && ...
+                       ( norm(ws.vs{i}.x0(3:4)) < norm(ws.vs{1,j}.x0(3:4)) ) && ...
+                       ( ws.obstacleTable(i,j) == 0 ) && ...
+                       ( ( norm(ws.vs{i}.x0(1:2) - ws.vs{1,j}.x(1:2,1)) <= 0.1 ) )%|| ...
+    %                    ( norm(ws.vs{i}.x0(1:2) - ws.vs{j}.x(1:2, 2)) <= 0.3 ) || ...
+    %                    ( norm(ws.vs{i}.x0(1:2) - ws.vs{j}.x(1:2, 3)) <= 0.3 ) )
+                   ws.blockingTable(i,j) = 1;
+               else
+                   ws.blockingTable(i,j) = 0;
+               end
+            end
+        end        
+
+        %% Controller
+        for i = 1:length(cfg.scn.vs)
+            % evaluate controller & save output of current vehicle to output-struct for all vehicles
+            ws.vs{i}.controller_output = cfg.scn.vs{i}.p.controller(cfg, ws, i);
+
+            % Write controller output (output-struct) for each vehicle to
+            % (trajectory-struct)
+            ws.vs{i}.x = ws.vs{i}.controller_output.x_final;
+            ws.vs{i}.u = ws.vs{i}.controller_output.u_final;
+        end
+
+        %% Log
+        % saving ws for vehicles seperately for easier access
+        log.lap{end + 1} = rmfield(ws, 'vs');
+
+        for i = 1:length(cfg.scn.vs)
+            log.vehicles{i}(end + 1) = ws.vs{i};
+        end
+
+        %% Visualization
+        % Visualization plots x0 (current state) of last time step and
+        % predictions of Hp states x calculated in the current time step.
+        % In other words - the visualization takes place before the
+        % simulation/application of the control inputs.
+        if cfg.plot.is_enabled
+            for i = 1:length(cfg.plot.plots_to_draw)
+                cfg.plot.plots_to_draw{i}.plot(cfg.scn, ws);
+            end
+            drawnow
+        end
+
+        %% Simulation: calc input response / next state
+        for i = 1:length(cfg.scn.vs)        
+            % TODO unify linear with non-linear models
+            % if linear model
+            if cfg.scn.vs{i}.isModelSimulationLinear
+                % calc next timestep's state
+                % equals to controller output `ws.vs{i}.x0 = ws.vs{i}.controller_output.x(:,1)`;
+                ws.vs{i}.x0 = ws.vs{i}.x0 + cfg.scn.vs{i}.model_simulation.ode(ws.vs{i}.x0, ws.vs{i}.u(:,1));
             else
-               ws.obstacleTable(i,j) = 0;
+                ws.vs{i}.x0 = simulate_ode(ws.vs{i}, cfg.scn.vs{i});
             end
         end
-    end
 
-    %% Determine Defending Relationship -> Blocking
-    for i = 1:length(cfg.scn.vs) % ego vehicle
-        for j = 1:length(cfg.scn.vs) % opposing vehicles
-           if (i ~= j) && ...
-                   ( norm(ws.vs{i}.x0(3:4)) < norm(ws.vs{1,j}.x0(3:4)) ) && ...
-                   ( ws.obstacleTable(i,j) == 0 ) && ...
-                   ( ( norm(ws.vs{i}.x0(1:2) - ws.vs{1,j}.x(1:2,1)) <= 0.1 ) )%|| ...
-%                    ( norm(ws.vs{i}.x0(1:2) - ws.vs{j}.x(1:2, 2)) <= 0.3 ) || ...
-%                    ( norm(ws.vs{i}.x0(1:2) - ws.vs{j}.x(1:2, 3)) <= 0.3 ) )
-               ws.blockingTable(i,j) = 1;
-           else
-               ws.blockingTable(i,j) = 0;
-           end
+        %% Execution control
+        % Check if race finished
+        for i = 1:length(cfg.scn.vs)
+            if ws.vs{i}.lap_count >= cfg.race.n_laps
+                ctl_race_ongoing = false;
+            end
         end
-    end        
 
-    %% Controller
-    for i = 1:length(cfg.scn.vs)
-        % evaluate controller & save output of current vehicle to output-struct for all vehicles
-        ws.vs{i}.controller_output = cfg.scn.vs{i}.p.controller(cfg, ws, i);
-        
-        % Write controller output (output-struct) for each vehicle to
-        % (trajectory-struct)
-        ws.vs{i}.x = ws.vs{i}.controller_output.x_final;
-        ws.vs{i}.u = ws.vs{i}.controller_output.u_final;
-    end
-
-    %% Log
-    % saving ws for vehicles seperately for easier access
-    log.lap{end + 1} = rmfield(ws, 'vs');
-    
-    for i = 1:length(cfg.scn.vs)
-        log.vehicles{i}(end + 1) = ws.vs{i};
-    end
-
-    %% Visualization
-    % Visualization plots x0 (current state) of last time step and
-    % predictions of Hp states x calculated in the current time step.
-    % In other words - the visualization takes place before the
-    % simulation/application of the control inputs.
-    if cfg.plot.is_enabled
-        for i = 1:length(cfg.plot.plots_to_draw)
-            cfg.plot.plots_to_draw{i}.plot(cfg.scn, ws);
+        % enact user inputs
+        if ctl_pause; disp('Pause...'); end
+        while true % pseudo do..while loop
+            if ctl_abort % ..stop race
+                disp('Aborted');
+                ctl_race_ongoing = false;
+                break;
+            end
+            if ~ctl_pause; break; end
+            pause(0.1)
         end
-        drawnow
+        fprintf('Loop time %4.0fms\n', toc(timer_loop) * 1000)
     end
-
-    %% Simulation: calc input response / next state
-    for i = 1:length(cfg.scn.vs)        
-        % TODO unify linear with non-linear models
-        % if linear model
-        if cfg.scn.vs{i}.isModelSimulationLinear
-            % calc next timestep's state
-            % equals to controller output `ws.vs{i}.x0 = ws.vs{i}.controller_output.x(:,1)`;
-            ws.vs{i}.x0 = ws.vs{i}.x0 + cfg.scn.vs{i}.model_simulation.ode(ws.vs{i}.x0, ws.vs{i}.u(:,1));
-        else
-            ws.vs{i}.x0 = simulate_ode(ws.vs{i}, cfg.scn.vs{i});
-        end
-    end
-    
-    %% Execution control
-    % Check if race finished
-    for i = 1:length(cfg.scn.vs)
-        if ws.vs{i}.lap_count >= cfg.race.n_laps
-            ctl_race_ongoing = false;
-        end
-    end
-    
-    % enact user inputs
-    if ctl_pause; disp('Pause...'); end
-    while true % pseudo do..while loop
-        if ctl_abort % ..stop race
-            disp('Aborted');
-            ctl_race_ongoing = false;
-            break;
-        end
-        if ~ctl_pause; break; end
-        pause(0.1)
-    end
-    fprintf('Loop time %4.0fms\n', toc(timer_loop) * 1000)
+catch ME
+    warning('#- Error in race loop -#')
 end
-disp('#- Ending race loop -#')
+disp('#-  Ending race loop  -#')
 disp('########################')
 fprintf('Overall loop time %.2fs\n', toc(timer_overall))
 
@@ -201,6 +205,12 @@ disp('Saving workspace')
 % remove figure handles, so they won't get saved
 cfg.plot.plots_to_draw = NaN;
 save([cfg.outputPath '/log.mat'])
+
+% if error occured in race loop
+if ~isempty(ME)
+    warning('Error in race loop ocurred, rethrowing:')
+    rethrow(ME)
+end
 end
 
 
