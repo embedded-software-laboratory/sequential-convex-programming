@@ -32,8 +32,18 @@ for i = 1:vehicle_p.iterations
         track_polygon_indices(k) = argmin_signed_distance;
     end
     
-    % Formulate and solve the restricted trajectory optimization problem.
-    [x, u, optimization_log] = controller.SCR.QP_restriction(cfg, x0, x, u, track_polygon_indices, i_vehicle);
+    
+    %% Formulate QP
+    [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
+        controller.SCR.createQP(cfg, x0, x, u, track_polygon_indices, i, i_vehicle, ws);
+    
+    %% Solve QP
+    % update states x and inputs u with optimized results
+    [x, u, optimization_log] = controller.solveQP(...
+        cfg, cfg.scn.vs{i_vehicle}.p,...
+        n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper);
     
     iterations{1, i}.x_opt = x;
     iterations{1, i}.u_opt = u;

@@ -1,5 +1,7 @@
-function [x, U, optimization_log] = QP_restriction(cfg, x0, x, u, track_polygon_indices, i_vehicle)
-% QP Create and solve convexified, restricted problem
+function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
+    A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
+    createQP(cfg, x0, x, u, track_polygon_indices, ~, i_vehicle, ~)
+% QP formulation:  Create and solve convexified, restricted problem
 
 p = cfg.scn.vs{i_vehicle}.p;
 model = cfg.scn.vs{i_vehicle}.model;
@@ -168,9 +170,4 @@ else
     bound_lower(idx_x(end,4)) = -0.01;
     bound_lower(idx_x(end,6)) = -0.02;
 end
-
-%% Solve QP
-[x, U, optimization_log] = controller.QP_solver(...
-    cfg, p, n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
-    A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper);
 end

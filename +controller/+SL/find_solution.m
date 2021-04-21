@@ -26,13 +26,21 @@ for i = 1:vehicle_p.iterations
     % of the euclidian-distance-closest track checkpoint
     checkpoint_indices = utils.find_closest_track_checkpoint_index(...
         x(cfg.scn.vs{i_vehicle}.model.ipos, :), checkpoints, vehicle_p.Hp);
-    %checkpoint_indices = controller.find_closest_track_checkpoint_index(vehicle_p.Hp, x, checkpoints);
-    %all(checkpoint_indices_1 == checkpoint_indices)
     
-    % Formulate and solve the linearized trajectory optimization problem.
+    %% Formulate QP
+    [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
+        controller.SL.createQP(cfg, x0, x, u, checkpoint_indices, i, i_vehicle, ws);
+    
+    %% Solve QP
     % update states x and inputs u with optimized results
-    [x, u, optimization_log] = controller.SL.QP_approximation(cfg, x0, x, u, checkpoint_indices, i, i_vehicle, ws);
+    [x, u, optimization_log] = controller.solveQP(...
+        cfg, cfg.scn.vs{i_vehicle}.p,...
+        n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper);
 
+    
+    
     iterations{1,i}.x_opt = x;
     iterations{1,i}.u_opt = u;
     iterations{1,i}.optimization_log = optimization_log;

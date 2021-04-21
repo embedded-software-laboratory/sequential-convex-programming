@@ -1,5 +1,7 @@
-function [x_new, u_new, optimization_log] = QP_approximation(cfg, x0, x, u, checkpoint_indices,iter,i_vehicle,ws)
-% QP Create and solve convexified problem
+function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
+    A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
+    createQP(cfg, x0, x, u, checkpoint_indices,iter,i_vehicle,ws)
+% QP formulation: create and solve convexified problem
 import controller.SL.acceleration_constraint_tangent
 
 % Assign for better readability/access
@@ -332,9 +334,4 @@ else
     bound_lower(idx_x(end,4)) = -0.01;
     bound_lower(idx_x(end,6)) = -0.02;
 end
-        
-%% Solve QP
-[x_new, u_new, optimization_log] = controller.QP_solver(...
-    cfg, p, n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
-	A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper);
 end
