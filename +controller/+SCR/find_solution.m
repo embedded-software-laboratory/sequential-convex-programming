@@ -1,8 +1,11 @@
-function controller_output = find_solution(cfg, ws, i_vehicle) 
-% was x0, controller_output_previous)
+function controller_output = find_solution(cfg, ws, i_vehicle)
+% OPTIMIZER Optimize convexified solution using QP
+% This script prepares all information for the problem formulation and
+% solving.
+
+timer = tic;
 
 vehicle_p = cfg.scn.vs{i_vehicle}.p;
-
 
 x0 = ws.vs{i_vehicle}.x0; % 1 stage: current x(0)
 
@@ -10,28 +13,14 @@ x0 = ws.vs{i_vehicle}.x0; % 1 stage: current x(0)
 x = ws.vs{i_vehicle}.x; % Hp stages: x(2), x(3), ... x(Hp-1), x(Hp), x(Hp)
 u = ws.vs{i_vehicle}.u; % Hp stages: u(1), u(2), ... x(Hp-1), x(Hp)
 
-timer = tic;
 
+%% Optimization Iterations
 for i = 1:vehicle_p.iterations
-    % For each trajectory point, find the closest track polygon.
-    track_polygon_indices = nan(vehicle_p.Hp, 1);
-	
-    for k = 1:vehicle_p.Hp
-        position = x(cfg.scn.vs{i_vehicle}.model.ipos, k);
-    
-        min_signed_distance = 1e300;
-        argmin_signed_distance = 0;
-            
-        for j = length(cfg.scn.track_polygons):-1:1
-            signed_distance = max(cfg.scn.track_polygons(j).A * position - cfg.scn.track_polygons(j).b);
-            if min_signed_distance > signed_distance
-                min_signed_distance = signed_distance;
-                argmin_signed_distance = j;
-            end
-        end
-        track_polygon_indices(k) = argmin_signed_distance;
-    end
-    
+ 
+    % For each point of the projected trajectory, find the index
+    % of the track polygon index
+    track_polygon_indices = utils.find_closest_track_polygon_index(...
+        x(cfg.scn.vs{i_vehicle}.model.ipos, :), cfg.scn.track_polygons, vehicle_p.Hp);						   
     
     %% Formulate QP
     [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
@@ -49,6 +38,11 @@ for i = 1:vehicle_p.iterations
     iterations{1, i}.u_opt = u;
     iterations{1, i}.optimization_log = optimization_log;
     iterations{1, i}.track_polygon_indices = track_polygon_indices;
+end
+
+%% Output preparation 
+if optimization_log.slack > 0.1
+    warning('Lateral deviation unavoidable');
 end
 
 % print status
