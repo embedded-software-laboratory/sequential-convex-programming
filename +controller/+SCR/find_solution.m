@@ -20,12 +20,19 @@ for i = 1:vehicle_p.iterations
     % For each point of the projected trajectory, find the index
     % of the track polygon index
     track_polygon_indices = utils.find_closest_track_polygon_index(...
-        x(cfg.scn.vs{i_vehicle}.model.ipos, :), cfg.scn.track_polygons, vehicle_p.Hp);						   
+        x(cfg.scn.vs{i_vehicle}.model.ipos, :), cfg.scn.track_polygons, vehicle_p.Hp);
+    
+    % FIXME this shouldn't be necessary for SCR. It's only added for quick
+    % adding vehicle obstacles & blocking
+    % For each point of the projected trajectory, find the index
+    % of the euclidian-distance-closest track checkpoint
+    checkpoint_indices = utils.find_closest_track_checkpoint_index(...
+        x(cfg.scn.vs{i_vehicle}.model.ipos, :), cfg.scn.track, vehicle_p.Hp);
     
     %% Formulate QP
     [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
         A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
-        controller.SCR.createQP(cfg, x0, x, u, track_polygon_indices, i, i_vehicle, ws);
+        controller.SCR.createQP(cfg, x0, x, u, checkpoint_indices, track_polygon_indices, i, i_vehicle, ws);
     
     %% Solve QP
     % update states x and inputs u with optimized results

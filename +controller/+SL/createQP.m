@@ -1,6 +1,6 @@
 function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
-    createQP(cfg, x0, x, u, checkpoint_indices,iter,i_vehicle,ws)
+    createQP(cfg, x0, x, u, checkpoint_indices, iter, i_vehicle, ws)
 % QP formulation: create and solve convexified problem
 import controller.SL.acceleration_constraint_tangent
 
@@ -226,7 +226,6 @@ for k = 1:p.Hp
             end
         end
     end
-
 end
 
 assert(n_rows == n_ineq);

@@ -4,7 +4,7 @@ function cfg_vehicle = config_vehicle(model, controller)
 % loading default controller if no is provided
 if ~exist('controller', 'var')
     disp('Using default controller as no provided as argument')
-    controller = @controller.SL.find_solution; % 'SL' or 'SCR'
+    controller = @controller.SCR.find_solution; % 'SL' or 'SCR'
 end
 
 cfg_vehicle = struct;
@@ -12,8 +12,8 @@ cfg_vehicle = struct;
 %% General
 cfg_vehicle.p.controller = controller;
 cfg_vehicle.p.iterations = 2;
-cfg_vehicle.p.isBlockingEnabled = false;
-cfg_vehicle.p.areObstaclesConsidered = false;
+cfg_vehicle.p.isBlockingEnabled = true;
+cfg_vehicle.p.areObstaclesConsidered = true;
 
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
@@ -49,8 +49,8 @@ cfg_vehicle.p.idx_motor_torque = 2;     % input motor torque
 
 % TODO if SCR
 if isequal(cfg_vehicle.p.controller, @controller.SCR.find_solution)
-    cfg_vehicle.p.dt = 0.5; % Size of prediction step
-    cfg_vehicle.p.Hp = 20; % Number of prediction steps
+    cfg_vehicle.p.dt = 0.05; %0.5; % Size of prediction step
+    cfg_vehicle.p.Hp = 50; % Number of prediction steps
 end
 
 cfg_vehicle.p.S = 1e5; % Penalty weight for slack (was 1e30 for usage in quad objective with BotzBicycle)

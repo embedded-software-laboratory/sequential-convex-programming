@@ -14,12 +14,12 @@ cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImp
 
 %% Track
 % e.g. `track.Hockenheim4()`, `track.hockenheim_simple()`
-cfg.scn.track = track.Hockenheim4(); 
+cfg.scn.track = track.hockenheim_simple(); 
 % TODO SCR only works with hockenheim_simple?
 
 %% Vehicles
 % vehicle_ 1
-vehicle_ = config_vehicle(@vehicle.BicycleBotz);
+vehicle_ = config_vehicle(@vehicle.Linear);
 % TODO: automate switching number of states depending on model / model nx
 % CAVE all states of model must be contained in the first states of simulation model (in same order)
 % TODO check above
@@ -31,15 +31,16 @@ end
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle_ 2
-% vehicle_ = config_vehicle(@vehicle.BicycleBotz);
-% % TODO couple with used vehicle_ model nx
-% if vehicle_.isModelLinear
-%     vehicle_.xStart = [0 -0.05 0.1 0 ];
-% else
-%     vehicle_.xStart = [0 -0.05 0.1 0 0 0];
-% end
-% vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity
-% cfg.scn.vs{end + 1} = vehicle_;
+vehicle_ = config_vehicle(@vehicle.Linear);
+% TODO couple with used vehicle_ model nx
+if vehicle_.isModelLinear
+    vehicle_.xStart = [0 -0.05 0.1 0 ];
+else
+    vehicle_.xStart = [0 -0.05 0.1 0 0 0];
+end
+vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
+vehicle_.p.a_max = 17; % decrease accel for SCR
+cfg.scn.vs{end + 1} = vehicle_;
 
 % % vehicle_ 3
 % vehicle_ = config_vehicle_();
