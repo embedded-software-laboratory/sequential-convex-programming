@@ -18,7 +18,12 @@ u = ws.vs{i_vehicle}.u; % Hp stages: u(1), u(2), ... x(Hp-1), x(Hp)
 for i = 1:vehicle_p.iterations
     if ~cfg.scn.vs{i_vehicle}.isModelLinear
         if i ~= 1 % if not first iteration
-            u = [u(:,1) u(:,1:end-1)]; % forward u? why? TODO (duplicated with run_simulation?)
+            % resubstitute input u from last time-step, delay optimal
+            % inputs - required, as numerical discretization for non-linear
+            % bicycle models requires u_{k+1} for x_{k+1}
+            % FIXME why? (duplicated with main "run" loop?)
+            % FIXME should ber synced with SCR, too
+            u = [ws.vs{i_vehicle}.u(:,1) u(:,1:end-1)];
         end
     end
 

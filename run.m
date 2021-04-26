@@ -50,13 +50,17 @@ try
         step_sim = step_sim + 1;
         timer_loop = tic;
 
-        % Advance predicted state trajectories by one time step
-        % TODO why u? Wasn't used by SCR (and SL?)
+        %% Advance predicted state trajectories by one time step
+        % keeping last state entry (stand still -> duplicated)
+        % & last input entry to 0s
+        % due to terminal constraints
         for i = 1:length(cfg.scn.vs)
-            ws.vs{i}.x(:,1:end-1) = ws.vs{i}.x(:,2:end);
-    %       ws.vs{i}.u(:,1:end-1) = ws.vs{i}.u(:,2:end);
-    %       ws.vs{i}.u(:,end) = [0 ; 0]; % trajectory prediction shift leads to stand still for last two predicted trajectory points, only possible if last input is zero
-            ws.vs{i}.u(:,1:end) = ws.vs{i}.u(:,1:end); % no shift of inputs as u1 input is needed for linearization together with x0
+            ws.vs{i}.x(:, 1:end-1) = ws.vs{i}.x(:, 2:end);
+            
+            %FIXME 
+%             ws.vs{i}.u(:, 1:end-1) = ws.vs{i}.u(:, 2:end);
+%             ws.vs{i}.u(:, end)     = [0; 0];
+            ws.vs{i}.u(:, 1:end)   = ws.vs{i}.u(:, 1:end); % no shift of inputs as u1 input is needed for linearization together with x0
         end
 
         %% Current CP, position and lap
