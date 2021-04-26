@@ -1,17 +1,19 @@
-function [x_new, u_new, optimization_log] = QP_approximation(cfg, x0, x, u, checkpoint_indices,iter,i_vehicle,ws)
-% QP Create and solve convexified problem
-import controller.SL.acceleration_constraint_tangent
+function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
+    A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
+    createQP(cfg, x0, x, u, checkpoint_indices, track_polygon_indices, iter, i_vehicle, ws)
+% QP formulation: create and solve convexified, restricted problem
 
 % Assign for better readability/access
 checkpoints = cfg.scn.track;
+track_polygons = cfg.scn.track_polygons;
 p = cfg.scn.vs{i_vehicle}.p;
 model = cfg.scn.vs{i_vehicle}.model;
 % TODO unify
 isLinear = cfg.scn.vs{i_vehicle}.isModelLinear;
 
-% Verification if indices-matrix has only one row and Hp columns
-assert(size(checkpoint_indices, 1) == 1);
-assert(size(checkpoint_indices, 2) == p.Hp);
+% Verification if indices-matrix has only one column and Hp rows
+assert(size(track_polygon_indices, 1) == p.Hp);
+assert(size(track_polygon_indices, 2) == 1);
 
 %% Index mapping
 idx        = reshape((1:model.ns * p.Hp), model.ns, p.Hp)';
@@ -26,7 +28,12 @@ n_eqns = model.nx * p.Hp; % number of equations: state equations * prediction st
 if isLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
 % if ~isLinear; n_eqns = n_eqns + 3; end % terminating conditions (v_x, v_y, dt/dyaw)
 
-n_ineq = 2 * p.Hp; % 2 track constraints at every time step
+n_ineq = 0;
+
+% n-polygon-dependent track constraints at every time step
+for k = 1:p.Hp
+    n_ineq = n_ineq + length(track_polygons(track_polygon_indices(k)).b);
+end
 if isLinear
     n_ineq = n_ineq + p.n_acceleration_limits * p.Hp; % acceleration bounds at every time step
 end
@@ -35,7 +42,7 @@ if p.areObstaclesConsidered
     if ~((sum(ws.obstacleTable(i_vehicle,:)) == 0) || ((sum(ws.obstacleTable(i_vehicle,:)) ~= 0) && (iter == 1)))
         n_ineq = n_ineq + sum(ws.obstacleTable(i_vehicle,:)) * p.Hp;  % relevant obstacle constraints at every time step
     end
-end
+end	
 
 objective_lin   = zeros(n_vars, 1);
 objective_quad  = zeros(n_vars, n_vars);
@@ -91,25 +98,20 @@ for k = 1:p.Hp
     %% Track limits
 	% assign current checkpoint for better readability
     checkpoint_c = checkpoints(checkpoint_indices(k));
-
-    % left side (27)
-    n_rows = n_rows(end) + 1;
+    track_polygon = track_polygons(track_polygon_indices(k));
+    n_rows = n_rows(end) + (1:length(track_polygon.b));
     A_ineq(n_rows, idx_slack) = -1;
-    A_ineq(n_rows, idx_pos(k,:)) = checkpoint_c.normal_vector';
-    b_ineq(n_rows) = checkpoint_c.normal_vector' * checkpoint_c.left;
-    % right side (28)
-    n_rows = n_rows(end) + 1;
-    A_ineq(n_rows, idx_slack) = -1;
-    A_ineq(n_rows, idx_pos(k,:)) = -checkpoint_c.normal_vector';
-    b_ineq(n_rows) = -checkpoint_c.normal_vector' * checkpoint_c.right;
+    A_ineq(n_rows, idx_pos(k,:)) = track_polygon.A;
 	
+    b_ineq(n_rows) = track_polygon.b;
+    
     if isLinear
         %% Acceleration limits    
         for i = 1:p.n_acceleration_limits
            n_rows = n_rows(end) + (1);
-           [Au_acc, b_acc] = controller.SL.acceleration_constraint_tangent(p, i, x(:, k));
-           A_ineq(n_rows, idx_u(k,:)) = Au_acc;
-           b_ineq(n_rows) = b_acc;
+           % simple circle, linearized
+           A_ineq(n_rows, idx_u(k,:)) = [cos(2*pi*i/p.n_acceleration_limits) sin(2*pi*i/p.n_acceleration_limits)];
+           b_ineq(n_rows) = p.a_max;
         end
     end
 
@@ -224,14 +226,13 @@ for k = 1:p.Hp
             end
         end
     end
-
 end
 
 assert(n_rows == n_ineq);
 
 %% Objective
 % Maximize position along track
-objective_lin(idx_pos(p.Hp,:)) = -p.Q * checkpoints(checkpoint_indices(p.Hp)).forward_vector;
+objective_lin(idx_pos(p.Hp,:)) = -p.Q * track_polygons(track_polygon_indices(p.Hp)).forward_direction;
 
 % Minimize control change over time (36)
 objective_quad(idx_u(1,:), idx_u(1,:)) = p.R;
@@ -287,15 +288,8 @@ bound_lower(idx_slack) = 0;
 
 if isLinear
     % Bounded acceleration
-    a_max = max([p.a_backward_max_list p.a_forward_max_list p.a_lateral_max_list]);
-
-    bound_upper(idx_u(:)) =  a_max;
-    bound_lower(idx_u(:)) = -a_max;
-
-    % Trust region for change in position
-    % Bounded states (trust region for change in position) - kinetic
-    bound_upper(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) + p.trust_region)'; % TODO was x_previous
-    bound_lower(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) - p.trust_region)'; % TODO was x_previous
+    bound_upper(idx_u(:)) =  p.a_max;
+    bound_lower(idx_u(:)) = -p.a_max;
 else
     % Bounded inputs
     % all time
@@ -332,9 +326,4 @@ else
     bound_lower(idx_x(end,4)) = -0.01;
     bound_lower(idx_x(end,6)) = -0.02;
 end
-        
-%% Solve QP
-[x_new, u_new, optimization_log] = controller.QP_solver(...
-    cfg, p, n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
-	A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper);
 end

@@ -104,7 +104,7 @@ classdef BaseOde < vehicle.Base
             %     mdaff = c2d(maff,dt);
             %     Ed = mdaff.b;
 
-                % (3) Symbolic Toolbox
+            % (3) Symbolic Toolbox
             %     dt = model.p.dt;
             %     M = dt*[Ac Bc; zeros(size(Ac,2)+size(Bc,2)-size(Ac,1),size(Ac,2)+size(Bc,2))];
             %     tmp = expm(M);

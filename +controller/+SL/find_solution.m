@@ -1,14 +1,14 @@
 function controller_output = find_solution(cfg, ws, i_vehicle)
 % OPTIMIZER Optimize convexified solution using QP
 % This script prepares all information for the problem formulation and
-% solving in the SL_QP-script.
+% solving.
 
 timer = tic;
 
 vehicle_p = cfg.scn.vs{i_vehicle}.p;
-checkpoints = cfg.scn.track;
 
 x0 = ws.vs{i_vehicle}.x0; % 1 stage: current x(0)
+
 % use states x and inputs u from last timestep
 x = ws.vs{i_vehicle}.x; % Hp stages: x(2), x(3), ... x(Hp-1), x(Hp), x(Hp)
 u = ws.vs{i_vehicle}.u; % Hp stages: u(1), u(2), ... x(Hp-1), x(Hp)
@@ -18,28 +18,39 @@ u = ws.vs{i_vehicle}.u; % Hp stages: u(1), u(2), ... x(Hp-1), x(Hp)
 for i = 1:vehicle_p.iterations
     if ~cfg.scn.vs{i_vehicle}.isModelLinear
         if i ~= 1 % if not first iteration
-            u = [u(:,1) u(:,1:end-1)]; % forward u? why? TODO (duplicated with run_simulation?)
+            % resubstitute input u from last time-step, delay optimal
+            % inputs - required, as numerical discretization for non-linear
+            % bicycle models requires u_{k+1} for x_{k+1}
+            % FIXME why? (duplicated with main "run" loop?)
+            % FIXME should ber synced with SCR, too
+            u = [ws.vs{i_vehicle}.u(:,1) u(:,1:end-1)];
         end
     end
 
     % For each point of the projected trajectory, find the index
     % of the euclidian-distance-closest track checkpoint
     checkpoint_indices = utils.find_closest_track_checkpoint_index(...
-        x(cfg.scn.vs{i_vehicle}.model.ipos, :), checkpoints, vehicle_p.Hp);
-    %checkpoint_indices = controller.find_closest_track_checkpoint_index(vehicle_p.Hp, x, checkpoints);
-    %all(checkpoint_indices_1 == checkpoint_indices)
+        x(cfg.scn.vs{i_vehicle}.model.ipos, :), cfg.scn.track, vehicle_p.Hp);
     
-    % Formulate and solve the linearized trajectory optimization problem.
+    %% Formulate QP
+    [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
+        controller.SL.createQP(cfg, x0, x, u, checkpoint_indices, i, i_vehicle, ws);
+    
+    %% Solve QP
     % update states x and inputs u with optimized results
-    [x, u, optimization_log] = controller.SL.QP_approximation(cfg, x0, x, u, checkpoint_indices, i, i_vehicle, ws);
-
-    iterations{1,i}.x_opt = x;
-    iterations{1,i}.u_opt = u;
-    iterations{1,i}.optimization_log = optimization_log;
-    iterations{1,i}.checkpoint_indices = checkpoint_indices;
+    [x, u, optimization_log] = controller.solveQP(...
+        cfg, cfg.scn.vs{i_vehicle}.p,...
+        n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper);
+    
+    iterations{1, i}.x_opt = x;
+    iterations{1, i}.u_opt = u;
+    iterations{1, i}.optimization_log = optimization_log;
+    iterations{1, i}.checkpoint_indices = checkpoint_indices;
 end
 
-%% Output preparation
+%% Output preparation 
 if optimization_log.slack > 0.1
     warning('Lateral deviation unavoidable');
 end
