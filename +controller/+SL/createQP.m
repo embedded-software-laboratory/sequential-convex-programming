@@ -28,7 +28,10 @@ n_eqns = model.nx * p.Hp; % number of equations: state equations * prediction st
 if isLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
 % if ~isLinear; n_eqns = n_eqns + 3; end % terminating conditions (v_x, v_y, dt/dyaw)
 
-n_ineq = 2 * p.Hp; % 2 track constraints at every time step
+n_ineq = 0;
+
+% 2 track constraints at every time step
+n_ineq = n_ineq + 2 * p.Hp;
 if isLinear
     n_ineq = n_ineq + p.n_acceleration_limits * p.Hp; % acceleration bounds at every time step
 end

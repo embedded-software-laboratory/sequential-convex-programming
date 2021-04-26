@@ -69,7 +69,7 @@ try
             ws.vs{i}.cp_curr = cp_curr;
 
             % new lap: advance lap counter
-            % TODO robust lap detection
+            % FIXME: robust lap detection?
             if (ws.vs{i}.cp_prev ~= ws.vs{i}.cp_curr) && ...
                 (ws.vs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
                 (ws.vs{i}.cp_curr / length(cfg.scn.track) < 1)

@@ -11,6 +11,7 @@ model = cfg.scn.vs{i_vehicle}.model;
 % TODO unify
 isLinear = cfg.scn.vs{i_vehicle}.isModelLinear;
 
+% Verification if indices-matrix has only one column and Hp rows
 assert(size(track_polygon_indices, 1) == p.Hp);
 assert(size(track_polygon_indices, 2) == 1);
 
@@ -28,7 +29,8 @@ if isLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
 % if ~isLinear; n_eqns = n_eqns + 3; end % terminating conditions (v_x, v_y, dt/dyaw)
 
 n_ineq = 0;
-% TODO ease and merge with SL?
+
+% n-polygon-dependent track constraints at every time step
 for k = 1:p.Hp
     n_ineq = n_ineq + length(track_polygons(track_polygon_indices(k)).b);
 end
@@ -103,7 +105,6 @@ for k = 1:p.Hp
 	
     b_ineq(n_rows) = track_polygon.b;
     
-    % TODO 1/x restrict non-linear similar to linear (as we are in SCR)
     if isLinear
         %% Acceleration limits    
         for i = 1:p.n_acceleration_limits
@@ -285,7 +286,6 @@ end
 % Slack Var must be positive
 bound_lower(idx_slack) = 0;
 
-% TODO 1/x restrict non-linear similar to linear (as we are in SCR)
 if isLinear
     % Bounded acceleration
     bound_upper(idx_u(:)) =  p.a_max;

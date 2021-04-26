@@ -4,7 +4,7 @@ function cfg_vehicle = config_vehicle(model, controller)
 % loading default controller if no is provided
 if ~exist('controller', 'var')
     disp('Using default controller as no provided as argument')
-    controller = @controller.SCR.find_solution; % 'SL' or 'SCR'
+    controller = @controller.SL.find_solution; % 'SL' or 'SCR'
 end
 
 cfg_vehicle = struct;
