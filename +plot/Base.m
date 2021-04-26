@@ -14,6 +14,11 @@ classdef Base < handle
             %BASE Construct an instance of this class
             %   Detailed explanation goes here
             obj.figure_handle = figure(figure_handle_number); % create or get existing figure
+            % sometimes (?) helps with performance:
+            %set(figure_handle_number,
+            %    'MenuBar', 'figure',
+            %    'ToolBar', 'figure');
+            
             obj.handles_tmp = {};
             obj.is_background_plotted = false;
             obj.subplot_handles = {};
