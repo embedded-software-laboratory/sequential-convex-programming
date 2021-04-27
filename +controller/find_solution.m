@@ -10,7 +10,7 @@ vh = cfg.scn.vs{i_vehicle};
 x0 = ws.vs{i_vehicle}.x0; % 1 stage: current x(0)
 
 % Decision variables
-% use states x and inputs u from last timestep
+% warm start for solver: use states x and inputs u from last time-step
 X = ws.vs{i_vehicle}.x; % Hp stages: x(2), x(3), ... x(Hp-1), x(Hp), x(Hp)
 U = ws.vs{i_vehicle}.u; % Hp stages: u(1), u(2), ... x(Hp-1), x(Hp)
 

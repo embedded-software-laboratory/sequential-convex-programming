@@ -53,10 +53,10 @@ try
         step_sim = step_sim + 1;
         timer_loop = tic;
 
-        %% Advance predicted state trajectories by one time step
-        % keeping last state entry (stand still -> duplicated)
-        % & last input entry to 0s
-        % due to terminal constraints
+        %% Shift last time-step's solution
+        % advance by one step, with terminal constraints:
+        %   state: keep last state entry (stand still -> duplicated)
+        %   input: last input entry to 0s
         for i = 1:length(cfg.scn.vs)
             ws.vs{i}.x(:, 1:end-1) = ws.vs{i}.x(:, 2:end);
             

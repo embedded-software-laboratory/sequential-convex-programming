@@ -1,7 +1,9 @@
-classdef BicycleBotz < vehicle.BaseOde
+classdef SingleTrack < vehicle.BaseOde
     % input: /delta steering angle, /tau torque rear wheels
+    % as defined in Networked Model Predictive Vehicle Race Control, 2019,
+    % Kloock et al.
     methods
-        function obj = BicycleBotz(p)
+        function obj = SingleTrack(p)
             obj@vehicle.BaseOde(p, 6, 2) % call superclass constructor
         end
         
