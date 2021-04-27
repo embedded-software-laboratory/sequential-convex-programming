@@ -1,19 +1,18 @@
 % Default config for a single vehicle
 
-function cfg_vehicle = config_vehicle(model, controller)
-% loading default controller if no is provided
-if ~exist('controller', 'var')
-    disp('Using default controller as no provided as argument')
-    controller = @controller.SL.find_solution; % 'SL' or 'SCR'
-end
-
+function cfg_vehicle = config_vehicle(model)
 cfg_vehicle = struct;
 
 %% General
-cfg_vehicle.p.controller = controller;
 cfg_vehicle.p.iterations = 2;
 cfg_vehicle.p.isBlockingEnabled = true;
 cfg_vehicle.p.areObstaclesConsidered = true;
+
+% arbitrary IDs, saved for later usage
+SL = 10; SCR = 20;
+cfg_vehicle.approximationSL = SL; cfg_vehicle.approximationSCR = SCR;
+% choose approximation
+cfg_vehicle.approximation = SCR; % 'SL' or 'SCR'
 
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
@@ -36,22 +35,12 @@ cfg_vehicle.distSafe2CenterVal = cfg_vehicle.distSafe2CenterVal_1;
 
 %% Common Parameters
 cfg_vehicle.p.Hp = 50; % Number of prediction steps
+cfg_vehicle.p.dt = 0.05; % Size of prediction step
 
-if cfg_vehicle.isModelLinear
-    cfg_vehicle.p.dt = 0.1; % Size of prediction step
-else
-    cfg_vehicle.p.dt = 0.05; % Size of prediction step
-end
 
 % %% paramsV2 MPC properties
 cfg_vehicle.p.idx_steering_angle = 1;   % input steering angle (delta)
 cfg_vehicle.p.idx_motor_torque = 2;     % input motor torque
-
-% TODO if SCR
-if isequal(cfg_vehicle.p.controller, @controller.SCR.find_solution)
-    cfg_vehicle.p.dt = 0.05; %0.5; % Size of prediction step
-    cfg_vehicle.p.Hp = 50; % Number of prediction steps
-end
 
 cfg_vehicle.p.S = 1e5; % Penalty weight for slack (was 1e30 for usage in quad objective with BotzBicycle)
 cfg_vehicle.p.Q = 1; % Penalty weight for maximization of position on track
@@ -87,8 +76,8 @@ cfg_vehicle.p.tireModel_Br = 4.1165;
 % %% SL Parameters
 % % if strcmp(cfg.controller.name, 'SL')
     cfg_vehicle.p.trust_region = 3;
-% 
-%     % Acceleration parameters
+
+    % Acceleration parameters
     cfg_vehicle.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
     % Empirically determined maximum accelerations in the forwards, backwards
     % and lateral directions, for varying speeds.
@@ -98,7 +87,7 @@ cfg_vehicle.p.tireModel_Br = 4.1165;
     cfg_vehicle.p.v_idx = @(v) min(12001,max(1, round(100*v+1) ));
 % %% SCR Parameters
 % elseif strcmp(cfg.controller.name, 'SCR')
-%     % Acceleration parameters
+    % Acceleration parameters
     cfg_vehicle.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
     cfg_vehicle.p.a_max = 22;
 % end

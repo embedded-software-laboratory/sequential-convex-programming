@@ -1,19 +1,29 @@
 function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
     createQP(cfg, x0, x, u, checkpoint_indices, track_polygon_indices, iter, i_vehicle, ws)
-% QP formulation: create and solve convexified, restricted problem
+% QP formulation: create and solve convexified problem
+% track can be represented as SCR or SL
+% SL: Sequential Linearization controller: QP approximated (linearised, thus relaxed) variant
+% SCR: Sequential Convex Restriction controller: QP in a restrictive variant
 
 % Assign for better readability/access
+vh = cfg.scn.vs{i_vehicle};
+p = vh.p;
 checkpoints = cfg.scn.track;
-track_polygons = cfg.scn.track_polygons;
-p = cfg.scn.vs{i_vehicle}.p;
+if vh.approximationIsSCR; track_polygons = cfg.scn.track_polygons; end
 model = cfg.scn.vs{i_vehicle}.model;
 % TODO unify
 isLinear = cfg.scn.vs{i_vehicle}.isModelLinear;
 
-% Verification if indices-matrix has only one column and Hp rows
-assert(size(track_polygon_indices, 1) == p.Hp);
-assert(size(track_polygon_indices, 2) == 1);
+if vh.approximationIsSL
+    % Verification if indices-matrix has only one row and Hp columns
+    assert(size(checkpoint_indices, 1) == 1);
+    assert(size(checkpoint_indices, 2) == p.Hp);
+elseif vh.approximationIsSCR
+    % Verification if indices-matrix has only one column and Hp rows
+    assert(size(track_polygon_indices, 1) == p.Hp);
+    assert(size(track_polygon_indices, 2) == 1);
+end
 
 %% Index mapping
 idx        = reshape((1:model.ns * p.Hp), model.ns, p.Hp)';
@@ -30,10 +40,17 @@ if isLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
 
 n_ineq = 0;
 
-% n-polygon-dependent track constraints at every time step
-for k = 1:p.Hp
-    n_ineq = n_ineq + length(track_polygons(track_polygon_indices(k)).b);
+
+if vh.approximationIsSL
+    % 2 track constraints at every time step 
+    n_ineq = n_ineq + 2 * p.Hp;
+elseif vh.approximationIsSCR
+    % n-polygon-dependent track constraints at every time step
+    for k = 1:p.Hp
+        n_ineq = n_ineq + length(track_polygons(track_polygon_indices(k)).b);
+    end
 end
+
 if isLinear
     n_ineq = n_ineq + p.n_acceleration_limits * p.Hp; % acceleration bounds at every time step
 end
@@ -42,7 +59,7 @@ if p.areObstaclesConsidered
     if ~((sum(ws.obstacleTable(i_vehicle,:)) == 0) || ((sum(ws.obstacleTable(i_vehicle,:)) ~= 0) && (iter == 1)))
         n_ineq = n_ineq + sum(ws.obstacleTable(i_vehicle,:)) * p.Hp;  % relevant obstacle constraints at every time step
     end
-end	
+end
 
 objective_lin   = zeros(n_vars, 1);
 objective_quad  = zeros(n_vars, n_vars);
@@ -96,22 +113,44 @@ isOpponentOvertaken = false;
 n_rows = 0; % for double check against defined problem size above
 for k = 1:p.Hp
     %% Track limits
-	% assign current checkpoint for better readability
+    % assign current checkpoint for better readability
     checkpoint_c = checkpoints(checkpoint_indices(k));
-    track_polygon = track_polygons(track_polygon_indices(k));
-    n_rows = n_rows(end) + (1:length(track_polygon.b));
-    A_ineq(n_rows, idx_slack) = -1;
-    A_ineq(n_rows, idx_pos(k,:)) = track_polygon.A;
-	
-    b_ineq(n_rows) = track_polygon.b;
+    
+    if vh.approximationIsSL
+        % left side (27)
+        n_rows = n_rows(end) + 1;
+        A_ineq(n_rows, idx_slack) = -1;
+        A_ineq(n_rows, idx_pos(k,:)) = checkpoint_c.normal_vector';
+        b_ineq(n_rows) = checkpoint_c.normal_vector' * checkpoint_c.left;
+        % right side (28)
+        n_rows = n_rows(end) + 1;
+        A_ineq(n_rows, idx_slack) = -1;
+        A_ineq(n_rows, idx_pos(k,:)) = -checkpoint_c.normal_vector';
+        b_ineq(n_rows) = -checkpoint_c.normal_vector' * checkpoint_c.right;
+    elseif vh.approximationIsSCR
+        track_polygon = track_polygons(track_polygon_indices(k));
+        n_rows = n_rows(end) + (1:length(track_polygon.b));
+        A_ineq(n_rows, idx_slack) = -1;
+        A_ineq(n_rows, idx_pos(k,:)) = track_polygon.A;
+    
+        b_ineq(n_rows) = track_polygon.b;
+        n_rows = n_rows(end);
+    end
     
     if isLinear
         %% Acceleration limits    
         for i = 1:p.n_acceleration_limits
-           n_rows = n_rows(end) + (1);
-           % simple circle, linearized
-           A_ineq(n_rows, idx_u(k,:)) = [cos(2*pi*i/p.n_acceleration_limits) sin(2*pi*i/p.n_acceleration_limits)];
-           b_ineq(n_rows) = p.a_max;
+            n_rows = n_rows(end) + (1);
+           
+            if vh.approximationIsSL
+                [Au_acc, b_acc] = controller.SL.acceleration_constraint_tangent(p, i, x(:, k));
+                A_ineq(n_rows, idx_u(k,:)) = Au_acc;
+                b_ineq(n_rows) = b_acc;
+            elseif vh.approximationIsSCR
+                % simple circle, linearized
+                A_ineq(n_rows, idx_u(k,:)) = [cos(2*pi*i/p.n_acceleration_limits) sin(2*pi*i/p.n_acceleration_limits)];
+                b_ineq(n_rows) = p.a_max;
+            end
         end
     end
 
@@ -232,7 +271,11 @@ assert(n_rows == n_ineq);
 
 %% Objective
 % Maximize position along track
-objective_lin(idx_pos(p.Hp,:)) = -p.Q * track_polygons(track_polygon_indices(p.Hp)).forward_direction;
+if vh.approximationIsSL
+    objective_lin(idx_pos(p.Hp,:)) = -p.Q * checkpoints(checkpoint_indices(p.Hp)).forward_vector;
+elseif vh.approximationIsSCR
+    objective_lin(idx_pos(p.Hp,:)) = -p.Q * track_polygons(track_polygon_indices(p.Hp)).forward_direction;
+end
 
 % Minimize control change over time (36)
 objective_quad(idx_u(1,:), idx_u(1,:)) = p.R;
@@ -260,8 +303,8 @@ if p.isBlockingEnabled
             T_ego = checkpoint_c.center;
             
             % nearest checkpoint of opp
-            n0_opp = checkpoints(ws.vs{1,1}.currCP).normal_vector;
-            T0_opp = checkpoints(ws.vs{1,1}.currCP).center;
+            n0_opp = checkpoints(ws.vs{1,1}.cp_curr).normal_vector;
+            T0_opp = checkpoints(ws.vs{1,1}.cp_curr).center;
             
             % current position of attacking opponent
             p0_opp = ws.vs{1,1}.x0(1:2);
@@ -288,8 +331,20 @@ bound_lower(idx_slack) = 0;
 
 if isLinear
     % Bounded acceleration
-    bound_upper(idx_u(:)) =  p.a_max;
-    bound_lower(idx_u(:)) = -p.a_max;
+    if vh.approximationIsSL
+        a_max = max([p.a_backward_max_list p.a_forward_max_list p.a_lateral_max_list]);
+
+        bound_upper(idx_u(:)) =  a_max;
+        bound_lower(idx_u(:)) = -a_max;
+
+        % Trust region for change in position
+        % Bounded states (trust region for change in position) - kinetic
+        bound_upper(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) + p.trust_region)';
+        bound_lower(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) - p.trust_region)';
+    elseif vh.approximationIsSCR
+        bound_upper(idx_u(:)) =  p.a_max;
+        bound_lower(idx_u(:)) = -p.a_max;
+    end
 else
     % Bounded inputs
     % all time

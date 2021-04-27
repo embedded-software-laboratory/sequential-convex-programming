@@ -1,6 +1,9 @@
 function run(cfg)
 % Main file to run the scenario with any given configuration
 %
+% debug despite try/catch block: `dbstop if caught error`, disable with
+% `dbclear if error`
+%
 % Used Abbreviations
 %   ws:     abbreviation of working set, the struct which acts as "RAM".
 %           Contains only current status; every step is saved in log
@@ -133,7 +136,7 @@ try
         %% Controller
         for i = 1:length(cfg.scn.vs)
             % evaluate controller & save output of current vehicle to output-struct for all vehicles
-            ws.vs{i}.controller_output = cfg.scn.vs{i}.p.controller(cfg, ws, i);
+            ws.vs{i}.controller_output = controller.find_solution(cfg, ws, i);
 
             % Write controller output (output-struct) for each vehicle to
             % (trajectory-struct)

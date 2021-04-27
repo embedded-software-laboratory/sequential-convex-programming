@@ -31,10 +31,22 @@ for i = 1:length(cfg.scn.vs)
         cfg.scn.vs{i}.model_simulation(cfg.scn.vs{i}.p);
 end
 
+%% Approximation
+for i = 1:length(cfg.scn.vs)
+    cfg.scn.vs{i}.approximationIsSL = ...
+        cfg.scn.vs{i}.approximation == cfg.scn.vs{i}.approximationSL;
+    cfg.scn.vs{i}.approximationIsSCR = ...
+        cfg.scn.vs{i}.approximation == cfg.scn.vs{i}.approximationSCR;
+    
+    if ~cfg.scn.vs{i}.approximationIsSL && ~cfg.scn.vs{i}.approximationIsSCR
+        throw ME('No valid approximation chosen')
+    end
+end
+
 %% Track Polygon Creation (for SCR)
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vs)
-    if isequal(cfg.scn.vs{i}.p.controller, @controller.SCR.find_solution)
+    if cfg.scn.vs{i}.approximationIsSCR
         cfg.scn.track_polygons = controller.SCR.generate_track_polygons.main(cfg.scn.track).polygons;
         break
     end
