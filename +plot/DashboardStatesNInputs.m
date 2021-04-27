@@ -3,7 +3,7 @@ classdef DashboardStatesNInputs < plot.Base
     %   Detailed explanation goes here
     
     methods
-        function plot(obj, scn, ws)
+        function plot(obj, ~, ws)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
     
@@ -17,81 +17,90 @@ classdef DashboardStatesNInputs < plot.Base
             u = [u u(:,end)]; % Duplicate last entry for better visibility in plot
 
             Hp = size(ws.vs{1}.x,2);
-            Tx = [0:1:Hp];
-            Tu = [1:(Hp+1)]; % include Hp+1 to display the values at Hp as one stair step
+            Tx = 0:1:Hp;
+            Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
             %% plot base track initially
             if ~obj.is_background_plotted
                 clf(obj.figure_handle)
-                set(obj.figure_handle,'Name','Dashboard: States & Inputs');
+                set(obj.figure_handle, 'Name', 'Dashboard: States & Inputs');
                 hold on
                 
                 % create plots
-                obj.subplot_handles{1} = subplot(3,2,1);
+                subplot(3,2,1);
+            	obj.subplot_plot_handles{1} = plot(Tx, x(3,:));
                 title('v_x [m/s]')
-                ylim([-3 3])
+%                 ylim([-3 3])
+                xlim([Tx(1) Tx(end)])
                 grid on
 
-                obj.subplot_handles{2} = subplot(3,2,2);
+                subplot(3,2,2);
+                obj.subplot_plot_handles{2} = plot(Tx, x(4,:));
                 title('v_y [m/s]')
-                ylim([-0.7 0.7])
+%                 ylim([-0.7 0.7])
+                xlim([Tx(1) Tx(end)])
                 grid on
 
-                %if length(x(:, 1)) >=6 % TODO make state dependent
-                    obj.subplot_handles{3} = subplot(3,2,3);
+                if length(x(:, 1)) >=6 % TODO make state dependent
+                    subplot(3,2,3);
+                    obj.subplot_plot_handles{3} = plot(Tx, x(5,:));
                     title('Yaw Angle Phi [rad]')
                     ylim([-3*pi 3*pi])
+                    xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
                     yticklabels({'-3\pi','-2\pi','-\pi','0','\pi','2\pi','3\pi'})
                     grid on
 
-                    obj.subplot_handles{4} = subplot(3,2,4);
+                    subplot(3,2,4);
+                    obj.subplot_plot_handles{4} = plot(Tx, x(6,:));
                     title('Yaw Rate W [rad/sec]')
                     ylim([-3.5*pi 3.5*pi])
+                    xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
                     yticklabels({'-3\pi/s','-2\pi/s','-\pi/s','0','\pi/s','2\pi/s','3\pi/s'})
                     grid on
-                %end
+                end
 
-                obj.subplot_handles{5} = subplot(3,2,5);
+                subplot(3,2,5);
+                obj.subplot_plot_handles{5} = plot(Tu, u(1,:));
                 title('Input Steering Angle [rad]')
-                ylim([-0.4 0.4])
+%                 ylim([-0.4 0.4])
+                xlim([Tu(1) Tu(end)])
                 grid on
 
-                obj.subplot_handles{6} = subplot(3,2,6);
+                subplot(3,2,6);
+                obj.subplot_plot_handles{6} = plot(Tu, u(2,:));
                 title('Input Torque [Nm]')
-                ylim([-0.12 0.12])
+%                 ylim([-0.12 0.12])
+                xlim([Tu(1) Tu(end)])
                 grid on
 
                 obj.is_background_plotted = true;
-                
-                obj.subplot_handles = get(gcf, 'Children');
             else
-                obj.clear_tmp()
-                cla;
+                %obj.clear_tmp()
+                %cla;
             end
 
-
-            %a = subplot(obj.subplot_handles{1});
-            %a = axes;
-            obj.add_tmp_handle(plot(obj.subplot_handles(1), Tx,x(3,:)))
-
-            %subplot(3,2,2);
-            obj.add_tmp_handle(plot(obj.subplot_handles(2), Tx,x(4,:)))
-
+            % update plots
+            set(obj.subplot_plot_handles{1}, 'XData', Tx);
+            set(obj.subplot_plot_handles{1}, 'YData', x(3,:));
+            
+            set(obj.subplot_plot_handles{2}, 'XData', Tx);
+            set(obj.subplot_plot_handles{2}, 'YData', x(4,:));
+            
             if length(x(:, 1)) >=6 % TODO make state dependent
-                %subplot(3,2,3);
-                obj.add_tmp_handle(plot(obj.subplot_handles(3), Tx,x(5,:)))
-
-                %subplot(3,2,4);
-                obj.add_tmp_handle(plot(obj.subplot_handles(4), Tx,x(6,:)))
+                set(obj.subplot_plot_handles{3}, 'XData', Tx);
+                set(obj.subplot_plot_handles{3}, 'YData', x(5,:));
+                
+                set(obj.subplot_plot_handles{4}, 'XData', Tx);
+                set(obj.subplot_plot_handles{4}, 'YData', x(6,:));
             end
 
-            %subplot(3,2,5);
-            obj.add_tmp_handle(stairs(obj.subplot_handles(5), Tu,u(1,:)))
-
-            %subplot(3,2,6);
-            obj.add_tmp_handle(stairs(obj.subplot_handles(6), Tu,u(2,:)))
+            set(obj.subplot_plot_handles{5}, 'XData', Tu);
+            set(obj.subplot_plot_handles{5}, 'YData', u(1,:));
+            
+            set(obj.subplot_plot_handles{6}, 'XData', Tu);
+            set(obj.subplot_plot_handles{6}, 'YData', u(2,:));
         end
     end
 end

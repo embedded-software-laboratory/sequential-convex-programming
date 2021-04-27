@@ -9,15 +9,15 @@ classdef Race < plot.Base
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
 
-            set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
+            set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             % plot base track initially
             if ~obj.is_background_plotted
                 % clear old plot
                 clf(obj.figure_handle)
                 
-                set(obj.figure_handle,'color',[1 1 1]);
-                set(obj.figure_handle,'Name','Race');
+                set(obj.figure_handle, 'color', [1 1 1]);
+                set(obj.figure_handle, 'Name', 'Race');
                 hold on
             
                 obj.plot_track(scn.track, scn.vs{1}.widthVal)

@@ -6,7 +6,7 @@ classdef Base < handle
         figure_handle
         handles_tmp % handles of temporary plot objects
         is_background_plotted
-        subplot_handles
+        subplot_plot_handles
     end
     
     methods
@@ -21,7 +21,7 @@ classdef Base < handle
             
             obj.handles_tmp = {};
             obj.is_background_plotted = false;
-            obj.subplot_handles = {};
+            obj.subplot_plot_handles = {};
         end
         
         function add_tmp_handle(obj, handle)

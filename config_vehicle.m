@@ -5,14 +5,14 @@ cfg_vehicle = struct;
 
 %% General
 cfg_vehicle.p.iterations = 2;
-cfg_vehicle.p.isBlockingEnabled = true;
-cfg_vehicle.p.areObstaclesConsidered = true;
+cfg_vehicle.p.isBlockingEnabled = false;
+cfg_vehicle.p.areObstaclesConsidered = false;
 
 % arbitrary IDs, saved for later usage
 SL = 10; SCR = 20;
 cfg_vehicle.approximationSL = SL; cfg_vehicle.approximationSCR = SCR;
 % choose approximation
-cfg_vehicle.approximation = SCR; % 'SL' or 'SCR'
+cfg_vehicle.approximation = SL; % 'SL' or 'SCR'
 
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
@@ -35,7 +35,7 @@ cfg_vehicle.distSafe2CenterVal = cfg_vehicle.distSafe2CenterVal_1;
 
 %% Common Parameters
 cfg_vehicle.p.Hp = 50; % Number of prediction steps
-cfg_vehicle.p.dt = 0.05; % Size of prediction step
+cfg_vehicle.p.dt = 0.1; % Size of prediction step
 
 
 % %% paramsV2 MPC properties
