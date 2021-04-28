@@ -3,7 +3,7 @@ classdef DashboardAcceleration < plot.Base
     %   Detailed explanation goes here
     
     methods
-        function plot(obj, scn, ws)
+        function plot(obj, cfg, ws)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
@@ -11,14 +11,14 @@ classdef DashboardAcceleration < plot.Base
             
             % TODO only using vehicle 1
             i_vehicle = 1;
-            p = scn.vs{i_vehicle}.p;
+            p = cfg.scn.vs{i_vehicle}.p;
             u = ws.vs{i_vehicle}.u;
                 
             % plot base track initially
             if ~obj.is_background_plotted
                 clf(obj.figure_handle)
                 set(obj.figure_handle,'color',[1 1 1]);
-                set(obj.figure_handle,'Name','Dashboard: Acceleration');
+                set(obj.figure_handle,'Name', ['Dashboard: Acceleration of Vehicle ' num2str(i_vehicle)]);
                 hold on
                 box on
 

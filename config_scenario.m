@@ -13,8 +13,8 @@ cfg.scn.vs = {};
 cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImpr' or 'EllipseImpr' 
 
 %% Track
-% e.g. `track.Hockenheim4()`, `track.hockenheim_simple()`
-cfg.scn.track = track.Hockenheim4(); 
+% e.g. `@track.Hockenheim4`, `@track.hockenheim_simple`
+cfg.scn.track_handle = @track.Hockenheim4; 
 % TODO SCR only works with hockenheim_simple?
 
 %% Vehicles
@@ -31,16 +31,16 @@ end
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle_ 2
-% vehicle_ = config_vehicle(@vehicle.Linear);
-% % TODO couple with used vehicle_ model nx
-% if vehicle_.isModelLinear
-%     vehicle_.xStart = [0 -0.05 0.1 0 ];
-% else
-%     vehicle_.xStart = [0 -0.05 0.1 0 0 0];
-% end
-% vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
-% vehicle_.p.a_max = 17; % decrease accel for SCR
-% cfg.scn.vs{end + 1} = vehicle_;
+vehicle_ = config_vehicle(@vehicle.Linear);
+% TODO couple with used vehicle_ model nx
+if vehicle_.isModelLinear
+    vehicle_.xStart = [0 -0.05 0.1 0 ];
+else
+    vehicle_.xStart = [0 -0.05 0.1 0 0 0];
+end
+vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
+vehicle_.p.a_max = 17; % decrease accel for SCR
+cfg.scn.vs{end + 1} = vehicle_;
 
 % % vehicle_ 3
 % vehicle_ = config_vehicle_();

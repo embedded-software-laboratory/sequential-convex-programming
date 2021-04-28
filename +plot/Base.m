@@ -38,7 +38,7 @@ classdef Base < handle
         end
     end
     methods (Abstract)
-        outputArg = plot(obj, scn, ws)
+        outputArg = plot(obj, cfg, ws)
     end
 end
 

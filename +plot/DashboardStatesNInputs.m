@@ -2,8 +2,21 @@ classdef DashboardStatesNInputs < plot.Base
     %RACE Summary of this class goes here
     %   Detailed explanation goes here
     
+    properties
+        table_desc
+        table_val
+    end
+    
     methods
-        function plot(obj, ~, ws)
+        function obj = DashboardStatesNInputs(figure_handle_number)
+            % call superclass constructor
+            obj@plot.Base(figure_handle_number)
+            
+            obj.table_desc = {};
+            obj.table_val = {};
+        end
+            
+        function plot(obj, cfg, ws)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
     
@@ -27,14 +40,14 @@ classdef DashboardStatesNInputs < plot.Base
                 hold on
                 
                 % create plots
-                subplot(3,2,1);
+                subplot(3,3,1);
             	obj.subplot_plot_handles{1} = plot(Tx, x(3,:));
                 title('v_x [m/s]')
 %                 ylim([-3 3])
                 xlim([Tx(1) Tx(end)])
                 grid on
 
-                subplot(3,2,2);
+                subplot(3,3,2);
                 obj.subplot_plot_handles{2} = plot(Tx, x(4,:));
                 title('v_y [m/s]')
 %                 ylim([-0.7 0.7])
@@ -42,7 +55,7 @@ classdef DashboardStatesNInputs < plot.Base
                 grid on
 
                 if length(x(:, 1)) >=6 % TODO make state dependent
-                    subplot(3,2,3);
+                    subplot(3,3,4);
                     obj.subplot_plot_handles{3} = plot(Tx, x(5,:));
                     title('Yaw Angle Phi [rad]')
                     ylim([-3*pi 3*pi])
@@ -51,7 +64,7 @@ classdef DashboardStatesNInputs < plot.Base
                     yticklabels({'-3\pi','-2\pi','-\pi','0','\pi','2\pi','3\pi'})
                     grid on
 
-                    subplot(3,2,4);
+                    subplot(3,3,5);
                     obj.subplot_plot_handles{4} = plot(Tx, x(6,:));
                     title('Yaw Rate W [rad/sec]')
                     ylim([-3.5*pi 3.5*pi])
@@ -61,19 +74,50 @@ classdef DashboardStatesNInputs < plot.Base
                     grid on
                 end
 
-                subplot(3,2,5);
+                subplot(3,3,7);
                 obj.subplot_plot_handles{5} = plot(Tu, u(1,:));
                 title('Input Steering Angle [rad]')
 %                 ylim([-0.4 0.4])
                 xlim([Tu(1) Tu(end)])
                 grid on
 
-                subplot(3,2,6);
+                subplot(3,3,8);
                 obj.subplot_plot_handles{6} = plot(Tu, u(2,:));
                 title('Input Torque [Nm]')
 %                 ylim([-0.12 0.12])
                 xlim([Tu(1) Tu(end)])
                 grid on
+                
+                % Text
+                subplot(3,3,[3,6,9]);
+                axis off
+                
+                % assemble text
+                obj.add_table_line('Control: press ESC to abort, SPACE to pause', '');
+                obj.add_table_line('', '');
+                obj.add_table_line('Configuration', '');
+                % get name of function handle
+                obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
+                
+                for i = 1:length(cfg.scn.vs)
+                    vh = cfg.scn.vs{i};
+                    obj.add_table_line('', '');
+                    obj.add_table_line(['Vehicle ' num2str(i)], '');
+                    obj.add_table_line('Vehicle Model', class(vh.model));
+                    obj.add_table_line('Vehicle Simulation Model', class(vh.model_simulation));
+                    if vh.approximation == vh.approximationSL
+                        approx = 'SL';
+                    elseif vh.approximation == vh.approximationSCR
+                        approx = 'SCR';
+                    end
+                    obj.add_table_line('Track Approximation via', approx);
+                    obj.add_table_line('Blocking enabled', obj.get_logical_string(vh.p.isBlockingEnabled));
+                    obj.add_table_line('Obstacles considered', obj.get_logical_string(vh.p.areObstaclesConsidered));
+                end
+                
+                % place text top left
+                text(0, 1, obj.table_desc, 'VerticalAlignment', 'top')
+                text(0.75, 1, obj.table_val, 'VerticalAlignment', 'top')
 
                 obj.is_background_plotted = true;
             else
@@ -102,6 +146,21 @@ classdef DashboardStatesNInputs < plot.Base
             set(obj.subplot_plot_handles{6}, 'XData', Tu);
             set(obj.subplot_plot_handles{6}, 'YData', u(2,:));
         end
+        
+        function add_table_line(obj, desc, val)
+            obj.table_desc{end + 1} = desc;
+            if ~isempty(val)
+                obj.table_desc{end} = [obj.table_desc{end} ':'];
+            end
+            obj.table_val{end + 1} = val;
+        end
+        
+        function logical_str = get_logical_string(~, logical)
+            logical_str = {'false', 'true'};
+            % shift for matlab 1-indexing
+            logical_str = logical_str{logical + 1};
+        end
+            
     end
 end
 

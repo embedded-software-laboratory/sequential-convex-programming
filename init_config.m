@@ -31,6 +31,9 @@ for i = 1:length(cfg.scn.vs)
         cfg.scn.vs{i}.model_simulation(cfg.scn.vs{i}.p);
 end
 
+%% Track
+cfg.scn.track = cfg.scn.track_handle();
+
 %% Approximation
 for i = 1:length(cfg.scn.vs)
     cfg.scn.vs{i}.approximationIsSL = ...

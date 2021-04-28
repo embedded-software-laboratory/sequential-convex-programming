@@ -19,7 +19,7 @@ for j = 1:length(log.lap)
     end
     
     for i = 1:length(cfg.plot.plots_to_draw)
-        cfg.plot.plots_to_draw{i}.plot(cfg.scn, ws);
+        cfg.plot.plots_to_draw{i}.plot(cfg, ws);
     end
     drawnow
 

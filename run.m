@@ -159,7 +159,7 @@ try
         % simulation/application of the control inputs.
         if cfg.plot.is_enabled
             for i = 1:length(cfg.plot.plots_to_draw)
-                cfg.plot.plots_to_draw{i}.plot(cfg.scn, ws);
+                cfg.plot.plots_to_draw{i}.plot(cfg, ws);
             end
             drawnow
         end

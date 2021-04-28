@@ -1,6 +1,6 @@
 % Change inputs to (log1,log2) for plotting (1) and (7)
 addpath('../')
-colors = getRwthColors(100);
+colors = utils.getRwthColors(100);
 
 track_ = track.Hockenheim4();
 left_points = [track_(:).left];
