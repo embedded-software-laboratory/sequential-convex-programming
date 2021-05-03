@@ -79,7 +79,13 @@ cfg_vehicle.p.tireModel_Br = 4.1165;
 
     % Acceleration parameters
     cfg_vehicle.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
-    cfg_vehicle.p.delta_angle = 2*pi / cfg_vehicle.p.n_acceleration_limits; % pre-compute for speed
+    
+    % pre-compute for speed
+    delta_angle = 2*pi / cfg_vehicle.p.n_acceleration_limits;
+    tmp = (1:cfg_vehicle.p.n_acceleration_limits)' .* delta_angle;
+    cfg_vehicle.p.acceleration_cos = cos(tmp);
+    cfg_vehicle.p.acceleration_sin = sin(tmp);
+    
     % Empirically determined maximum accelerations in the forwards, backwards
     % and lateral directions, for varying speeds.
     cfg_vehicle.p.a_lateral_max_list = interp1([0 10 43 52 200],[1 14 28 33 33], 0:0.01:120);
