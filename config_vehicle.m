@@ -79,12 +79,13 @@ cfg_vehicle.p.tireModel_Br = 4.1165;
 
     % Acceleration parameters
     cfg_vehicle.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
+    cfg_vehicle.p.delta_angle = 2*pi / cfg_vehicle.p.n_acceleration_limits;
     % Empirically determined maximum accelerations in the forwards, backwards
     % and lateral directions, for varying speeds.
     cfg_vehicle.p.a_lateral_max_list = interp1([0 10 43 52 200],[1 14 28 33 33], 0:0.01:120);
     cfg_vehicle.p.a_forward_max_list = interp1([0 10 20 35 52 79 83 200],[2 13 18 18 15 6 1 1], 0:0.01:120);
     cfg_vehicle.p.a_backward_max_list = interp1([0 30 40 52 76 200],[11 13 24 30 40 40], 0:0.01:120);
-    cfg_vehicle.p.v_idx = @(v) min(12001,max(1, round(100*v+1) ));
+    cfg_vehicle.p.v_idx = @(v) min(12001, max(1, round(100*v + 1)));
 % %% SCR Parameters
 % elseif strcmp(cfg.controller.name, 'SCR')
     % Acceleration parameters

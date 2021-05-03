@@ -71,7 +71,6 @@ try
         for i = 1:length(cfg.scn.vs)
             % update checkpoints
             cp_curr = utils.find_closest_track_checkpoint_index(...
-                ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track, 1);
             ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
             ws.vs{i}.cp_curr = cp_curr;
 
@@ -81,6 +80,7 @@ try
                 (ws.vs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
                 (ws.vs{i}.cp_curr / length(cfg.scn.track) < 1)
                 ws.vs{i}.lap_count = ws.vs{i}.lap_count + 1;
+                    ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track_center, 1);
             end
         end
 
