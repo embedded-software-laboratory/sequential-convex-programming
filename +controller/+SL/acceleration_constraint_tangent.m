@@ -10,17 +10,22 @@ function [Au, b] = acceleration_constraint_tangent(p,i,x)
     v_sq = vx^2 + vy^2;
     v = sqrt(v_sq);
     
-    c = cos(i*p.delta_angle);
-    s = sin(i*p.delta_angle);
+    c = cos(i.*p.delta_angle);
+    s = sin(i.*p.delta_angle);
     
     v_idx = p.v_idx(v);
-    ay_max = p.a_lateral_max_list(v_idx);    
-    if c > 0
-        ax_max = p.a_forward_max_list(v_idx);
-    else
-        ax_max = p.a_backward_max_list(v_idx);
-    end
+    ay_max = p.a_lateral_max_list(v_idx);
     
-    Au = 1/sqrt(v_sq + 0.01) * [ay_max*c ax_max*s] * [vx vy; -vy vx];
+    ax_max = p.a_forward_max_list(v_idx) .* ones(size(i));
+    ax_max(c <= 0) = p.a_backward_max_list(v_idx);
+    
+    % vectorized from
+    %Au = zeros(length(i), 2);
+    %  for j = 1:length(i)
+    %      Au(j, :) = 1/sqrt(v_sq + 0.01) .* [ay_max*c(j) ax_max(j)*s(j)] * [vx vy; -vy vx];
+    %  end
+    Au = 1/sqrt(v_sq + 0.01) .* [ay_max*c .* vx + ax_max.*s .* -vy...
+        ay_max*c .* vy + ax_max.*s .* vx];
+    
     b = ax_max * ay_max;
 end

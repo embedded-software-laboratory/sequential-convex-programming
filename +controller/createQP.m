@@ -138,20 +138,25 @@ for k = 1:p.Hp
     end
     
     if isLinear
-        %% Acceleration limits    
-        for i = 1:p.n_acceleration_limits
-            n_rows = n_rows(end) + (1);
+        %% Acceleration limits
+        if vh.approximationIsSL
+            [Au_acc, b_acc] = controller.SL.acceleration_constraint_tangent(p, (1:p.n_acceleration_limits)', x(:, k));
+            for i = 1:p.n_acceleration_limits
+                n_rows = n_rows(end) + (1);
            
-            if vh.approximationIsSL
-                [Au_acc, b_acc] = controller.SL.acceleration_constraint_tangent(p, i, x(:, k));
-                A_ineq(n_rows, idx_u(k,:)) = Au_acc;
-                b_ineq(n_rows) = b_acc;
-            elseif vh.approximationIsSCR
+                A_ineq(n_rows, idx_u(k,:)) = Au_acc(i, :);
+                b_ineq(n_rows) = b_acc(i);
+            end
+        elseif vh.approximationIsSCR
+            for i = 1:p.n_acceleration_limits
+                n_rows = n_rows(end) + (1);
                 % simple circle, linearized
                 A_ineq(n_rows, idx_u(k,:)) = [cos(2*pi*i/p.n_acceleration_limits) sin(2*pi*i/p.n_acceleration_limits)];
                 b_ineq(n_rows) = p.a_max;
             end
         end
+        
+        
     end
 
 
@@ -332,10 +337,8 @@ bound_lower(idx_slack) = 0;
 if isLinear
     % Bounded acceleration
     if vh.approximationIsSL
-        a_max = max([p.a_backward_max_list p.a_forward_max_list p.a_lateral_max_list]);
-
-        bound_upper(idx_u(:)) =  a_max;
-        bound_lower(idx_u(:)) = -a_max;
+        bound_upper(idx_u(:)) =  p.a_max;
+        bound_lower(idx_u(:)) = -p.a_max;
 
         % Trust region for change in position
         % Bounded states (trust region for change in position) - kinetic
