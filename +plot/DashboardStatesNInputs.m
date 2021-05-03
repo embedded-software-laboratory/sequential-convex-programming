@@ -77,14 +77,14 @@ classdef DashboardStatesNInputs < plot.Base
                 subplot(3,3,7);
                 obj.subplot_plot_handles{5} = plot(Tu, u(1,:));
                 title('Input Steering Angle [rad]')
-%                 ylim([-0.4 0.4])
+                ylim([-0.4 0.4])
                 xlim([Tu(1) Tu(end)])
                 grid on
 
                 subplot(3,3,8);
                 obj.subplot_plot_handles{6} = plot(Tu, u(2,:));
                 title('Input Torque [Nm]')
-%                 ylim([-0.12 0.12])
+                ylim([-0.12 0.12])
                 xlim([Tu(1) Tu(end)])
                 grid on
                 

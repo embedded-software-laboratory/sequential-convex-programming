@@ -272,9 +272,9 @@ assert(n_rows == n_ineq);
 %% Objective
 % Maximize position along track
 if vh.approximationIsSL
-    objective_lin(idx_pos(p.Hp,:)) = -p.Q * checkpoints(checkpoint_indices(p.Hp)).forward_vector;
+    objective_lin(idx_pos(p.Hp, :)) = -p.Q * checkpoints(checkpoint_indices(p.Hp)).forward_vector;
 elseif vh.approximationIsSCR
-    objective_lin(idx_pos(p.Hp,:)) = -p.Q * track_polygons(track_polygon_indices(p.Hp)).forward_direction;
+    objective_lin(idx_pos(p.Hp, :)) = -p.Q * track_polygons(track_polygon_indices(p.Hp)).forward_direction;
 end
 
 % Minimize control change over time (36)
@@ -359,10 +359,8 @@ else
     bound_lower(idx_u(end,2)) = -0.15 * p.TR_motorTorque;
 
     % Bounded states (trust region for change in position) - kinetic
-    for k = 1:p.Hp
-        bound_upper(idx_pos(k,:)) = x(model.ipos, k) + p.TR_pos;
-        bound_lower(idx_pos(k,:)) = x(model.ipos, k) - p.TR_pos;
-    end
+    bound_upper(idx_pos(1:p.Hp,:)) = (x(model.ipos, 1:p.Hp) + p.TR_pos)';
+    bound_lower(idx_pos(1:p.Hp,:)) = (x(model.ipos, 1:p.Hp) - p.TR_pos)';
 
     % Bounded states (trust region for change in velocities) - kinematic
     bound_upper(idx_x(:,3)) = p.TR_velX;

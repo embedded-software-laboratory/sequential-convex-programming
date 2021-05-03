@@ -14,7 +14,7 @@ cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImp
 
 %% Track
 % e.g. `@track.Hockenheim4`, `@track.hockenheim_simple`
-cfg.scn.track_handle = @track.Hockenheim4; 
+cfg.scn.track_handle = @track.hockenheim_simple; 
 % TODO SCR only works with hockenheim_simple?
 
 %% Vehicles
@@ -24,9 +24,9 @@ vehicle_ = config_vehicle(@vehicle.SingleTrack);
 % CAVE all states of model must be contained in the first states of simulation model (in same order)
 % TODO check above
 if vehicle_.isModelLinear
-    vehicle_.xStart = [0 0 0.1 0 ];
+    vehicle_.xStart = [0 0 .1 0 ];
 else
-    vehicle_.xStart = [0.1 0.05 0.1 0 0 0];
+    vehicle_.xStart = [0 0 .1 0 0 0];
 end
 cfg.scn.vs{end + 1} = vehicle_;
 
