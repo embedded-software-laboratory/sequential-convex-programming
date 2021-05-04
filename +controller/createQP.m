@@ -139,18 +139,19 @@ for k = 1:p.Hp
     
     if isLinear
         %% Acceleration limits    
-        for i = 1:p.n_acceleration_limits
+        for k = 1:p.n_acceleration_limits
             n_rows = n_rows(end) + (1);
            
             if vh.approximationIsSL
-                [Au_acc, b_acc] = controller.SL.acceleration_constraint_tangent(p, i, x(:, k));
-                A_ineq(n_rows, idx_u(k,:)) = Au_acc;
-                b_ineq(n_rows) = b_acc;
+                h = @controller.SL.acceleration_constraint;
             elseif vh.approximationIsSCR
-                % simple circle, linearized
-                A_ineq(n_rows, idx_u(k,:)) = [cos(2*pi*i/p.n_acceleration_limits) sin(2*pi*i/p.n_acceleration_limits)];
-                b_ineq(n_rows) = p.a_max;
+                h = @controller.SCR.acceleration_constraint;
             end
+            
+            [Au_acc, b_acc] = h(p, k, x(:, k));
+            
+            A_ineq(n_rows, idx_u(k,:)) = Au_acc;
+            b_ineq(n_rows) = b_acc;
         end
     end
 
