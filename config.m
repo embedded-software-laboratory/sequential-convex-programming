@@ -14,6 +14,14 @@ cfg.outputPath = ['output\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
 %% Race
 cfg.race.n_laps = 3;            % Number of laps to be driven
 
+%% Logging
+cfg.log.DEBUG   = 4;
+cfg.log.LOG     = 3;
+cfg.log.INFO    = 2;
+cfg.log.WARN    = 1;
+cfg.log.ERROR   = 0;
+cfg.log.level   = cfg.log.DEBUG; % log level: choose from above
+
 %% Plotting
 cfg.plot.is_enabled = true;
 cfg.plot.has_accelerations = true;

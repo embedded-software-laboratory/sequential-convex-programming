@@ -67,35 +67,38 @@ try
         end
 
         %% Current CP, position and lap
-        % Get current checkpoints (corresponding to x0) and current laps
-        for i = 1:length(cfg.scn.vs)
-            % update checkpoints
-            cp_curr = utils.find_closest_track_checkpoint_index(...
-                ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track, 1);
-            ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
-            ws.vs{i}.cp_curr = cp_curr;
+        if cfg.log.level >= cfg.log.LOG
+            % Get current checkpoints (corresponding to x0) and current laps
+            for i = 1:length(cfg.scn.vs)
+                % update checkpoints
+                cp_curr = utils.find_closest_track_checkpoint_index(...
+                    ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track_center, 1);
+                ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
+                ws.vs{i}.cp_curr = cp_curr;
 
-            % new lap: advance lap counter
-            % FIXME: robust lap detection?
-            if (ws.vs{i}.cp_prev ~= ws.vs{i}.cp_curr) && ...
-                (ws.vs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
-                (ws.vs{i}.cp_curr / length(cfg.scn.track) < 1)
-                ws.vs{i}.lap_count = ws.vs{i}.lap_count + 1;
+                % new lap: advance lap counter
+                % FIXME: robust lap detection?
+                if (ws.vs{i}.cp_prev ~= ws.vs{i}.cp_curr) && ...
+                    (ws.vs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
+                    (ws.vs{i}.cp_curr / length(cfg.scn.track) < 1)
+                    ws.vs{i}.lap_count = ws.vs{i}.lap_count + 1;
+                end
             end
-        end
 
-        % Determine relative positions of racing vehicles corresponding to
-        % current checkpoints and current laps
-        for i = 1:length(cfg.scn.vs)
-            ws.vs{i}.pos = 1;
-            for j = 1:length(cfg.scn.vs)
-                if (ws.vs{i}.cp_curr < ws.vs{1,j}.cp_curr) && ...
-                        (ws.vs{i}.lap_count == ws.vs{1,j}.lap_count) || ...
-                        (ws.vs{i}.lap_count < ws.vs{1,j}.lap_count)
-                    ws.vs{i}.pos = ws.vs{i}.pos + 1;
+            % Determine relative positions of racing vehicles corresponding to
+            % current checkpoints and current laps
+            for i = 1:length(cfg.scn.vs)
+                ws.vs{i}.pos = 1;
+                for j = 1:length(cfg.scn.vs)
+                    if (ws.vs{i}.cp_curr < ws.vs{1,j}.cp_curr) && ...
+                            (ws.vs{i}.lap_count == ws.vs{1,j}.lap_count) || ...
+                            (ws.vs{i}.lap_count < ws.vs{1,j}.lap_count)
+                        ws.vs{i}.pos = ws.vs{i}.pos + 1;
+                    end
                 end
             end
         end
+        
 
         %% Determine obstacle relationship
         % Set obstacle-matrix entry to 1 if vehicle of row has to respect
@@ -143,13 +146,16 @@ try
             ws.vs{i}.x = ws.vs{i}.controller_output.x_final;
             ws.vs{i}.u = ws.vs{i}.controller_output.u_final;
         end
+        
 
         %% Log
-        % saving ws for vehicles seperately for easier access
-        log.lap{end + 1} = rmfield(ws, 'vs');
+        if cfg.log.level >= cfg.log.LOG
+            % saving ws for vehicles seperately for easier access
+            log.lap{end + 1} = rmfield(ws, 'vs');
 
-        for i = 1:length(cfg.scn.vs)
-            log.vehicles{i}(end + 1) = ws.vs{i};
+            for i = 1:length(cfg.scn.vs)
+                log.vehicles{i}(end + 1) = ws.vs{i};
+            end
         end
 
         %% Visualization
@@ -186,15 +192,17 @@ try
         end
 
         % enact user inputs
-        if ctl_pause; disp('Pause...'); end
-        while true % pseudo do..while loop
-            if ctl_abort % ..stop race
-                disp('Aborted');
-                ctl_race_ongoing = false;
-                break;
+        if cfg.plot.is_enabled
+            if ctl_pause; disp('Pause...'); end
+            while true % pseudo do..while loop
+                if ctl_abort % ..stop race
+                    disp('Aborted');
+                    ctl_race_ongoing = false;
+                    break;
+                end
+                if ~ctl_pause; break; end
+                pause(0.1)
             end
-            if ~ctl_pause; break; end
-            pause(0.1)
         end
         fprintf('Loop time %4.0fms\n', toc(timer_loop) * 1000)
     end
@@ -205,13 +213,15 @@ disp('#-  Ending race loop  -#')
 disp('########################')
 fprintf('Overall loop time %.2fs\n', toc(timer_overall))
 
-%% Save 
-% save all workspace variables, but not figures
-disp('Saving workspace')
+%% Save
+if cfg.log.level >= cfg.log.LOG
+    % save all workspace variables, but not figures
+    disp('Saving workspace')
 
-% remove figure handles, so they won't get saved
-cfg.plot.plots_to_draw = NaN;
-save([cfg.outputPath '/log.mat'])
+    % remove figure handles, so they won't get saved
+    cfg.plot.plots_to_draw = NaN;
+    save([cfg.outputPath '/log.mat'])
+end
 
 % if error occured in race loop
 if exist('ME', 'var')
@@ -257,7 +267,7 @@ function ws = init_ws(cfg)
 
         % lap-specific
         cp_x0 = utils.find_closest_track_checkpoint_index(...
-            ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track, 1);
+            ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track_center, 1);
         ws.vs{i}.cp_prev = cp_x0;
         ws.vs{i}.cp_curr = cp_x0;
         ws.vs{i}.lap_count = 0; % start with 0 finished laps

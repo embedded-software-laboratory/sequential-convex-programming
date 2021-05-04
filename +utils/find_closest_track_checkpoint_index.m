@@ -1,4 +1,4 @@
-function cp_indices = find_closest_track_checkpoint_index(pos, cp, Hp)
+function cp_indices = find_closest_track_checkpoint_index(pos, cp_center, Hp)
 % find closest checkpoint(s) of track to given state(s) (position) x
 % Inputs:
 %   cp:     track or subset of track
@@ -9,9 +9,9 @@ function cp_indices = find_closest_track_checkpoint_index(pos, cp, Hp)
 cp_indices = nan(1, Hp);
 for k = 1:Hp
     % expand position of state for comparison with checkpoints
-    x_position_compare = repmat(pos(:, k), 1, length(cp));
+    x_position_compare = repmat(pos(:, k), 1, length(cp_center));
     % take euclidian distance (for x and y) for each center-checkpoint
-    euclidian_distance = sum(([cp.center] - x_position_compare).^2);
+    euclidian_distance = sum((cp_center - x_position_compare).^2);
     % save index of closest checkpoint
     [~, cp_indices(k)] = min(euclidian_distance);
 end

@@ -139,20 +139,17 @@ for k = 1:p.Hp
     
     if isLinear
         %% Acceleration limits    
-        for k = 1:p.n_acceleration_limits
-            n_rows = n_rows(end) + (1);
-           
-            if vh.approximationIsSL
-                h = @controller.SL.acceleration_constraint;
-            elseif vh.approximationIsSCR
-                h = @controller.SCR.acceleration_constraint;
-            end
-            
-            [Au_acc, b_acc] = h(p, k, x(:, k));
-            
-            A_ineq(n_rows, idx_u(k,:)) = Au_acc;
-            b_ineq(n_rows) = b_acc;
+        if vh.approximationIsSL
+            h = @controller.SL.acceleration_constraint;
+        elseif vh.approximationIsSCR
+            h = @controller.SCR.acceleration_constraint;
         end
+        
+        [Au_acc, b_acc] = h(p, (1:p.n_acceleration_limits)', x(:, k));
+        n_rows = n_rows(end) + p.n_acceleration_limits;
+        
+        A_ineq(n_rows - p.n_acceleration_limits + 1:n_rows, idx_u(k,:)) = Au_acc;
+        b_ineq(n_rows - p.n_acceleration_limits + 1:n_rows) = b_acc;
     end
 
 
@@ -333,10 +330,8 @@ bound_lower(idx_slack) = 0;
 if isLinear
     % Bounded acceleration
     if vh.approximationIsSL
-        a_max = max([p.a_backward_max_list p.a_forward_max_list p.a_lateral_max_list]);
-
-        bound_upper(idx_u(:)) =  a_max;
-        bound_lower(idx_u(:)) = -a_max;
+        bound_upper(idx_u(:)) =  p.a_max;
+        bound_lower(idx_u(:)) = -p.a_max;
 
         % Trust region for change in position
         % Bounded states (trust region for change in position) - kinetic

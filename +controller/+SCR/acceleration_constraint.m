@@ -4,7 +4,6 @@
 
 % Resulting constraint: Ax * [px,py,vx,vy] + Au * [ax,ay] <= b
 function [Au, b] = acceleration_constraint(p,k,~)
-
-     Au = [cos(2*pi*k/p.n_acceleration_limits) sin(2*pi*k/p.n_acceleration_limits)];
+     Au = [cos(2*pi.*k/p.n_acceleration_limits) sin(2*pi.*k/p.n_acceleration_limits)];
      b = p.a_max;
 end
