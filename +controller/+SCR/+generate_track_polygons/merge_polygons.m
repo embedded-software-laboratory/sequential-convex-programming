@@ -1,23 +1,26 @@
-function track = merge_polygons(track)
+function track = merge_polygons(track, epsilon_area_tolerance)
 % merge polygons to convex regions
 
-% Iterate in reverse, because we will delete elements in the loop
-for i = length(track.polygons):-1:2  
+% iterate in reverse: deleting polygons in the loop
+for i = length(track.polygons):-1:2
+    % construct polygon indices
     idx_1 = track.polygons(i).vertex_indices;
     idx_2 = track.polygons(i-1).vertex_indices;
     % union indices of adjacent polygons
-    idx_merged = unique([idx_1 idx_2]);
+    idx_union = union(idx_1, idx_2);
 
-    [~, V1]       = convhull(track.vertices(:, idx_1)', 'simplify', true);
-    [~, V2]       = convhull(track.vertices(:, idx_2)', 'simplify', true);
-    [K, V_merged] = convhull(track.vertices(:, idx_merged)', 'simplify', true);
+    % calculate hull areas & indices
+    [~, area_1]                 = convhull(track.vertices(:, idx_1)');
+    [~, area_2]                 = convhull(track.vertices(:, idx_2)');
+    % simplify: only keep hull vertices
+    [indices_hull, area_merged] = convhull(track.vertices(:, idx_union)', 'simplify', true);
 
-    % Only merge adjacent polygons if their union is (almost) convex.
-    area_tolerance = .05;
-    if V_merged - V1 - V2 < area_tolerance
-        track.polygons(i) = []; % Delete first polygon
-        track.polygons(i-1).vertex_indices = idx_merged(K(2:end)); % Replace second polygon with union
-    if volume_merged - (volume_1 + volume_2) <= .0%5 % epsilon_volume_tolerance
+    % merge polygons if their union is (almost) convex.
+    if area_merged - (area_1 + area_2) <= epsilon_area_tolerance
+        % delete polygon 1
+        track.polygons(i) = [];
+        % replace polygon 2 with union (first and last entry of hull is duplicated)
+        track.polygons(i-1).vertex_indices = idx_union(indices_hull(2:end));
     end
 end
 end

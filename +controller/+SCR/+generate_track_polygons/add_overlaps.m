@@ -57,14 +57,14 @@ function new_track = add_overlaps(track)
         
         vertices_union = [vertices_0; vertices_1; vertices_2];
         
-        [~,vol_0] = convhull(vertices_0);
-        [~,vol_1] = convhull(vertices_1);
-        [~,vol_2] = convhull(vertices_2);
-        [K,vol_union] = convhull(vertices_union,'simplify',true);
+        [~, area_0] = convhull(vertices_0);
+        [~, area_1] = convhull(vertices_1);
+        [~, area_2] = convhull(vertices_2);
+        [K, area_union] = convhull(vertices_union,'simplify',true);
         
         %assert(abs(vol_0+vol_1+vol_2-vol_union) < 1e-10);
         % FIXME only track hockenheim requires slighlty larger deviation margin
-        assert(abs(vol_0+vol_1+vol_2-vol_union) < 1e-8);
+        assert(abs(area_0 + area_1 + area_2 - area_union) < 1e-8);
         
         vertices_union = vertices_union(K(2:end),:);
         

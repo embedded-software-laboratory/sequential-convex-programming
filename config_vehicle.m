@@ -12,7 +12,7 @@ cfg_vehicle.p.areObstaclesConsidered = false;
 SL = 10; SCR = 20;
 cfg_vehicle.approximationSL = SL; cfg_vehicle.approximationSCR = SCR;
 % choose approximation
-cfg_vehicle.approximation = SL; % 'SL' or 'SCR'
+cfg_vehicle.approximation = SCR; % 'SL' or 'SCR'
 
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
