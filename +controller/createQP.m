@@ -27,9 +27,9 @@ end
 
 %% Index mapping
 idx        = reshape((1:model.ns * p.Hp), model.ns, p.Hp)';
-idx_x      = idx(:, model.ix);
-idx_pos    = idx(:, model.ipos);
-idx_u      = idx(:, model.iu);
+idx_x      = idx(:, model.idx_x);
+idx_pos    = idx(:, model.idx_pos);
+idx_u      = idx(:, model.idx_u);
 idx_slack  = model.ns * p.Hp + 1;
 
 %% Problem size
@@ -335,8 +335,8 @@ if isLinear
 
         % Trust region for change in position
         % Bounded states (trust region for change in position) - kinetic
-        bound_upper(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) + p.trust_region)';
-        bound_lower(idx_pos(1:p.Hp, :)) = (x(model.ipos, 1:p.Hp) - p.trust_region)';
+        bound_upper(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) + p.trust_region)';
+        bound_lower(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) - p.trust_region)';
     elseif vh.approximationIsSCR
         bound_upper(idx_u(:)) =  p.a_max;
         bound_lower(idx_u(:)) = -p.a_max;
@@ -355,8 +355,8 @@ else
     bound_lower(idx_u(end,2)) = -0.15 * p.TR_motorTorque;
 
     % Bounded states (trust region for change in position) - kinetic
-    bound_upper(idx_pos(1:p.Hp,:)) = (x(model.ipos, 1:p.Hp) + p.TR_pos)';
-    bound_lower(idx_pos(1:p.Hp,:)) = (x(model.ipos, 1:p.Hp) - p.TR_pos)';
+    bound_upper(idx_pos(1:p.Hp,:)) = (x(model.idx_pos, 1:p.Hp) + p.TR_pos)';
+    bound_lower(idx_pos(1:p.Hp,:)) = (x(model.idx_pos, 1:p.Hp) - p.TR_pos)';
 
     % Bounded states (trust region for change in velocities) - kinematic
     bound_upper(idx_x(:,3)) = p.TR_velX;

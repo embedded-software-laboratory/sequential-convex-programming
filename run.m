@@ -72,7 +72,7 @@ try
             for i = 1:length(cfg.scn.vs)
                 % update checkpoints
                 cp_curr = utils.find_closest_track_checkpoint_index(...
-                    ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track_center, 1);
+                    ws.vs{i}.x0(cfg.scn.vs{i}.model.idx_pos), cfg.scn.track_center, 1);
                 ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
                 ws.vs{i}.cp_curr = cp_curr;
 
@@ -261,13 +261,13 @@ function ws = init_ws(cfg)
     for i = 1:length(cfg.scn.vs)
         % controller-specifics
         ws.vs{i}.controller_output = NaN;
-        ws.vs{i}.x0 = cfg.scn.vs{i}.xStart';
-        ws.vs{i}.x = repmat(cfg.scn.vs{i}.xStart', 1, cfg.scn.vs{i}.p.Hp);
+        ws.vs{i}.x0 = cfg.scn.vs{i}.x_start;
+        ws.vs{i}.x = repmat(ws.vs{i}.x0, 1, cfg.scn.vs{i}.p.Hp);
         ws.vs{i}.u = repmat([0;0], 1, cfg.scn.vs{i}.p.Hp);
 
         % lap-specific
         cp_x0 = utils.find_closest_track_checkpoint_index(...
-            ws.vs{i}.x0(cfg.scn.vs{i}.model.ipos), cfg.scn.track_center, 1);
+            ws.vs{i}.x0(cfg.scn.vs{i}.model.idx_pos), cfg.scn.track_center, 1);
         ws.vs{i}.cp_prev = cp_x0;
         ws.vs{i}.cp_curr = cp_x0;
         ws.vs{i}.lap_count = 0; % start with 0 finished laps

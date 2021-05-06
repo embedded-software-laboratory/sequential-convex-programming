@@ -22,14 +22,23 @@ else
 end
 
 %% Vehicle Models
-% Instantiate vehicle models, in partiuclar, the initialization of the
-% jacobians is crucial for gaining computation speed
 for i = 1:length(cfg.scn.vs)
+    % detect if model is linear
+    cfg.scn.vs{i}.isModelLinear = isequal(cfg.scn.vs{i}.model, @model.vehicle.Linear);
+    cfg.scn.vs{i}.isModelSimulationLinear = isequal(cfg.scn.vs{i}.model_simulation, @model.vehicle.Linear);
+    
+    % Instantiate vehicle models, in partiuclar, the initialization of the
+    % jacobians is crucial for gaining computation speed
     cfg.scn.vs{i}.model = ...
-        cfg.scn.vs{i}.model(cfg.scn.vs{i}.p);
+        cfg.scn.vs{i}.model(cfg.scn.vs{i}.p.Hp, cfg.scn.vs{i}.p.dt, cfg.scn.vs{i}.model_p);
     cfg.scn.vs{i}.model_simulation = ...
-        cfg.scn.vs{i}.model_simulation(cfg.scn.vs{i}.p);
+        cfg.scn.vs{i}.model_simulation(cfg.scn.vs{i}.p.Hp, cfg.scn.vs{i}.p.dt, cfg.scn.vs{i}.model_simulation_p);
+    
+    % expand start states to match model states
+    assert(isequal(size(cfg.scn.vs{i}.x_start), [4 1]))
+    cfg.scn.vs{i}.x_start = [cfg.scn.vs{i}.x_start' zeros(1, cfg.scn.vs{i}.model.nx - 4)]';
 end
+
 
 
 %% Approximation

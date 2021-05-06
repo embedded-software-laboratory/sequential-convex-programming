@@ -9,30 +9,33 @@ classdef Linear < model.vehicle.Base
         Bd
     end
     
-    methods
-        function obj = Linear(p)
-            obj@model.vehicle.Base(p, 4, 2) % call superclass constructor
-            
-            dt = obj.p.dt;
+    methods (Static)
+        function p = getParamsCarMaker(dt)
+            % CarMaker model from B. Alrifaee and J. Maczijewski, ‘Real-time Trajectory optimization for Autonomous Vehicle Racing using Sequential Linearization’, in 2018 IEEE Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483, doi: 10.1109/IVS.2018.8500634.
+            % Linear model: x1 = Ax + Bu
             ddt = dt * dt / 2;
-            
-            %% Linear model: x1 = Ax + Bu
-            obj.Ad = [
+            p.Ad = [
                 1 0 dt 0;
                 0 1 0 dt;
                 0 0 1 0;
                 0 0 0 1];
-            obj.Bd = [
+            p.Bd = [
                 ddt 0;
                 0 ddt;
                 dt 0;
                 0 dt];
         end
+    end
+    
+    methods
+        function obj = Linear(Hp, dt, p)
+            obj@model.vehicle.Base(4, 2, Hp, dt, p) % call superclass constructor
+        end
             
         function dx = ode(obj, x, u)
             % TODO - is it correct? at least needs matching dt to obj.p.dt
             % for simulation
-            dx = (obj.Ad - eye(size(obj.Ad))) * x + obj.Bd * u;
+            dx = (obj.p.Ad - eye(size(obj.p.Ad))) * x + obj.p.Bd * u;
         end
         
         function [Ad, Bd, Ed] = calculatePredictionMatrices(obj, ~, ~)
@@ -40,9 +43,9 @@ classdef Linear < model.vehicle.Base
             % point. Thus, additional arguments not required
             
             % expand linear model to all prediction steps
-            Ad = repmat(obj.Ad, 1, 1, obj.p.Hp);
-            Bd = repmat(obj.Bd, 1, 1, obj.p.Hp);
-            Ed = repmat(zeros(obj.nx, 1), 1, 1, obj.p.Hp);
+            Ad = repmat(obj.p.Ad, 1, 1, obj.Hp);
+            Bd = repmat(obj.p.Bd, 1, 1, obj.Hp);
+            Ed = repmat(zeros(obj.nx, 1), 1, 1, obj.Hp);
         end
     end
 end

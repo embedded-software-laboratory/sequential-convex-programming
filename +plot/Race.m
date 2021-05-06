@@ -105,7 +105,7 @@ classdef Race < plot.Base
                 %         last_checkpoint = p.checkpoints(last_checkpoint_index);                 % Select checkpoint of last trajectory point
                 %         L = 30;                                                                 % Length of plotted linear constraints
                 %         
-                %         lastTrajectoryPoint = controller_output.x(p.ipos,p.Hp);                 % Select last trajectory point
+                %         lastTrajectoryPoint = controller_output.x(p.idx_pos,p.Hp);                 % Select last trajectory point
                 %         
                 %         dist = pdist([lastTrajectoryPoint'; [p.obstacle_1.xVal p.obstacle_1.yVal]],'euclidean');            % See SL_QP
                 %         normal_vector = - (lastTrajectoryPoint-[p.obstacle_1.xVal; p.obstacle_1.yVal])/dist;                % See SL_QP

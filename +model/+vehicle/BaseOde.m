@@ -6,9 +6,9 @@ classdef BaseOde < model.vehicle.Base
     end
     
     methods
-        function obj = BaseOde(p, nx, nu)
+        function obj = BaseOde(nx, nu, Hp, dt, p)
             % call superclass constructor
-            obj@model.vehicle.Base(p, nx, nu)
+            obj@model.vehicle.Base(nx, nu, Hp, dt, p)
             
             % pre-calc symbolic linearization
             obj.ode_jacobian = obj.linearize_model();
@@ -20,12 +20,12 @@ classdef BaseOde < model.vehicle.Base
         
         function [Ad, Bd, Ed] = calculatePredictionMatrices(obj, x0, u0)    
             % Initialize discretized matrices
-            Ad = zeros(obj.nx, obj.nx, obj.p.Hp);
-            Bd = zeros(obj.nx, obj.nu, obj.p.Hp);
-            Ed = zeros(obj.nx, obj.p.Hp);
+            Ad = zeros(obj.nx, obj.nx, obj.Hp);
+            Bd = zeros(obj.nx, obj.nu, obj.Hp);
+            Ed = zeros(obj.nx, obj.Hp);
 
             % Calculate discretized prediction matrix for each prediction step
-            for i = 1:obj.p.Hp
+            for i = 1:obj.Hp
                [Ad(:,:,i), Bd(:,:,i), Ed(:,i)] =  ...
                    obj.discretize_linearized_model(x0(:,i), u0(:,i));
             end
@@ -79,16 +79,14 @@ classdef BaseOde < model.vehicle.Base
             % Cited from
             % Raymond DeCarlo: Linear Systems: A State Variable Approach with Numerical Implementation, Prentice Hall, NJ, 1989
             % page 215
-            dt = obj.p.dt;
-
-            tmp = expm(dt*[Ac Bc; zeros(size(Ac,2)+size(Bc,2)-size(Ac,1),size(Ac,2)+size(Bc,2))]);
+            tmp = expm(obj.dt*[Ac Bc; zeros(size(Ac,2)+size(Bc,2)-size(Ac,1),size(Ac,2)+size(Bc,2))]);
             Ad = tmp(1:size(Ac,1),1:size(Ac,2));
             Bd = tmp(1:size(Bc,1),[1:size(Bc,2)]+size(Ac,2));
             %     tmp2 = expm_new(dt*[Ac Bc; zeros(size(Ac,2)+size(Bc,2)-size(Ac,1),size(Ac,2)+size(Bc,2))]);
             %     Ad2 = tmp2(1:size(Ac,1),1:size(Ac,2));
             %     Bd2 = tmp2(1:size(Bc,1),[1:size(Bc,2)]+size(Ac,2));
 
-            tmp = expm(dt*[Ac Ec; zeros(size(Ac,2)+size(Ec,2)-size(Ac,1),size(Ac,2)+size(Ec,2))]);
+            tmp = expm(obj.dt*[Ac Ec; zeros(size(Ac,2)+size(Ec,2)-size(Ac,1),size(Ac,2)+size(Ec,2))]);
             Ed = tmp(1:size(Ec,1), [1:size(Ec,2)]+size(Ac,2));
 
             % (2) Control System Toolbox (from Alrifaee 2017)

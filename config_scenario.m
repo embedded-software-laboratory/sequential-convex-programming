@@ -14,62 +14,52 @@ cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImp
 
 %% Track
 % e.g. `@track.Hockenheim4`, `@track.hockenheim_simple`
-cfg.scn.track_handle = @model.track.hockenheim_simple;
+cfg.scn.track_handle = @model.track.Hockenheim4;
 % TODO SCR only works with hockenheim_simple?
 cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 
 %% Vehicles
-% vehicle_ 1
-vehicle_ = config_vehicle(@model.vehicle.Linear);
-% TODO: automate switching number of states depending on model / model nx
-% CAVE all states of model must be contained in the first states of simulation model (in same order)
-% TODO check above
-if vehicle_.isModelLinear
-    vehicle_.xStart = [0 0 .1 0 ];
-else
-    vehicle_.xStart = [0 0 .1 0 0 0];
-end
+% x_start [pos_x pox_y v_x v_y] will be initialized to match model states
+
+% Vehicle
+vehicle_ = config_vehicle_ST;
+vehicle_.x_start = [0 0 .1 0]';
 cfg.scn.vs{end + 1} = vehicle_;
 
-% vehicle_ 2
-% vehicle_ = config_vehicle(@vehicle.Linear);
-% % TODO couple with used vehicle_ model nx
-% if vehicle_.isModelLinear
-%     vehicle_.xStart = [0 -0.05 0.1 0 ];
-% else
-%     vehicle_.xStart = [0 -0.05 0.1 0 0 0];
-% end
+% % vehicle 2
+% vehicle_ = config_vehicle_ST;
+% vehicle_.x_start = [0 -0.05 0.1 0]';
 % vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
 % vehicle_.p.a_max = 17; % decrease accel for SCR
 % cfg.scn.vs{end + 1} = vehicle_;
 
-% % vehicle_ 3
-% vehicle_ = config_vehicle_();
-% vehicle_.xStart = [0.9 0.05 0.1 0 0 0]; % Start position
+% % vehicle 3
+% vehicle_ = config_vehicle;
+% vehicle_.x_start = [0.9 0.05 0.1 0]';
 % cfg.scn.vs{end + 1} = vehicle_;
 % 
-% % vehicle_ 4
-% vehicle_ = config_vehicle_();
-% vehicle_.xStart = [1.3 -0.05 0.1 0 0 0]; % Start position
+% % vehicle 4
+% vehicle_ = config_vehicle
+% vehicle_.x_start = [1.3 -0.05 0.1 0]';
 % cfg.scn.vs{end + 1} = vehicle_;
 % 
-% % vehicle_ 5
-% vehicle_ = config_vehicle_();
-% vehicle_.xStart = [1.7 0.05 0.1 0 0 0]; % Start position
+% % vehicle 5
+% vehicle_ = config_vehicle
+% vehicle_.x_start = [1.7 0.05 0.1 0]';
 % cfg.scn.vs{end + 1} = vehicle_;
 % 
-% % vehicle_ 6
-% vehicle_ = config_vehicle_();
-% vehicle_.xStart = [2.1 -0.05 0.1 0 0 0]; % Start position
+% % vehicle 6
+% vehicle_ = config_vehicle
+% vehicle_.x_start = [2.1 -0.05 0.1 0]';
 % cfg.scn.vs{end + 1} = vehicle_;
 % 
-% % vehicle_ 7
-% vehicle_ = config_vehicle_();
-% vehicle_.xStart = [2.5 0.05 0.1 0 0 0]; % Start position
+% % vehicle 7
+% vehicle_ = config_vehicle
+% vehicle_.x_start = [2.5 0.05 0.1 0]';
 % cfg.scn.vs{end + 1} = vehicle_;
 % 
-% % vehicle_ 8
-% vehicle_ = config_vehicle_();
-% vehicle_.xStart = [2.8 -0.05 0.1 0 0 0]; % Start position
+% % vehicle 8
+% vehicle_ = config_vehicle
+% vehicle_.x_start = [2.8 -0.05 0.1 0]';
 % cfg.scn.vs{end + 1} = vehicle_;
 end
