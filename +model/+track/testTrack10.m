@@ -15,12 +15,12 @@ function checkpoints = testTrack10
     checkpoints.forward_vector = [1; 0];
     checkpoints.ds = 0;
 
-    checkpoints = track.add_turn_straight_tt10(checkpoints, 0, 7, trackWidth);
-    checkpoints = track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
-    checkpoints = track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
-    checkpoints = track.add_turn_straight_tt10(checkpoints, 0, 7, trackWidth);
-    checkpoints = track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
-    checkpoints = track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
+    checkpoints = model.track.add_turn_straight_tt10(checkpoints, 0, 7, trackWidth);
+    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
+    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
+    checkpoints = model.track.add_turn_straight_tt10(checkpoints, 0, 7, trackWidth);
+    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
+    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.5, trackWidth);
     
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
     

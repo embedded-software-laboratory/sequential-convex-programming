@@ -39,7 +39,7 @@ for i=1:length(spline)
 end
 
 trackWidth = 4.5;
-checkpoints = track.spline_to_checkpoints(spline, trackWidth, n_spline);
+checkpoints = model.track.spline_to_checkpoints(spline, trackWidth, n_spline);
 
 % remove double entry (start & end)
 checkpoints = checkpoints(2:end);

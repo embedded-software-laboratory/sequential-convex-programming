@@ -17,8 +17,8 @@ cfg_vehicle.approximation = SCR; % 'SL' or 'SCR'
 cfg_vehicle.model = model;
 cfg_vehicle.model_simulation = cfg_vehicle.model; % model used for simulation
 
-cfg_vehicle.isModelLinear = isequal(cfg_vehicle.model, @vehicle.Linear);
-cfg_vehicle.isModelSimulationLinear = isequal(cfg_vehicle.model_simulation, @vehicle.Linear);
+cfg_vehicle.isModelLinear = isequal(cfg_vehicle.model, @model.vehicle.Linear);
+cfg_vehicle.isModelSimulationLinear = isequal(cfg_vehicle.model_simulation, @model.vehicle.Linear);
 
 % obstacles are modeled as rotated rectangles that can move with
 % constant speed and direction.

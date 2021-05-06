@@ -13,12 +13,12 @@ function checkpoints = testTrack3
     checkpoints.forward_vector = [1; 0];
     checkpoints.ds = 0;
 
-    checkpoints = track.add_turn(checkpoints, 0, 3, trackWidth);
-    checkpoints = track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
-    checkpoints = track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
-    checkpoints = track.add_turn(checkpoints, 0, 3, trackWidth);
-    checkpoints = track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
-    checkpoints = track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
+    checkpoints = model.track.add_turn(checkpoints, 0, 3, trackWidth);
+    checkpoints = model.track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
+    checkpoints = model.track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
+    checkpoints = model.track.add_turn(checkpoints, 0, 3, trackWidth);
+    checkpoints = model.track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
+    checkpoints = model.track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
     
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
     

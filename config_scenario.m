@@ -14,13 +14,13 @@ cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImp
 
 %% Track
 % e.g. `@track.Hockenheim4`, `@track.hockenheim_simple`
-cfg.scn.track_handle = @track.hockenheim_simple;
+cfg.scn.track_handle = @model.track.hockenheim_simple;
 % TODO SCR only works with hockenheim_simple?
 cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 
 %% Vehicles
 % vehicle_ 1
-vehicle_ = config_vehicle(@vehicle.Linear);
+vehicle_ = config_vehicle(@model.vehicle.Linear);
 % TODO: automate switching number of states depending on model / model nx
 % CAVE all states of model must be contained in the first states of simulation model (in same order)
 % TODO check above

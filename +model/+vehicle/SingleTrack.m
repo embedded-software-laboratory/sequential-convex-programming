@@ -1,10 +1,10 @@
-classdef SingleTrack < vehicle.BaseOde
+classdef SingleTrack < model.vehicle.BaseOde
     % input: /delta steering angle, /tau torque rear wheels
     % as defined in Networked Model Predictive Vehicle Race Control, 2019,
     % Kloock et al.
     methods
         function obj = SingleTrack(p)
-            obj@vehicle.BaseOde(p, 6, 2) % call superclass constructor
+            obj@model.vehicle.BaseOde(p, 6, 2) % call superclass constructor
         end
         
         function dX = ode(obj, X, u)

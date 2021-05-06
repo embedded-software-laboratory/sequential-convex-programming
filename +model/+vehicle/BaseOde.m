@@ -1,4 +1,4 @@
-classdef BaseOde < vehicle.Base
+classdef BaseOde < model.vehicle.Base
     % base class for ODEs with symbolic differentiation and linearization
     
     properties
@@ -8,7 +8,7 @@ classdef BaseOde < vehicle.Base
     methods
         function obj = BaseOde(p, nx, nu)
             % call superclass constructor
-            obj@vehicle.Base(p, nx, nu)
+            obj@model.vehicle.Base(p, nx, nu)
             
             % pre-calc symbolic linearization
             obj.ode_jacobian = obj.linearize_model();

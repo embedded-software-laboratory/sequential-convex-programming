@@ -1,4 +1,4 @@
-classdef Linear < vehicle.Base
+classdef Linear < model.vehicle.Base
     % Linear vehicle model
     % Controls:
     %   a_x acceleration longitudinal
@@ -11,7 +11,7 @@ classdef Linear < vehicle.Base
     
     methods
         function obj = Linear(p)
-            obj@vehicle.Base(p, 4, 2) % call superclass constructor
+            obj@model.vehicle.Base(p, 4, 2) % call superclass constructor
             
             dt = obj.p.dt;
             ddt = dt * dt / 2;
