@@ -1,7 +1,7 @@
 % Default config for a single vehicle
 
-function cfg_vh = config_vehicle_linearLiniger(cfg)
-cfg_vh = config_vehicle(cfg);
+function cfg_vh = vehicle_linLiniger(cfg)
+cfg_vh = config.vehicle(cfg);
 
 %% Model
 % CAVE: model params should match across controller and simulation model

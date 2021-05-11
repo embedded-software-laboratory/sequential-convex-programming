@@ -5,7 +5,7 @@
 %   ensure that the start position of the vehicles is on the first
 %   lap regarding the track center-checkpoints.
 
-function cfg = config_scenario(cfg)
+function cfg = scenario(cfg)
 cfg.scn.obstacles = {};
 cfg.scn.vs = {};
 
@@ -22,12 +22,12 @@ cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 % x_start [pos_x pox_y v_x v_y] will be initialized to match model states
 
 % Vehicle
-vehicle_ = config_vehicle(cfg);
+vehicle_ = config.vehicle(cfg);
 vehicle_.x_start = [0 0 .1 0]';
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle 2
-vehicle_ = config_vehicle_linearLiniger(cfg);
+vehicle_ = config.vehicle_linLiniger(cfg);
 vehicle_.x_start = [0 -0.05 0.1 0]';
 % vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
 % vehicle_.p.a_max = 17; % decrease accel for SCR

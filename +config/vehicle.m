@@ -1,6 +1,6 @@
 % Default config for a single vehicle
 
-function cfg_vh = config_vehicle(cfg)
+function cfg_vh = vehicle(cfg)
 cfg_vh = struct;
 
 %% General Optimization

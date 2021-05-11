@@ -25,8 +25,8 @@ timer_overall = tic;
 % loading default config if no is provided
 if ~exist('cfg', 'var')
     disp('Using config script as no provided as argument')
-    cfg = config();
-    cfg = config_scenario(cfg);
+    cfg = config.config();
+    cfg = config.scenario(cfg);
     cfg = init_config(cfg);
 end
 

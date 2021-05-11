@@ -1,7 +1,7 @@
 % Default config for a single vehicle
 
-function cfg_vh = config_vehicle_ST(cfg)
-cfg_vh = config_vehicle(cfg);
+function cfg_vh = vehicle_ST(cfg)
+cfg_vh = config.vehicle(cfg);
 
 % FIXME really different weight necessary?
 cfg_vh.p.R = 350 * eye(2); % Penalty weight for control changes over time
