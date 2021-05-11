@@ -93,16 +93,16 @@ classdef DashboardStatesNInputs < plot.Base
                 axis off
                 
                 % assemble text
-                obj.add_table_line('Control: press ESC to abort, SPACE to pause', '');
+                obj.add_table_line('\bfControl: press ESC to abort, SPACE to pause\rm', '');
                 obj.add_table_line('', '');
-                obj.add_table_line('Configuration', '');
+                obj.add_table_line('\bfConfiguration\rm', '');
                 % get name of function handle
                 obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
                 
                 for i = 1:length(cfg.scn.vs)
                     vh = cfg.scn.vs{i};
                     obj.add_table_line('', '');
-                    obj.add_table_line(['Vehicle ' num2str(i)], '');
+                    obj.add_table_line(['\bfVehicle ' num2str(i) '\rm'], '');
                     obj.add_table_line('Vehicle Model', class(vh.model));
                     obj.add_table_line('Vehicle Params', vh.model.p.paramsName);
                     obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
