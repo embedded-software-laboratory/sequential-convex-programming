@@ -6,11 +6,14 @@ classdef DashboardAcceleration < plot.Base
         function plot(obj, cfg, ws)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
+            % TODO only using vehicle 1
+            i_vehicle = 1;
+            
+            % only plot for linear models (having accelerations as input)
+            if ~cfg.scn.vs{i_vehicle}.isModelLinear; return; end
             
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
-            % TODO only using vehicle 1
-            i_vehicle = 1;
             p = cfg.scn.vs{i_vehicle}.p;
             u = ws.vs{i_vehicle}.u;
                 
@@ -22,8 +25,8 @@ classdef DashboardAcceleration < plot.Base
                 hold on
                 box on
 
-
-                u_max = max([max(p.a_backward_max_list) max(p.a_forward_max_list) max(p.a_lateral_max_list)]);
+                model_p = cfg.scn.vs{i_vehicle}.model_p;
+                u_max = max([max(model_p.a_backward_max) max(model_p.a_forward_max) max(model_p.a_lateral_max)]);
 
                 a = linspace(0,2*pi,50);
                 c = cos(a);

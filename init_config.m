@@ -37,9 +37,14 @@ for i = 1:length(cfg.scn.vs)
     % expand start states to match model states
     assert(isequal(size(cfg.scn.vs{i}.x_start), [4 1]))
     cfg.scn.vs{i}.x_start = [cfg.scn.vs{i}.x_start' zeros(1, cfg.scn.vs{i}.model.nx - 4)]';
+    
+    %% Inputs
+    % SL Acceleration: pre-compute for speed
+    delta_angle = 2*pi / cfg.scn.vs{i}.p.n_acceleration_limits;
+    tmp = (1:cfg.scn.vs{i}.p.n_acceleration_limits)' .* delta_angle;
+    cfg.scn.vs{i}.p.acceleration_cos = cos(tmp);
+    cfg.scn.vs{i}.p.acceleration_sin = sin(tmp);
 end
-
-
 
 %% Approximation
 for i = 1:length(cfg.scn.vs)

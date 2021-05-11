@@ -145,7 +145,7 @@ for k = 1:p.Hp
             h = @controller.SCR.acceleration_constraint;
         end
         
-        [Au_acc, b_acc] = h(p, (1:p.n_acceleration_limits)', x(:, k));
+        [Au_acc, b_acc] = h(vh.model_p, p, (1:p.n_acceleration_limits)', x(:, k));
         n_rows = n_rows(end) + p.n_acceleration_limits;
         
         A_ineq(n_rows - p.n_acceleration_limits + 1:n_rows, idx_u(k,:)) = Au_acc;
@@ -330,8 +330,10 @@ bound_lower(idx_slack) = 0;
 if isLinear
     % Bounded acceleration
     if vh.approximationIsSL
-        bound_upper(idx_u(:)) =  p.a_max;
-        bound_lower(idx_u(:)) = -p.a_max;
+        % FIXME why bounds, acceleration constraints are already considered
+        % in inequalities?
+        bound_upper(idx_u(:)) =  vh.model_p.a_max;
+        bound_lower(idx_u(:)) = -vh.model_p.a_max;
 
         % Trust region for change in position
         % Bounded states (trust region for change in position) - kinetic

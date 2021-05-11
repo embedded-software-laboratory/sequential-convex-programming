@@ -4,6 +4,10 @@ classdef SingleTrack < model.vehicle.BaseOde
     methods (Static)
         function p = getParamsLinigerRC_1_43
             % Liniger RC 1:43 MPCC from GitHub https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getModelParams.m
+            % Bounds from https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getMPC_vars.m
+            
+            p.paramsName = 'ST from Liniger 1:43';
+            
             % Tire
             p.Br = 3.3852;
             p.Cr = 1.2691;
@@ -24,10 +28,19 @@ classdef SingleTrack < model.vehicle.BaseOde
             p.Cm2 = 0.0545;
             p.Cr0 = 0.0518;
             p.Cr2 = 0.00035;
+            
+            % Bound input
+            % duty_cycle -0.1 ... 1
+            % delta_steering -0.35 ... 0.35
+            % Bound input changes
+            % duty cycle -1 ... 1
+            % delta_steering -1 ... 1
         end
         
         function p = getParamsKloockRC_1_43
             % Liniger, acc. to M. Kloock, P. Scheffe, L. Botz, J. Maczijewski, B. Alrifaee, and S. Kowalewski, ‘Networked Model Predictive Vehicle Race Control’, in 2019 IEEE Intelligent Transportation Systems Conference (ITSC), Auckland, New Zealand, Oct. 2019, pp. 1552–1557, doi: 10.1109/ITSC.2019.8917222.
+            
+            p.paramsName = 'ST from Kloock via Plots ST Liniger 1:43';
             
             % Tire (CAVE: being different than Liniger GitHub's)
             p.Bf = 3.0323;
@@ -58,18 +71,6 @@ classdef SingleTrack < model.vehicle.BaseOde
 
     methods
         function obj = SingleTrack(Hp, dt, p)
-            % inputs
-            p.idx_d = 1; % steering angle
-            p.idx_t = 2; % motor torque
-            
-            % states
-            p.idx_pos_x = 1;    % x-position of vehicle CoG in intertial frame
-            p.idx_pos_y = 2;    % y-position of vehicle CoG in intertial frame
-            p.idx_v_x = 3;  % longitudinal velocity of vehicle CoG
-            p.idx_v_y = 4;  % lateral velocity of vehicle CoG
-            p.idx_yaw = 5;	% vehicle angle relative to inertial frame (yaw)
-            p.idx_dyaw = 6;	% yaw rate
-            
             obj@model.vehicle.BaseOde(6, 2, Hp, dt, p) % call superclass constructor
         end
         
@@ -84,16 +85,28 @@ classdef SingleTrack < model.vehicle.BaseOde
             % Inputs:   p (parameter struct), X (vector of current system states),
             %           u (vector of current system inputs)
             % Ouputs:   dX (vector of first order differential equations)
+            
+            % States:
+            % 1 x-position of vehicle CoG in intertial frame
+            % 2 y-position of vehicle CoG in intertial frame
+            % 3 longitudinal velocity of vehicle CoG
+            % 4 lateral velocity of vehicle CoG
+            % 5 vehicle angle relative to inertial frame (yaw)
+            % 6 yaw rate
+            
+            % Inputs
+            % 1 steering angle
+            % 2 motor torque
 
             %% Readability
             % States
-            v_x   = x(obj.p.idx_v_x);
-            v_y   = x(obj.p.idx_v_y);
-            yaw   = x(obj.p.idx_yaw);
-            dyaw  = x(obj.p.idx_dyaw);
+            v_x   = x(3);
+            v_y   = x(4);
+            yaw   = x(5);
+            dyaw  = x(6);
             % Inputs
-            delta = u(obj.p.idx_d);
-            t     = u(obj.p.idx_t);
+            delta = u(1);
+            t     = u(2);
 
             %% Tire forces
             % front/rear tire side slip angle
@@ -103,16 +116,16 @@ classdef SingleTrack < model.vehicle.BaseOde
             F_fy = obj.p.Df * sin(obj.p.Cf * atan(obj.p.Bf * alpha_f));
             F_ry = obj.p.Dr * sin(obj.p.Cr * atan(obj.p.Br * alpha_r));
             % rear tire longitudinal force
-            F_rx = (obj.p.Cm1 - obj.p.Cm2) * t - obj.p.Cr0 - obj.p.Cr2*v_x^2;
+            F_rx = (obj.p.Cm1 - obj.p.Cm2 * v_x) * t - obj.p.Cr0 - obj.p.Cr2 * v_x^2;
 
             %% ODE
             dX = [
                 v_x * cos(yaw) - v_y * sin(yaw);
-            	v_x * sin(yaw) + v_y * cos(yaw);
-            	1/obj.p.m * (F_rx - F_fy * sin(delta) + obj.p.m * v_y * dyaw);
-            	1/obj.p.m * (F_ry + F_fy * cos(delta) - obj.p.m * v_x * dyaw);
-            	dyaw;
-            	1/obj.p.Iz * (F_fy * obj.p.l_f * cos(delta) - F_ry * obj.p.l_r)];
+                v_x * sin(yaw) + v_y * cos(yaw);
+                1/obj.p.m * (F_rx - F_fy * sin(delta) + obj.p.m * v_y * dyaw);
+                1/obj.p.m * (F_ry + F_fy * cos(delta) - obj.p.m * v_x * dyaw);
+                dyaw;
+                1/obj.p.Iz * (F_fy * obj.p.l_f * cos(delta) - F_ry * obj.p.l_r)];
         end
     end
 end

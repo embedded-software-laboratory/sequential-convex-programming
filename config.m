@@ -10,6 +10,7 @@ warning off backtrace
 cfg.env.cplex.path = 'D:\#local Apps\CPLEX_MATLAB_x64';
 
 cfg.outputPath = ['output\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
+cfg.tempPath = 'temp\';
     
 %% Race
 cfg.race.n_laps = 3;            % Number of laps to be driven

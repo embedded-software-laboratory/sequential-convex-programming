@@ -104,7 +104,9 @@ classdef DashboardStatesNInputs < plot.Base
                     obj.add_table_line('', '');
                     obj.add_table_line(['Vehicle ' num2str(i)], '');
                     obj.add_table_line('Vehicle Model', class(vh.model));
-                    obj.add_table_line('Vehicle Simulation Model', class(vh.model_simulation));
+                    obj.add_table_line('Vehicle Params', vh.model.p.paramsName);
+                    obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
+                    obj.add_table_line('Vehicle Sim Params', vh.model_simulation.p.paramsName);
                     if vh.approximation == vh.approximationSL
                         approx = 'SL';
                     elseif vh.approximation == vh.approximationSCR
@@ -117,7 +119,7 @@ classdef DashboardStatesNInputs < plot.Base
                 
                 % place text top left
                 text(0, 1, obj.table_desc, 'VerticalAlignment', 'top')
-                text(0.75, 1, obj.table_val, 'VerticalAlignment', 'top')
+                text(0.6, 1, obj.table_val, 'VerticalAlignment', 'top')
 
                 obj.is_background_plotted = true;
             else
