@@ -28,7 +28,11 @@ cfg.plot.is_enabled = true;
 cfg.plot.has_accelerations = true;
 cfg.plot.has_focus_on_vehicle = false;
 
-% init plots - make sure to give unique figure numbers
+% fixed plots drawn at initialization
+% CAVE: hard-coded in init, here only for proper figure order
+plot.TrackPolygons(1);
+
+% init loop plots - make sure to give unique figure numbers
 cfg.plot.plots_to_draw = {
     plot.Race(10)
     plot.DashboardStatesNInputs(11)
