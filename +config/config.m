@@ -30,7 +30,7 @@ cfg.plot.has_focus_on_vehicle = false;
 
 % init plots - make sure to give unique figure numbers
 cfg.plot.plots_to_draw = {
-    plot.Race(1)
-    plot.DashboardStatesNInputs(2)
-    plot.DashboardAcceleration(3)};
+    plot.Race(10)
+    plot.DashboardStatesNInputs(11)
+    plot.DashboardAcceleration(12)};
 end

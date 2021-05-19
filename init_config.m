@@ -63,6 +63,9 @@ cfg.scn.track = cfg.scn.track_handle();
 % Precompute for speed
 cfg.scn.track_center = [cfg.scn.track.center];
 
+% plot track, includes prerun of track SCR
+plot.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_SCR_epsilon_area_tolerance);
+
 % Polygon Creation (for SCR)
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vs)
