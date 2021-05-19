@@ -16,10 +16,10 @@ function [checkpoints, creation_scale] = testCircle
     checkpoints.forward_vector = [1; 0];
     checkpoints.ds = 0;
 
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.25, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.25, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.25, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.25, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.25, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.25, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.25, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.25, trackWidth);
     
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
 end

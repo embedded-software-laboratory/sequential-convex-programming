@@ -15,12 +15,12 @@ function [checkpoints, creation_scale] = testOvalC
     checkpoints.forward_vector = [1; 0];
     checkpoints.ds = 0;
 
-    checkpoints = model.track.add_turn_straight(checkpoints, 0, 3, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.28, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.28, trackWidth);
-    checkpoints = model.track.add_turn_straight(checkpoints, 0, 3, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.28, trackWidth);
-    checkpoints = model.track.add_turn_corner(checkpoints, -0.25, 0.28, trackWidth);
+    checkpoints = model.track.add_turn_N50(checkpoints, 0, 3, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.28, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.28, trackWidth);
+    checkpoints = model.track.add_turn_N50(checkpoints, 0, 3, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.28, trackWidth);
+    checkpoints = model.track.add_turn_N30(checkpoints, -0.25, 0.28, trackWidth);
     
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
 end

@@ -187,7 +187,8 @@ classdef Race < plot.Base
                 plot([right_points(1,:) right_points(1,1)],[right_points(2,:) right_points(2,1)],'.k');
             end
 
-            % Center track in figure, add padding
+            % Center track in figure, add padding (else will move due to
+            % vehicle plotting
             bounds = [min([left_points right_points]');max([left_points right_points]')];    
             xlim(bounds(:,1))
             ylim(bounds(:,2))
@@ -196,6 +197,7 @@ classdef Race < plot.Base
             ylim(mean(ylim) + diff(ylim) * [-1 1] * 0.6)    
             daspect([1 1 1])
             axis off
+            xlabel('x [m]'); ylabel('y [m]')
             
             % add scale
             text(0.5, .6, 'Scale: 1m', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
