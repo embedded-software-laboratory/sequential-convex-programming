@@ -1,4 +1,4 @@
-function checkpoints = HockenheimShort
+function [checkpoints, creation_scale] = HockenheimShort
 % The layout of the Grand Prix Circuit of Hockenheim, Germany, has been
 % used as an inspiration for this layout. The track is designed for
 % races of model scale cars of scale 1:43. However, the track layout
@@ -6,6 +6,7 @@ function checkpoints = HockenheimShort
 % to maneuver.
 % FIXME: which scale? trackWidth is the same as other HockenheimGP, but
 % states other scale
+creation_scale = 1/43;
 
 trackWidth = 0.25;
 

@@ -1,9 +1,11 @@
-function checkpoints = testTrack6
+function [checkpoints, creation_scale] = testCircle
     % scale 1:43
     % by Botz
     
     % Circular track corresponding to new vehicle dimensions (length
     % 0.075 m, width 0.045 m) for provoked oversteering/drifting.
+    creation_scale = 1/43;
+
     trackWidth = 0.3;
 
     checkpoints = struct;

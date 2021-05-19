@@ -98,12 +98,14 @@ classdef DashboardStatesNInputs < plot.Base
                 subplot(3,3,[3,6,9]);
                 axis off
                 
-                % assemble text
+                %% assemble text
                 obj.add_table_line('\bfControl: press ESC to abort, SPACE to pause\rm', '');
                 obj.add_table_line('', '');
                 obj.add_table_line('\bfConfiguration\rm', '');
                 % get name of function handle
                 obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
+                obj.add_table_line('Track Creation Scale', utils.rat2str(cfg.scn.track_creation_scale));
+                
                 
                 for i = 1:length(cfg.scn.vs)
                     vh = cfg.scn.vs{i};                

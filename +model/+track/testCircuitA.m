@@ -1,7 +1,8 @@
-function checkpoints = testTrack7
+function [checkpoints, creation_scale] = testCircuitA
     % scale 1:43
     % by Botz
     % Real track layout similar to Janis
+    creation_scale = 1/43;
 
     trackWidth = 0.3;
 

@@ -1,8 +1,10 @@
-function checkpoints = hockenheim_simple
+function [checkpoints, creation_scale] = testCircuitE
 % scale 1:1
 % by Maczijewski
 % was called "hockenheim_simple" despite having not similarity
 % creating simple, artificial hockenheim track
+creation_scale = 1/1;
+
 trackWidth = 7;
 
 % start point

@@ -1,8 +1,9 @@
-function checkpoints = testTrack2
+function [checkpoints, creation_scale] = testOvalA
     % scale 1:1
     % by Botz
     % Oval track corresponding to original dimensions of the vehicles
     % according to Maczijewski 2017.
+    creation_scale = 1/1;
 
     trackWidth = 10;
 

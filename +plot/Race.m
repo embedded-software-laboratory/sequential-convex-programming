@@ -16,7 +16,7 @@ classdef Race < plot.Base
                 clf(obj.figure_handle)
                 
                 set(obj.figure_handle, 'color', [1 1 1]);
-                set(obj.figure_handle, 'Name', 'Race (States: Position x and y)');
+                set(obj.figure_handle, 'Name', ['Race (States: Position x and y) [track created with scale ' utils.rat2str(scn.track_creation_scale) ']']);
                 hold on
                 
                 % create legend accordingly to cars drawn below

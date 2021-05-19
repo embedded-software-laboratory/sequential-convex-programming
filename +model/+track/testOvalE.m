@@ -1,8 +1,9 @@
-function checkpoints = testTrack3
+function [checkpoints, creation_scale] = testOvalE
     % scale 1:43
     % by Botz
     % Basic oval track corresponding to new vehicle dimensions (length
-    % 0.075 m, width 0.045 m).
+    % 0.075 m, width 0.045 m)
+    creation_scale = 1/43;
 
     trackWidth = 0.2;
 
@@ -22,5 +23,4 @@ function checkpoints = testTrack3
     checkpoints = model.track.add_turn(checkpoints, -0.25, 0.19, trackWidth);
     
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
-    
 end

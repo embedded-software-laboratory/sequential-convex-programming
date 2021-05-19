@@ -1,5 +1,10 @@
-function checkpoints = hockenheim_record(checkpoint_distance, trackWidth)
+function [checkpoints, creation_scale] = HockenheimShortRecorded(checkpoint_distance, trackWidth)
 % inputs e.g. 1, 7
+creation_scale = 1/1;
+
+if ~exist('checkpoint_distance', 'var'); checkpoint_distance = 1; end
+if ~exist('trackWidth', 'var'); trackWidth = 7; end
+
 % loads and prepares reald world (?) path of Hockenheim
 data = load('model/track/HockenheimShortRecorded.mat');
 path = data.vehicle_path.Data(:,1:2);

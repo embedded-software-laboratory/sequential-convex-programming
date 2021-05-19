@@ -1,7 +1,9 @@
-function checkpoints = testTrack8
+function [checkpoints, creation_scale] = testCircuitLiniger
     % scale 1:43
     % by Botz
     % track similar to A. Liniger, A. Domahidi, and M. Morari, “Optimization-Based Autonomous Racing of 1:43 Scale RC Cars,” Optim. Control Appl. Meth., vol. 36, no. 5, pp. 628–647, Sep. 2015, doi: 10.1002/oca.2123.
+    creation_scale = 1/43;
+
     trackWidth = 0.3;
 
     checkpoints = struct;

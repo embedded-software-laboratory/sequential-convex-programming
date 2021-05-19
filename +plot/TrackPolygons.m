@@ -1,14 +1,18 @@
 classdef TrackPolygons < plot.Base
     % plot discretized track's polygon creation process
     %
-    % usage example `plot.TrackPolygons().plot(model.track.Hockenheim4, 0.5)`
+    % usage example
+    % ```
+    % [checkpoints, track_creation_scale] = model.track.HockenheimShort()
+    % plot.TrackPolygons().plot(checkpoints, track_creation_scale, 0.5)
+    % ```
     
     methods
-        function plot(obj, checkpoints, epsilon_area_tolerance)
+        function plot(obj, checkpoints, track_creation_scale, epsilon_area_tolerance)
             % epsilon_area_tolerance [m^2]: maximal poylgon differnce for
             % merging
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
-            set(obj.figure_handle, 'Name', 'Track - SCR', 'WindowState', 'maximized');
+            set(obj.figure_handle, 'Name', sprintf('Track - SCR (scale %s)', utils.rat2str(track_creation_scale)), 'WindowState', 'maximized');
             
             t = tiledlayout(2,2);
             t.Padding = 'tight';
@@ -25,11 +29,11 @@ classdef TrackPolygons < plot.Base
             plotTrackPolygons_(track, sprintf('1) Tesselation to %i Polygons', length(track.polygons)))
             % 2) merge polygons
             ax3 = nexttile;
-            track = controller.SCR.generate_track_polygons.merge_polygons(track, epsilon_area_tolerance);
+            track = controller.SCR.generate_track_polygons.merge_polygons(track, track_creation_scale, epsilon_area_tolerance);
             plotTrackPolygons_(track, sprintf('2) Merged to %i Polygons', length(track.polygons)))
             % 3) add overlaps
             ax4 = nexttile;
-            track = controller.SCR.generate_track_polygons.add_overlaps(track);
+            track = controller.SCR.generate_track_polygons.add_overlaps(track, track_creation_scale);
             plotTrackPolygons_(track, sprintf('3) Overlapped %i Polygons', length(track.polygons)))
             
             linkaxes([ax1 ax2 ax3 ax4],'xy')

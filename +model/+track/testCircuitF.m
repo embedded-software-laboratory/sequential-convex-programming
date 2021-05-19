@@ -1,6 +1,8 @@
-function checkpoints = testTrack1
+function [checkpoints, creation_scale] = testCircuitF
 % scale 1:1
 % by Maczijewski
+creation_scale = 1/1;
+
 trackWidth = 7;
 
 checkpoints = struct; % contains all relevatn information/a definition of the track layout

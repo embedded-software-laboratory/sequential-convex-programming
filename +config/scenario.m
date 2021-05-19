@@ -13,8 +13,8 @@ cfg.scn.vs = {};
 cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImpr' or 'EllipseImpr' 
 
 %% Track
-% e.g. `@track.Hockenheim4`, `@track.hockenheim_simple`
-cfg.scn.track_handle = @model.track.Hockenheim4;
+% e.g. HockenheimShort, testCircuitE
+cfg.scn.track_handle = @model.track.HockenheimShort;
 % TODO SCR only works with hockenheim_simple?
 cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 

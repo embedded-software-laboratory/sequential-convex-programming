@@ -1,8 +1,9 @@
-function checkpoints = testTrack10
+function [checkpoints, creation_scale] = testOvalB
     % scale 1:43
     % by Botz
     % Oval track corresponding to new vehicle dimensions (length
     % 0.075 m, width 0.045 m).
+    creation_scale = 1/43;
 
     trackWidth = 0.3;
 

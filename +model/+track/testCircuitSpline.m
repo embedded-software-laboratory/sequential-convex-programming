@@ -1,6 +1,10 @@
-function checkpoints = testtrack_1(n_spline)
+function [checkpoints, creation_scale] = testCircuitSpline(n_spline)
 % n_spline e.g. 10
 % was called TestTrack1
+creation_scale = 1/1;
+
+if ~exist('n_spline', 'var'); n_spline = 10; end
+
 spline = struct;
 spline(1).point = [58 106]';
 spline(1).tangent = [-10 -27]';

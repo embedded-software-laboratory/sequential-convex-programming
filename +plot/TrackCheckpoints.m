@@ -1,15 +1,19 @@
 classdef TrackCheckpoints < plot.Base
     % plot discretized track's checkpoints
     %
-    % usage example `plot.TrackCheckpoints().plot(model.track.Hockenheim4)`
+    % usage example
+    % ```
+    % [checkpoints, track_creation_scale] = model.track.HockenheimShort()
+    % plot.TrackCheckpoints().plot(checkpoints, track_creation_scale)
+    % ```
     
     methods
-        function plot(obj, checkpoints)
+        function plot(obj, checkpoints, track_creation_scale)
             % in case is distinct plot (need to check object as `isnan`
             % doesn't work with objects)
             if isobject(obj.figure_handle) || ~isnan(obj.figure_handle)
                 set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
-                set(obj.figure_handle, 'Name', 'Track - Discretized & Checkpoints');
+                set(obj.figure_handle, 'Name', sprintf('Track - Discretized & Checkpoints (scale %s)', utils.rat2str(track_creation_scale)));
             end
             
             hold on

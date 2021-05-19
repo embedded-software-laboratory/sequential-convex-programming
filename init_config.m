@@ -59,18 +59,18 @@ for i = 1:length(cfg.scn.vs)
 end
 
 %% Track
-cfg.scn.track = cfg.scn.track_handle();
+[cfg.scn.track, cfg.scn.track_creation_scale] = cfg.scn.track_handle();
 % Precompute for speed
 cfg.scn.track_center = [cfg.scn.track.center];
 
 % plot track, includes prerun of track SCR
-plot.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_SCR_epsilon_area_tolerance);
+plot.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
 
 % Polygon Creation (for SCR)
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vs)
     if cfg.scn.vs{i}.approximationIsSCR
-        cfg.scn.track_polygons = controller.SCR.generate_track_polygons.main(cfg.scn.track, cfg.scn.track_SCR_epsilon_area_tolerance).polygons;
+        cfg.scn.track_polygons = controller.SCR.generate_track_polygons.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance).polygons;
         break
     end
 end
