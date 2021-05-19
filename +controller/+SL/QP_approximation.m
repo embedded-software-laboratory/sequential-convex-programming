@@ -237,12 +237,14 @@ assert(n_rows == n_ineq);
 objective_lin(idx_pos(p.Hp,:)) = -p.Q * checkpoints(checkpoint_indices(p.Hp)).forward_vector;
 
 % Minimize control change over time (36)
-objective_quad(idx_u(1,:), idx_u(1,:)) = p.R;
+% create repetetive structure
 for i = 1:p.Hp - 1
     objective_quad(idx_u(  i, :), idx_u(  i, :)) = 2 * p.R;  
     objective_quad(idx_u(  i, :), idx_u(i+1, :)) = -p.R; 
     objective_quad(idx_u(i+1, :), idx_u(  i, :)) = -p.R;
 end
+% overwrite repetetive for first & last entry
+objective_quad(idx_u(1,:), idx_u(1,:)) = p.R;
 objective_quad(idx_u(p.Hp, :), idx_u(p.Hp, :)) = p.R;
 
 % Minimize slack var (parameter q in paper?)
