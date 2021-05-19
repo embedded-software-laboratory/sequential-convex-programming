@@ -5,8 +5,9 @@ classdef TrackCheckpoints < plot.Base
     
     methods
         function plot(obj, checkpoints)
-            % in case is distinct plot
-            if ~isnan(obj.figure_handle)
+            % in case is distinct plot (need to check object as `isnan`
+            % doesn't work with objects)
+            if isobject(obj.figure_handle) || ~isnan(obj.figure_handle)
                 set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
                 set(obj.figure_handle, 'Name', 'Track - Discretized & Checkpoints');
             end
@@ -33,7 +34,7 @@ classdef TrackCheckpoints < plot.Base
             plot([right(1,:) right(1,1)],[right(2,:) right(2,1)], 'r');
 
             
-            if ~isnan(obj.figure_handle)
+            if isobject(obj.figure_handle) || ~isnan(obj.figure_handle)
                 xlabel('x [m]'); ylabel('y [m]')
             end
             legend(...
