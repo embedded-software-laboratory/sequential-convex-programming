@@ -1,9 +1,8 @@
 function checkpoints = testTrack9
-    
+    % scale 1:43
+    % by Botz
     % Oval track corresponding to new vehicle dimensions (length
     % 0.075 m, width 0.045 m).
-    
-    % Adapted number of checkpoints (more on straights, less in corners).
 
     trackWidth = 0.2;
 
@@ -38,6 +37,4 @@ function checkpoints = testTrack9
     checkpoints = model.track.add_turn_corner(checkpoints, -0.375, 0.5, trackWidth);
     
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
-    
 end
-

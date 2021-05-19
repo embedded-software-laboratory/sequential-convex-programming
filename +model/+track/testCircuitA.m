@@ -1,8 +1,7 @@
 function checkpoints = testTrack7
-    
+    % scale 1:43
+    % by Botz
     % Real track layout similar to Janis
-    
-    % Adapted number of checkpoints (more on straights, less in corners).
 
     trackWidth = 0.3;
 

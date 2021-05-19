@@ -1,6 +1,7 @@
 function checkpoints = hockenheim_record(checkpoint_distance, trackWidth)
+% inputs e.g. 1, 7
 % loads and prepares reald world (?) path of Hockenheim
-data = load('track/hockenheim_record.mat');
+data = load('model/track/HockenheimShortRecorded.mat');
 path = data.vehicle_path.Data(:,1:2);
 
 checkpoints = struct('left',{},'right',{},'center',{});

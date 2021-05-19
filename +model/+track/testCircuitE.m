@@ -1,4 +1,7 @@
 function checkpoints = hockenheim_simple
+% scale 1:1
+% by Maczijewski
+% was called "hockenheim_simple" despite having not similarity
 % creating simple, artificial hockenheim track
 trackWidth = 7;
 

@@ -1,5 +1,6 @@
 function checkpoints = testtrack_1(n_spline)
-% creating artificial test tracl, named TestTrack1
+% n_spline e.g. 10
+% was called TestTrack1
 spline = struct;
 spline(1).point = [58 106]';
 spline(1).tangent = [-10 -27]';

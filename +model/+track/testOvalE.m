@@ -1,5 +1,6 @@
 function checkpoints = testTrack3
-    
+    % scale 1:43
+    % by Botz
     % Basic oval track corresponding to new vehicle dimensions (length
     % 0.075 m, width 0.045 m).
 

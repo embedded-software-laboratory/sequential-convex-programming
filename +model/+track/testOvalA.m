@@ -1,5 +1,6 @@
 function checkpoints = testTrack2
-
+    % scale 1:1
+    % by Botz
     % Oval track corresponding to original dimensions of the vehicles
     % according to Maczijewski 2017.
 

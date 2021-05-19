@@ -1,9 +1,7 @@
 function checkpoints = testTrack8
-    
-    % Real track layout similar to Liniger Papers 2014-2018
-    
-    % Adapted number of checkpoints (more on straights, less in corners).
-
+    % scale 1:43
+    % by Botz
+    % track similar to A. Liniger, A. Domahidi, and M. Morari, “Optimization-Based Autonomous Racing of 1:43 Scale RC Cars,” Optim. Control Appl. Meth., vol. 36, no. 5, pp. 628–647, Sep. 2015, doi: 10.1002/oca.2123.
     trackWidth = 0.3;
 
     checkpoints = struct;
@@ -43,8 +41,5 @@ function checkpoints = testTrack8
     checkpoints = model.track.add_turn_straight(checkpoints, 0, 1.6, trackWidth);
     checkpoints = model.track.add_turn_corner(checkpoints, -0.375, 0.525, trackWidth);
     
-    
     checkpoints = checkpoints(2:end); % select checkpoints 2 till end
-    
 end
-
