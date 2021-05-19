@@ -20,16 +20,21 @@ classdef DashboardStatesNInputs < plot.Base
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
     
+            % choose vehicle
+            i_veh = 1;
+            colors = utils.getRwthColors(100);
+            color = colors(i_veh, :); % need to store color for later plot updates (else Matlab's gc will delete)
+            
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             %% Prepare data
-            x = ws.vs{1}.x;
-            x = [ws.vs{1}.x0 x];
+            x = ws.vs{i_veh}.x;
+            x = [ws.vs{i_veh}.x0 x];
 
-            u = ws.vs{1}.u;
+            u = ws.vs{i_veh}.u;
             u = [u u(:,end)]; % Duplicate last entry for better visibility in plot
 
-            Hp = size(ws.vs{1}.x,2);
+            Hp = size(ws.vs{i_veh}.x,2);
             Tx = 0:1:Hp;
             Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
@@ -39,16 +44,17 @@ classdef DashboardStatesNInputs < plot.Base
                 set(obj.figure_handle, 'Name', 'Dashboard: States & Inputs');
                 hold on
                 
+                
                 % create plots
                 subplot(3,3,1);
-            	obj.subplot_plot_handles{1} = plot(Tx, x(3,:));
+            	obj.subplot_plot_handles{1} = plot(Tx, x(3,:), 'Color', color);
                 title('v_x [m/s]')
 %                 ylim([-3 3])
                 xlim([Tx(1) Tx(end)])
                 grid on
 
                 subplot(3,3,2);
-                obj.subplot_plot_handles{2} = plot(Tx, x(4,:));
+                obj.subplot_plot_handles{2} = plot(Tx, x(4,:), 'Color', color);
                 title('v_y [m/s]')
 %                 ylim([-0.7 0.7])
                 xlim([Tx(1) Tx(end)])
@@ -56,7 +62,7 @@ classdef DashboardStatesNInputs < plot.Base
 
                 if length(x(:, 1)) >=6 % TODO make state dependent
                     subplot(3,3,4);
-                    obj.subplot_plot_handles{3} = plot(Tx, x(5,:));
+                    obj.subplot_plot_handles{3} = plot(Tx, x(5,:), 'Color', color);
                     title('Yaw Angle Phi [rad]')
                     ylim([-3*pi 3*pi])
                     xlim([Tx(1) Tx(end)])
@@ -65,7 +71,7 @@ classdef DashboardStatesNInputs < plot.Base
                     grid on
 
                     subplot(3,3,5);
-                    obj.subplot_plot_handles{4} = plot(Tx, x(6,:));
+                    obj.subplot_plot_handles{4} = plot(Tx, x(6,:), 'Color', color);
                     title('Yaw Rate W [rad/sec]')
                     ylim([-3.5*pi 3.5*pi])
                     xlim([Tx(1) Tx(end)])
@@ -75,14 +81,14 @@ classdef DashboardStatesNInputs < plot.Base
                 end
 
                 subplot(3,3,7);
-                obj.subplot_plot_handles{5} = plot(Tu, u(1,:));
+                obj.subplot_plot_handles{5} = plot(Tu, u(1,:), 'Color', color);
                 title('Input Steering Angle [rad]')
                 ylim([-0.4 0.4])
                 xlim([Tu(1) Tu(end)])
                 grid on
 
                 subplot(3,3,8);
-                obj.subplot_plot_handles{6} = plot(Tu, u(2,:));
+                obj.subplot_plot_handles{6} = plot(Tu, u(2,:), 'Color', color);
                 title('Input Torque [Nm]')
                 ylim([-0.12 0.12])
                 xlim([Tu(1) Tu(end)])
@@ -100,9 +106,9 @@ classdef DashboardStatesNInputs < plot.Base
                 obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
                 
                 for i = 1:length(cfg.scn.vs)
-                    vh = cfg.scn.vs{i};
+                    vh = cfg.scn.vs{i};                
                     obj.add_table_line('', '');
-                    obj.add_table_line(['\bfVehicle ' num2str(i) '\rm'], '');
+                    obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
                     obj.add_table_line('Vehicle Model', class(vh.model));
                     obj.add_table_line('Vehicle Params', vh.model.p.paramsName);
                     obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));

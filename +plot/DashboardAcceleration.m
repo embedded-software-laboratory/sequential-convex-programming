@@ -8,13 +8,16 @@ classdef DashboardAcceleration < plot.Base
             %   Detailed explanation goes here
             % TODO only using vehicle 1
             i_vehicle = 1;
+            colors = utils.getRwthColors(100);
+            color = colors(i_vehicle, :); % need to store color for later plot updates (else Matlab's gc will delete)
+                
+            
             
             % only plot for linear models (having accelerations as input)
             if ~cfg.scn.vs{i_vehicle}.isModelLinear; return; end
             
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
-            p = cfg.scn.vs{i_vehicle}.p;
             u = ws.vs{i_vehicle}.u;
                 
             % plot base track initially
@@ -50,8 +53,8 @@ classdef DashboardAcceleration < plot.Base
                 obj.clear_tmp()
             end
             
-            obj.add_tmp_handle(plot(u(1,:),u(2,:),'b*-'));
-            obj.add_tmp_handle(plot(u(1,1),u(2,1),'o', 'MarkerSize',10, 'MarkerEdgeColor','r', 'MarkerFaceColor','r'));
+            obj.add_tmp_handle(plot(u(1,:),u(2,:),'*-', 'Color', color));
+            obj.add_tmp_handle(plot(u(1,1),u(2,1),'o', 'MarkerSize',10, 'MarkerEdgeColor','k', 'MarkerFaceColor',color));
         end
     end
 end

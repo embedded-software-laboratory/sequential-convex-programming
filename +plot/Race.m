@@ -26,7 +26,7 @@ classdef Race < plot.Base
                 handles = zeros(length(scn.vs), 1);
                 names = cell(length(scn.vs), 1);
                 for k = 1:length(scn.vs)
-                    % pseudo plot fo coloring
+                    % pseudo plot for coloring
                     handles(k) = fill(NaN:NaN, NaN:NaN, c(k, :));
                     names{k} = ['Vehicle ' num2str(k)];
                 end
