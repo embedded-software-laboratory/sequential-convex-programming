@@ -1,6 +1,9 @@
 function track = merge_polygons(track, epsilon_area_tolerance)
 % merge polygons to convex regions
 
+
+    scale = 1/40; % FIXME
+
 % iterate in reverse: deleting polygons in the loop
 for i = length(track.polygons):-1:2
     % construct polygon indices
@@ -16,7 +19,7 @@ for i = length(track.polygons):-1:2
     [indices_hull, area_merged] = convhull(track.vertices(:, idx_union)', 'simplify', true);
 
     % merge polygons if their union is (almost) convex.
-    if area_merged - (area_1 + area_2) <= epsilon_area_tolerance
+    if area_merged - (area_1 + area_2) <= epsilon_area_tolerance * (scale^2)
         % delete polygon 1
         track.polygons(i) = [];
         % replace polygon 2 with union (first and last entry of hull is duplicated)

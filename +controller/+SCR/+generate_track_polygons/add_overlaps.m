@@ -1,4 +1,6 @@
 function new_track = add_overlaps(track)
+    scale = 1/40; % FIXME
+    
     % convert to constraints
     for i = 1:length(track.polygons)
         [track.polygons(i).A,track.polygons(i).b] = utils.vert2con(track.vertices(:,track.polygons(i).vertex_indices)');
@@ -6,7 +8,6 @@ function new_track = add_overlaps(track)
     
     % find neighbor intersections
     for i1 = 1:length(track.polygons)
-        
         % find shared vertices
         i2 = utils.mod1(i1+1, length(track.polygons));
         nv1 = length(track.polygons(i1).vertex_indices);
@@ -22,8 +23,8 @@ function new_track = add_overlaps(track)
         n = [0 -1;1 0]* (p1-p2);
         n = n ./ norm(n);
         b = n'*p1;
-        I1 = find(abs(abs(track.polygons(i1).b) - abs(b)) < 1e-10);
-        I2 = find(abs(abs(track.polygons(i2).b) - abs(b)) < 1e-10);
+        I1 = find(abs(abs(track.polygons(i1).b) - abs(b)) < 1e-10 * scale);
+        I2 = find(abs(abs(track.polygons(i2).b) - abs(b)) < 1e-10 * scale);
         assert(numel(I1) == 1);
         assert(numel(I2) == 1);
         
@@ -60,11 +61,12 @@ function new_track = add_overlaps(track)
         [~, area_0] = convhull(vertices_0);
         [~, area_1] = convhull(vertices_1);
         [~, area_2] = convhull(vertices_2);
-        [K, area_union] = convhull(vertices_union,'simplify',true);
+        [K, area_union] = convhull(vertices_union, 'simplify', true);
         
-        %assert(abs(vol_0+vol_1+vol_2-vol_union) < 1e-10);
-        % FIXME only track hockenheim requires slighlty larger deviation margin
-        assert(abs(area_0 + area_1 + area_2 - area_union) < 1e-8);
+        assert(abs(area_0 + area_1 + area_2 - area_union) < 1e-10 * (scale^2));
+        % FIXME only track hockenheim requires slighlty larger deviation
+        % margin of 1e-8 - maybe was caused by missing scaling? then remove
+        % comment
         
         vertices_union = vertices_union(K(2:end),:);
         
