@@ -22,7 +22,7 @@ cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 % x_start [pos_x pox_y v_x v_y] will be initialized to match model states
 
 % Vehicle
-vehicle_ = config.vehicle(cfg);
+vehicle_ = config.vehicle_SCR(cfg);
 vehicle_.x_start = [0 0 .1 0]';
 cfg.scn.vs{end + 1} = vehicle_;
 

@@ -20,8 +20,8 @@ cfg_vh.p.R = 0.05 * eye(2); % Penalty weight for control changes over time
 SL = 10; SCR = 20;
 cfg_vh.approximationSL = SL; cfg_vh.approximationSCR = SCR;
 % choose approximation
-cfg_vh.approximation = SL; % 'SL' or 'SCR'
-
+cfg_vh.approximation = cfg_vh.approximationSL; % 'approximationSL' or 'approximationSL'
+ 
 %% Model
 % CAVE: model params should match across controller and simulation model
 cfg_vh.model = @model.vehicle.Linear;
