@@ -4,7 +4,7 @@ classdef SingleTrack < model.vehicle.BaseOde
     methods (Static)
         function p = getParamsLinigerRC_1_43
             % Liniger RC 1:43 MPCC from GitHub https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getModelParams.m
-            % Bounds from https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getMPC_vars.m
+            % Bounds adapted from https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getMPC_vars.m
             
             p.paramsName = 'ST from Liniger 1:43';
             
@@ -29,16 +29,27 @@ classdef SingleTrack < model.vehicle.BaseOde
             p.Cr0 = 0.0518;
             p.Cr2 = 0.00035;
             
-            % Bound input
-            % duty_cycle -0.1 ... 1
-            % delta_steering -0.35 ... 0.35
-            % Bound input changes
-            % duty cycle -1 ... 1
-            % delta_steering -1 ... 1
+            % Bounds (first row lower, second upper bounds)
+            %    states                          inputs
+            %    p_x  p_y  v_x  v_y  yaw  dyaw   delta d
+            %    m    m    m/s  m/s       1/s    rad   %
+            p.bounds = ...
+                [-Inf -Inf -.1  -2   -10  -7    -.35  -.1 ;
+                  Inf  Inf  4    2    10   7     .35   1 ];
+            p.bounds_delta = ...
+                [-Inf -Inf -Inf -Inf -Inf -Inf   -1   -1  ;
+                  Inf  Inf  Inf  Inf  Inf  Inf    1    1 ];
+             
+            %FIXME copied from Kloock, maybe should use 3
+            % trust region for position
+            p.bounds_TR_pos = 0.5;
         end
         
         function p = getParamsKloockRC_1_43
             % Liniger, acc. to M. Kloock, P. Scheffe, L. Botz, J. Maczijewski, B. Alrifaee, and S. Kowalewski, ‘Networked Model Predictive Vehicle Race Control’, in 2019 IEEE Intelligent Transportation Systems Conference (ITSC), Auckland, New Zealand, Oct. 2019, pp. 1552–1557, doi: 10.1109/ITSC.2019.8917222.
+            
+            % get defaults, then overwrite changes
+            p = model.vehicle.SingleTrack.getParamsLinigerRC_1_43();
             
             p.paramsName = 'ST from Kloock via Plots ST Liniger 1:43';
             
@@ -51,12 +62,6 @@ classdef SingleTrack < model.vehicle.BaseOde
             p.Cr = 1.3709;
             p.Dr = 0.1644;
             
-            % Vehicle
-            p.m = 0.041; % vehicle mass [kg]
-            p.Iz = 27.8e-6; % vehicle inertia [kg m^2]
-            p.l_f = 0.029; % front wheel to CoG [m]
-            p.l_r = 0.033; % rear wheel to CoG [m]
-            
             % Acceleration/Drag
             % Kloock simplified formula to "n*T",
             %   n beeing transmission ratio
@@ -66,6 +71,28 @@ classdef SingleTrack < model.vehicle.BaseOde
             p.Cm2 = 0;
             p.Cr0 = 0;
             p.Cr2 = 0;
+        end
+        
+        function p = getParamsKloockRC_1_43_WithKloocksBounds
+            % get defaults, then overwrite changes
+            p = model.vehicle.SingleTrack.getParamsKloockRC_1_43();
+            
+            p.paramsName = 'ST from Kloock via Plots ST Liniger 1:43, plus custom bounds';
+            
+            % Bounds (first row upper, second lower bounds)
+            %    states                          inputs
+            %    p_x  p_y  v_x  v_y  yaw  dyaw   delta d
+            %    m    m    m/s  m/s       1/s    rad   CAVE FIXME Nm
+            p.bounds = ...
+                [-Inf -Inf  .05 -2   -Inf -2*pi  -.4   -.08 ;
+                  Inf  Inf  2    2    Inf  2*pi   .4    .08];
+            p.bounds_delta = ...
+                [-Inf -Inf -Inf -Inf -Inf -Inf   -Inf  -Inf ;
+                  Inf  Inf  Inf  Inf  Inf  Inf    Inf   Inf];
+             
+            %FIXME 
+            % trust region for position
+            p.bounds_TR_pos = 0.5;
         end
     end
 
