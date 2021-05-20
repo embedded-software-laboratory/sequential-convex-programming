@@ -348,27 +348,34 @@ if isLinear
 else
     % Bounded inputs
     % all time
-    bound_upper(idx_u(:,1)) =  p.TR_steeringAngle;
-    bound_upper(idx_u(:,2)) =  p.TR_motorTorque;
-    bound_lower(idx_u(:,1)) = -p.TR_steeringAngle;
-    bound_lower(idx_u(:,2)) = -p.TR_motorTorque;
+    bound_lower(idx_u(:, 1)) = model.p.bounds(1, model.idx_u(1));
+    bound_lower(idx_u(:, 2)) = model.p.bounds(1, model.idx_u(2));
+    bound_upper(idx_u(:, 1)) = model.p.bounds(2, model.idx_u(1));
+    bound_upper(idx_u(:, 2)) = model.p.bounds(2, model.idx_u(2));
     % last prediction step
-    bound_upper(idx_u(end,1)) =  0.15 * p.TR_steeringAngle;
-    bound_upper(idx_u(end,2)) =  0.15 * p.TR_motorTorque;
-    bound_lower(idx_u(end,1)) = -0.15 * p.TR_steeringAngle;
-    bound_lower(idx_u(end,2)) = -0.15 * p.TR_motorTorque;
+%     bound_lower(idx_u(end, 1)) = 0.15 * bound_lower(idx_u(end,1));
+%     bound_lower(idx_u(end, 2)) = 0.15 * bound_lower(idx_u(end,2));
+%     bound_upper(idx_u(end, 1)) = 0.15 * bound_upper(idx_u(end,1));
+%     bound_upper(idx_u(end, 2)) = 0.15 * bound_upper(idx_u(end,2));
 
     % Bounded states (trust region for change in position) - kinetic
-    bound_upper(idx_pos(1:p.Hp,:)) = (x(model.idx_pos, 1:p.Hp) + p.TR_pos)';
-    bound_lower(idx_pos(1:p.Hp,:)) = (x(model.idx_pos, 1:p.Hp) - p.TR_pos)';
+    % FIXME merge TR with bounds below
+    bound_lower(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) - model.p.bounds_TR_pos)';
+    bound_upper(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) + model.p.bounds_TR_pos)';
 
     % Bounded states (trust region for change in velocities) - kinematic
-    bound_upper(idx_x(:,3)) = p.TR_velX;
-    bound_upper(idx_x(:,4)) = p.TR_velY;
-    bound_upper(idx_x(:,6)) = p.TR_velW;
-    bound_lower(idx_x(:,3)) = 0.005;
-    bound_lower(idx_x(:,4)) = -p.TR_velY;
-    bound_lower(idx_x(:,6)) = -p.TR_velW;
+%     bound_lower(idx_x(:,1)) = model.p.bounds(1, model.idx_x(1));
+%     bound_lower(idx_x(:,2)) = model.p.bounds(1, model.idx_x(2));
+    bound_lower(idx_x(:,3)) = model.p.bounds(1, model.idx_x(3));
+    bound_lower(idx_x(:,4)) = model.p.bounds(1, model.idx_x(4));
+    bound_lower(idx_x(:,3)) = model.p.bounds(1, model.idx_x(5));
+    bound_lower(idx_x(:,6)) = model.p.bounds(1, model.idx_x(6));
+%     bound_upper(idx_x(:,1)) = model.p.bounds(2, model.idx_x(1));
+%     bound_upper(idx_x(:,2)) = model.p.bounds(2, model.idx_x(2));
+    bound_upper(idx_x(:,3)) = model.p.bounds(2, model.idx_x(3));
+    bound_upper(idx_x(:,4)) = model.p.bounds(2, model.idx_x(4));
+    bound_upper(idx_x(:,5)) = model.p.bounds(2, model.idx_x(5));
+    bound_upper(idx_x(:,6)) = model.p.bounds(2, model.idx_x(6));
 
     % "Terminal Constraints"
     % Bounded states for last prediction step instead of term. constr.

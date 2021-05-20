@@ -22,27 +22,27 @@ cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 % x_start [pos_x pox_y v_x v_y] will be initialized to match model states
 
 % Vehicle
-vehicle_ = config.vehicle_SCR(cfg);
+vehicle_ = config.vehicle_ST(cfg);
 vehicle_.x_start = [0 0 .1 0]';
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle 2
-vehicle_ = config.vehicle_linLiniger(cfg);
+vehicle_ = config.vehicle_SCR(cfg);
 vehicle_.x_start = [0 -0.05 0.1 0]';
 % vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
 % vehicle_.p.a_max = 17; % decrease accel for SCR
 cfg.scn.vs{end + 1} = vehicle_;
 
-% vehicle 3
-vehicle_ = config.vehicle_ST(cfg);
-vehicle_.x_start = [0.9 0.05 0.1 0]';
-cfg.scn.vs{end + 1} = vehicle_;
-
-% vehicle 4
-vehicle_ = config.vehicle_ST_Kloock(cfg);
-vehicle_.x_start = [1.3 -0.05 0.1 0]';
-cfg.scn.vs{end + 1} = vehicle_;
-
+% % vehicle 3
+% vehicle_ = config.vehicle_ST(cfg);
+% vehicle_.x_start = [0.9 0.05 0.1 0]';
+% cfg.scn.vs{end + 1} = vehicle_;
+% 
+% % vehicle 4
+% vehicle_ = config.vehicle_ST_Kloock(cfg);
+% vehicle_.x_start = [1.3 -0.05 0.1 0]';
+% cfg.scn.vs{end + 1} = vehicle_;
+% 
 % % vehicle 5
 % vehicle_ = config_vehicle
 % vehicle_.x_start = [1.7 0.05 0.1 0]';

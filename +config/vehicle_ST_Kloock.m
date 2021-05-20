@@ -12,12 +12,4 @@ cfg_vh.model = @model.vehicle.SingleTrack;
 cfg_vh.model_p = model.vehicle.SingleTrack.getParamsKloockRC_1_43();
 cfg_vh.model_simulation = cfg_vh.model;
 cfg_vh.model_simulation_p = model.vehicle.SingleTrack.getParamsKloockRC_1_43();
-
-%% Trust region - upper and lower bounds
-cfg_vh.p.TR_steeringAngle = 0.40;   % Bounded input: steering angle [rad]
-cfg_vh.p.TR_motorTorque = 0.08; 	% Bounded input: motor torque [Nm]
-cfg_vh.p.TR_pos = 0.5;     % Bounded state: position in x and y [m]
-cfg_vh.p.TR_velX = 2;       % Bounded state: velocity in x [m/s]
-cfg_vh.p.TR_velY = 2;       % Bounded state: velocity in y [m/s]
-cfg_vh.p.TR_velW = 2*pi;       % Bounded state: velocity in W (yaw rate) [1/s]
 end
