@@ -1,12 +1,14 @@
-function [checkpoints, creation_scale] = HockenheimShortRecorded(checkpoint_distance, trackWidth)
+function [checkpoints, creation_scale] = HockenheimShortCarMaker(checkpoint_distance, trackWidth)
 % inputs e.g. 1, 7
+% recorded from CarMaker's Hockenheim race track (see B. Alrifaee and J. Maczijewski, “Real-time Trajectory optimization for Autonomous Vehicle Racing using Sequential Linearization,” in 2018 IEEE Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483. doi: 10.1109/IVS.2018.8500634.
+
 creation_scale = 1/1;
 
 if ~exist('checkpoint_distance', 'var'); checkpoint_distance = 1; end
 if ~exist('trackWidth', 'var'); trackWidth = 7; end
 
 % loads and prepares reald world (?) path of Hockenheim
-data = load('model/track/HockenheimShortRecorded.mat');
+data = load('model/track/HockenheimShortCarMaker.mat');
 path = data.vehicle_path.Data(:,1:2);
 
 checkpoints = struct('left',{},'right',{},'center',{});

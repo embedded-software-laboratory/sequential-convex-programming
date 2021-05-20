@@ -52,8 +52,9 @@ classdef Linear < model.vehicle.Base
     
     
     methods (Static)
-        function p = getParamsCarMaker(dt, shallPlot)
-            % from SL paper
+        function p = getParamsF1CarMaker(dt, shallPlot)
+            % recorded from CarMaker's Formula One vehicle (see B. Alrifaee and J. Maczijewski, “Real-time Trajectory optimization for Autonomous Vehicle Racing using Sequential Linearization,” in 2018 IEEE Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483. doi: 10.1109/IVS.2018.8500634.
+            
             if ~exist('shallPlot', 'var'); shallPlot = false; end
             
             p = model.vehicle.Linear.getParamsDefault(dt);
