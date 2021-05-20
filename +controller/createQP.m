@@ -329,6 +329,16 @@ end
 % Slack Var must be positive
 bound_lower(idx_slack) = 0;
 
+% Trust Region for change in position
+% required due to linearization at working point - if too far away,
+% linearization error could increase too much
+% (could use delta bounds instead, but not supported by solvers)
+if vh.approximationIsSL
+    % FIXME scale trust region size with track
+    bound_lower(idx_pos) = (x(model.idx_pos, :) - p.trust_region_size)';
+    bound_upper(idx_pos) = (x(model.idx_pos, :) + p.trust_region_size)';
+end
+
 if isLinear
     % Bounded acceleration
     if vh.approximationIsSL
@@ -336,11 +346,6 @@ if isLinear
         % in inequalities?
         bound_upper(idx_u(:)) =  vh.model_p.a_max;
         bound_lower(idx_u(:)) = -vh.model_p.a_max;
-
-        % Trust region for change in position
-        % Bounded states (trust region for change in position) - kinetic
-        bound_upper(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) + p.trust_region)';
-        bound_lower(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) - p.trust_region)';
     elseif vh.approximationIsSCR
         bound_upper(idx_u(:)) =  p.a_max;
         bound_lower(idx_u(:)) = -p.a_max;
