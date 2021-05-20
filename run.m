@@ -26,12 +26,14 @@ timer_overall = tic;
 if ~exist('cfg', 'var')
     disp('Using config script as no provided as argument')
     cfg = config.config();
+    init_paths(cfg);
     cfg = config.scenario(cfg);
     cfg = init_config(cfg);
+else
+    init_paths(cfg);
 end
+    
 
-% create output dir if non-existing
-if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
 
 % initialize working and logging structures
 step_sim = 0;
@@ -318,4 +320,10 @@ function init_control_keys(plots_to_draw)
         set(plots_to_draw{i}.figure_handle, ...
             'WindowKeyPressFcn', @key_press_callback);
     end
+end
+
+function init_paths(cfg)
+    % create output & temp dir if non-existing
+    if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
+    if ~isfolder(cfg.tempPath); mkdir(cfg.tempPath); end
 end
