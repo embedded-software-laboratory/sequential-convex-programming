@@ -138,7 +138,10 @@ for k = 1:p.Hp
     end
     
     if isLinear
-        %% Acceleration limits    
+        %% Acceleration limits
+        % inequalities required due to complex shape of input limits due to
+        % not modelling the actual technical inputs but the resulting
+        % accelerations
         if vh.approximationIsSL
             h = @controller.SL.acceleration_constraint;
         elseif vh.approximationIsSCR
@@ -350,39 +353,29 @@ if isLinear
         bound_upper(idx_u(:)) =  p.a_max;
         bound_lower(idx_u(:)) = -p.a_max;
     end
-else
+end
+
+% Additional State and Input bounds
+% only sensible for ODE models, as linear models'...
+%   - inputs are restricted via inequalities
+%   - states are only position and acceleration, of which...
+%       - position is only restircted via trust region (above)
+%       - acceleration is already restricted via inequalities (ellipses)
+if ~isLinear
     % Bounded inputs
-    % all time
-    bound_lower(idx_u(:, 1)) = model.p.bounds(1, model.idx_u(1));
-    bound_lower(idx_u(:, 2)) = model.p.bounds(1, model.idx_u(2));
-    bound_upper(idx_u(:, 1)) = model.p.bounds(2, model.idx_u(1));
-    bound_upper(idx_u(:, 2)) = model.p.bounds(2, model.idx_u(2));
-    % last prediction step
-%     bound_lower(idx_u(end, 1)) = 0.15 * bound_lower(idx_u(end,1));
-%     bound_lower(idx_u(end, 2)) = 0.15 * bound_lower(idx_u(end,2));
-%     bound_upper(idx_u(end, 1)) = 0.15 * bound_upper(idx_u(end,1));
-%     bound_upper(idx_u(end, 2)) = 0.15 * bound_upper(idx_u(end,2));
+    bound_lower(idx_u) = repmat(model.p.bounds(1, model.idx_u), length(idx_u), 1);
+    bound_upper(idx_u) = repmat(model.p.bounds(2, model.idx_u), length(idx_u), 1);
+    % special for last prediction step
+    %bound_lower(idx_u(end, :)) = 0.15 * bound_lower(idx_u(end, :));
+    %bound_upper(idx_u(end, :)) = 0.15 * bound_upper(idx_u(end, :));
 
-    % Bounded states (trust region for change in position) - kinetic
-    % FIXME merge TR with bounds below
-    bound_lower(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) - model.p.bounds_TR_pos)';
-    bound_upper(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) + model.p.bounds_TR_pos)';
-
-    % Bounded states (trust region for change in velocities) - kinematic
-%     bound_lower(idx_x(:,1)) = model.p.bounds(1, model.idx_x(1));
-%     bound_lower(idx_x(:,2)) = model.p.bounds(1, model.idx_x(2));
-    bound_lower(idx_x(:,3)) = model.p.bounds(1, model.idx_x(3));
-    bound_lower(idx_x(:,4)) = model.p.bounds(1, model.idx_x(4));
-    bound_lower(idx_x(:,3)) = model.p.bounds(1, model.idx_x(5));
-    bound_lower(idx_x(:,6)) = model.p.bounds(1, model.idx_x(6));
-%     bound_upper(idx_x(:,1)) = model.p.bounds(2, model.idx_x(1));
-%     bound_upper(idx_x(:,2)) = model.p.bounds(2, model.idx_x(2));
-    bound_upper(idx_x(:,3)) = model.p.bounds(2, model.idx_x(3));
-    bound_upper(idx_x(:,4)) = model.p.bounds(2, model.idx_x(4));
-    bound_upper(idx_x(:,5)) = model.p.bounds(2, model.idx_x(5));
-    bound_upper(idx_x(:,6)) = model.p.bounds(2, model.idx_x(6));
+    % Bounded states
+    % (all except position, as this is done above via trust region)
+    bound_lower(idx_x(:, 3:end)) = repmat(model.p.bounds(1, model.idx_x(3:end)), length(idx_x(:, 3:end)), 1);
+    bound_upper(idx_x(:, 3:end)) = repmat(model.p.bounds(2, model.idx_x(3:end)), length(idx_x(:, 3:end)), 1);
 
     % "Terminal Constraints"
+    % FIXME
     % Bounded states for last prediction step instead of term. constr.
     bound_upper(idx_x(end,3)) = 0.01;
     bound_upper(idx_x(end,4)) = 0.01;
