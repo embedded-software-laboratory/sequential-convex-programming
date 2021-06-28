@@ -1,4 +1,4 @@
-function new_track = add_overlaps(track, track_scale)
+function track_new = t3_overlap(track, track_scale)
 % Inputs
 % track
 % track_scale [m]
@@ -45,8 +45,8 @@ for i1 = 1:length(track.polygons)
     track.polygons(i1).b_intersection = [b1;b2];
 end
 
-new_track = struct;
-new_track.vertices = nan(2,0);
+track_new = struct;
+track_new.vertices = nan(2,0);
 
 % add overlaps
 for i1 = 1:length(track.polygons)
@@ -73,10 +73,10 @@ for i1 = 1:length(track.polygons)
 
     vertices_union = vertices_union(K(2:end),:);
 
-    indices = size(new_track.vertices,2) + (1 : size(vertices_union, 1));
+    indices = size(track_new.vertices,2) + (1 : size(vertices_union, 1));
 
-    new_track.vertices = [new_track.vertices  vertices_union'];
-    new_track.polygons(i1).vertex_indices = indices;
-    [new_track.polygons(i1).A, new_track.polygons(i1).b] = utils.vert2con(vertices_union);        
+    track_new.vertices = [track_new.vertices  vertices_union'];
+    track_new.polygons(i1).vertex_indices = indices;
+    [track_new.polygons(i1).A, track_new.polygons(i1).b] = utils.vert2con(vertices_union);        
 end
 end

@@ -13,7 +13,7 @@ checkpoints = cfg.scn.track;
 if vh.approximationIsSCR; track_polygons = cfg.scn.track_polygons; end
 model = cfg.scn.vs{i_vehicle}.model;
 % TODO unify
-isLinear = cfg.scn.vs{i_vehicle}.isModelLinear;
+isModelLinear = cfg.scn.vs{i_vehicle}.isModelLinear;
 
 if vh.approximationIsSL
     % Verification if indices-matrix has only one row and Hp columns
@@ -35,7 +35,7 @@ idx_slack  = model.ns * p.Hp + 1;
 %% Problem size
 n_vars = model.ns * p.Hp + 1; % number of variables: (states + inputs) * prediction steps + slack variable
 n_eqns = model.nx * p.Hp; % number of equations: state equations * prediction steps
-if isLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
+if isModelLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
 % if ~isLinear; n_eqns = n_eqns + 3; end % terminating conditions (v_x, v_y, dt/dyaw)
 
 n_ineq = 0;
@@ -51,7 +51,7 @@ elseif vh.approximationIsSCR
     end
 end
 
-if isLinear
+if isModelLinear
     n_ineq = n_ineq + p.n_acceleration_limits * p.Hp; % acceleration bounds at every time step
 end
 if p.areObstaclesConsidered
@@ -93,7 +93,7 @@ for k = 2:p.Hp
 end
 
 %% Terminating conditions
-if isLinear
+if isModelLinear
     % v_{x,y}{Hp} = 0 (b_eq already inited to 0)
     n_rows = n_rows(end) + (1:2);
     A_eq(n_rows, idx_x(k, 3:4)) = eye(2);
@@ -137,15 +137,10 @@ for k = 1:p.Hp
         n_rows = n_rows(end);
     end
     
-    if isLinear
-        %% Acceleration limits    
-        if vh.approximationIsSL
-            h = @controller.SL.acceleration_constraint;
-        elseif vh.approximationIsSCR
-            h = @controller.SCR.acceleration_constraint;
-        end
-        
-        [Au_acc, b_acc] = h(vh.model_p, p, (1:p.n_acceleration_limits)', x(:, k));
+    if isModelLinear
+        %% Acceleration limits
+        [Au_acc, b_acc] = controller.get_acceleration_ellipses(...
+            vh.model_p, p, (1:p.n_acceleration_limits)', x(:, k));
         n_rows = n_rows(end) + p.n_acceleration_limits;
         
         A_ineq(n_rows - p.n_acceleration_limits + 1:n_rows, idx_u(k,:)) = Au_acc;
@@ -329,7 +324,7 @@ end
 % Slack Var must be positive
 bound_lower(idx_slack) = 0;
 
-if isLinear
+if isModelLinear
     % Bounded acceleration
     if vh.approximationIsSL
         % FIXME why bounds, acceleration constraints are already considered

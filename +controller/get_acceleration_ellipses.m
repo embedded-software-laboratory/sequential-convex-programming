@@ -4,7 +4,7 @@
 % x = [px,py,vx,vy] (previous state vector)
 
 % Resulting constraint: Ax * [px,py,vx,vy] + Au * [ax,ay] <= b
-function [Au, b] = acceleration_constraint(model_p,p,k,x)
+function [Au, b] = get_acceleration_ellipses(model_p,p,k,x)
     vx = x(3);
     vy = x(4);
     v_sq = vx^2 + vy^2;

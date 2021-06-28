@@ -1,4 +1,4 @@
-function track = tesselate(checkpoints)
+function track = t1_tesselate(checkpoints)
 % tesselate track from discrete checkpoints to polygons
 track = struct;
 

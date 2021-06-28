@@ -1,4 +1,4 @@
-function track = merge_polygons(track, track_scale, epsilon_area_tolerance)
+function track = t2_merge(track, track_scale, epsilon_area_tolerance)
 % merge polygons to convex regions
 %
 % Inputs
