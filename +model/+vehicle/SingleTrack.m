@@ -33,16 +33,14 @@ classdef SingleTrack < model.vehicle.BaseOde
             %    states                          inputs
             %    p_x  p_y  v_x  v_y  yaw  dyaw   delta d
             %    m    m    m/s  m/s       1/s    rad   %
+            % CAVE position bounds are not considered in QP creation
             p.bounds = ...
                 [-Inf -Inf -.1  -2   -10  -7    -.35  -.1 ;
                   Inf  Inf  4    2    10   7     .35   1 ];
+            % CAVE FIXME delta not considered in QP creation
             p.bounds_delta = ...
                 [-Inf -Inf -Inf -Inf -Inf -Inf   -1   -1  ;
                   Inf  Inf  Inf  Inf  Inf  Inf    1    1 ];
-             
-            %FIXME copied from Kloock, maybe should use 3
-            % trust region for position
-            p.bounds_TR_pos = 0.5;
         end
         
         function p = getParamsKloockRC_1_43
@@ -82,17 +80,15 @@ classdef SingleTrack < model.vehicle.BaseOde
             % Bounds (first row upper, second lower bounds)
             %    states                          inputs
             %    p_x  p_y  v_x  v_y  yaw  dyaw   delta d
-            %    m    m    m/s  m/s       1/s    rad   CAVE FIXME Nm
+            %    m    m    m/s  m/s       1/s    rad   [CAVE] Nm
+            % CAVE position bounds are not considered in QP creation
             p.bounds = ...
                 [-Inf -Inf  .05 -2   -Inf -2*pi  -.4   -.08 ;
                   Inf  Inf  2    2    Inf  2*pi   .4    .08];
+            % CAVE FIXME delta not considered in QP creation
             p.bounds_delta = ...
                 [-Inf -Inf -Inf -Inf -Inf -Inf   -Inf  -Inf ;
                   Inf  Inf  Inf  Inf  Inf  Inf    Inf   Inf];
-             
-            %FIXME 
-            % trust region for position
-            p.bounds_TR_pos = 0.5;
         end
     end
 

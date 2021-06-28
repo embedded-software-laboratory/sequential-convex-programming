@@ -3,7 +3,7 @@
 function cfg_vh = vehicle(cfg)
 cfg_vh = struct;
 
-%% General Optimization
+%% Controller: General Optimization
 cfg_vh.p.iterations = 2;
 cfg_vh.p.isBlockingEnabled = false;
 cfg_vh.p.areObstaclesConsidered = false;
@@ -15,12 +15,26 @@ cfg_vh.p.S = 1e5; % Penalty weight for slack (was 1e30 for usage in quad objecti
 cfg_vh.p.Q = 1; % Penalty weight for maximization of position on track
 cfg_vh.p.R = 0.05 * eye(2); % Penalty weight for control changes over time
 
-%% Approximation Method
+
+%% Contoller: Miscellaneous Modelling
+% Acceleration: number of tangents around the ellipses
+cfg_vh.p.n_acceleration_limits = 16;
+
+% Linearization (SL): size of Trust Region for position
+% FIXME adapt to scale
+% FIXME choose value
+%cfg_vh.p.trust_region_size = 3; % fram Janis, 1:1 scale? linear vehicle model
+cfg_vh.p.trust_region_size = 0.5; % from Kloock, 1:43 scale? ST model
+
+
+
+%% Controller: Approximation Method
 % arbitrary IDs, saved for later usage
 SL = 10; SCR = 20;
 cfg_vh.approximationSL = SL; cfg_vh.approximationSCR = SCR;
 % choose approximation
 cfg_vh.approximation = cfg_vh.approximationSL; % 'approximationSL' or 'approximationSL'
+
  
 %% Model
 % CAVE: model params should match across controller and simulation model
@@ -30,6 +44,7 @@ cfg_vh.model_p = model.vehicle.Linear.getParamsF1CarMaker(cfg_vh.p.dt);
 cfg_vh.model_simulation = cfg_vh.model;
 cfg_vh.model_simulation_p = model.vehicle.Linear.getParamsF1CarMaker(cfg_vh.p.dt);
 % cfg_vh.model_simulation_p = model.vehicle.Linear.getParamsSingleTrackLiniger(cfg_vh.p.dt, [cfg.tempPath 'singleTrackAMax.mat']);
+
 
 %% Geometric
 % xStart [pos_x pox_y v_x v_y] will be initialized to match model states
@@ -45,17 +60,4 @@ cfg_vh.distSafe2CenterVal_1 = round(sqrt((cfg_vh.lengthVal/2)^2 + (cfg_vh.widthV
 cfg_vh.distSafe2CenterVal_2 = [0.09;0.06]; % Definition of ellipsis (two semi-axis)
 % TODO why there are two defined above?
 cfg_vh.distSafe2CenterVal = cfg_vh.distSafe2CenterVal_1;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% TODO
-    %% SL Parameters
-    cfg_vh.p.trust_region = 3;
-
-    % Acceleration parameters
-    cfg_vh.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
-    
-    %% SCR Parameters
-    % Acceleration parameters
-    cfg_vh.p.n_acceleration_limits = 16; % Number of tangents around the acceleration border
-    cfg_vh.p.a_max = 22;
 end
