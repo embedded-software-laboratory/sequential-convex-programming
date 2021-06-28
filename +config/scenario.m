@@ -33,11 +33,11 @@ vehicle_.x_start = [0 -0.05 0.1 0]';
 % vehicle_.p.a_max = 17; % decrease accel for SCR
 cfg.scn.vs{end + 1} = vehicle_;
 
-% % vehicle 3
-% vehicle_ = config.vehicle_ST(cfg);
-% vehicle_.x_start = [0.9 0.05 0.1 0]';
-% cfg.scn.vs{end + 1} = vehicle_;
-% 
+% vehicle 3
+vehicle_ = config.vehicle(cfg);
+vehicle_.x_start = [0.9 0.05 0.1 0]';
+cfg.scn.vs{end + 1} = vehicle_;
+
 % % vehicle 4
 % vehicle_ = config.vehicle_ST_Kloock(cfg);
 % vehicle_.x_start = [1.3 -0.05 0.1 0]';

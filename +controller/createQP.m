@@ -330,20 +330,14 @@ end
 bound_lower(idx_slack) = 0;
 
 if isLinear
-    % Bounded acceleration
+    %% Trust region for change in position
     if vh.approximationIsSL
-        % FIXME why bounds, acceleration constraints are already considered
-        % in inequalities?
-        bound_upper(idx_u(:)) =  vh.model_p.a_max;
-        bound_lower(idx_u(:)) = -vh.model_p.a_max;
-
-        % Trust region for change in position
-        % Bounded states (trust region for change in position) - kinetic
+        % required due to linearization at working point - if too far away,
+        % linearization error could increase too much
         bound_upper(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) + p.trust_region)';
         bound_lower(idx_pos(1:p.Hp, :)) = (x(model.idx_pos, 1:p.Hp) - p.trust_region)';
     elseif vh.approximationIsSCR
-        bound_upper(idx_u(:)) =  p.a_max;
-        bound_lower(idx_u(:)) = -p.a_max;
+        % not required due to better track modeling
     end
 else
     % Bounded inputs
