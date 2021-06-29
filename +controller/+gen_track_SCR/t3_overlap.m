@@ -66,7 +66,7 @@ for i1 = 1:length(track.polygons)
     [K, area_union] = convhull(vertices_union, 'simplify', true);
 
     % polygons need to be convex: close to same area
-    assert(abs(area_0 + area_1 + area_2 - area_union) < 1e-10 * (track_scale^2));
+    assert(abs(area_0 + area_1 + area_2 - area_union) < 1e-9 * (track_scale^2));
     % FIXME only track hockenheim requires slighlty larger deviation
     % margin of 1e-8 - maybe was caused by missing scaling? then remove
     % comment
