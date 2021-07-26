@@ -13,7 +13,7 @@ cfg_vh.p.R = 0.01 * eye(2); % Penalty weight for control changes over time
 
 %% Contoller: Miscellaneous Modelling
 % Linearization (SL): size of Trust Region for position
-cfg_vh.p.trust_region_size = 50; % from Kloock, 1:43 scale? ST model
+cfg_vh.p.trust_region_size = 50; % from Janis, 1:1 scale
 
 %% Model
 % CAVE: model params should match across controller and simulation model
