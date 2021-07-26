@@ -15,17 +15,19 @@ classdef Linear < model.vehicle.Base
             % Linear model: x1 = Ax + Bu
             ddt = dt^2 / 2;
             p.paramsName = 'Default Linear';
+            
             p.Ad = [      % global coordinates
                 1 0 dt 0; % p_x
                 0 1 0 dt; % p_y
                 0 0 1 0;  % v_x
                 0 0 0 1]; % v_y
+            
             p.Bd = [
+            %   a_x a_y (globally)
                 ddt 0;
                 0   ddt;
                 dt  0;
                 0   dt];
-            %   a_x a_y (globally)
         end
     end
     
