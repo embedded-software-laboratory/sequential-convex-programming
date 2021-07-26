@@ -38,11 +38,11 @@ hold on
 
 %% (1) one Vehicle
 % FIXME: restrict data input to one lap only
-x0 = [log.vehicles{1}.x0];
-X = x0(1, :);
-Y = x0(2, :);
-velX = x0(3, :);
-velY = x0(4, :);
+x_0 = [log.vehicles{1}.x_0];
+X = x_0(1, :);
+Y = x_0(2, :);
+velX = x_0(3, :);
+velY = x_0(4, :);
 vel = sqrt(velX.^2 + velY.^2);
 
 plot(X, Y, 'Color', colors(1,:), 'LineWidth', 2)
@@ -73,24 +73,24 @@ c.Label.FontSize = 11;
 %     X2 = nan(1,nbStates2);
 %     Y2 = nan(1,nbStates2);
 %     for i = 1:nbStates2
-%        X2(i) = log.vehicles{1,2}.currLapLog(i).x0(1);
-%        Y2(i) = log.vehicles{1,2}.currLapLog(i).x0(2);
+%        X2(i) = log.vehicles{1,2}.currLapLog(i).x_0(1);
+%        Y2(i) = log.vehicles{1,2}.currLapLog(i).x_0(2);
 %     end
 %     plot(X2,Y2,'Color', color100(2,:),'LineWidth', 1)
 %     hold on
-%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,2}.currLapLog(137).x0, log.vehicles{1,2}.currLapLog(137).u(1), color100(2,:))
+%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,2}.currLapLog(137).x_0, log.vehicles{1,2}.currLapLog(137).U_opt(1), color100(2,:))
 %     hold on
 %     
 %     nbStates1 = length(log.vehicles{1,1}.lapLog{1,1}) + 1;
 %     X1 = nan(1,nbStates1);
 %     Y1 = nan(1,nbStates1);
 %     for i = 1:nbStates1
-%        X1(i) = log.vehicles{1,1}.currLapLog(i).x0(1);
-%        Y1(i) = log.vehicles{1,1}.currLapLog(i).x0(2);
+%        X1(i) = log.vehicles{1,1}.currLapLog(i).x_0(1);
+%        Y1(i) = log.vehicles{1,1}.currLapLog(i).x_0(2);
 %     end
 %     plot(X1,Y1,'Color', color100(5,:),'LineWidth', 1)
 %     hold on
-%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,1}.currLapLog(137).x0, log.vehicles{1,1}.currLapLog(137).u(1), color100(5,:))
+%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,1}.currLapLog(137).x_0, log.vehicles{1,1}.currLapLog(137).U_opt(1), color100(5,:))
 
 
 %% (5) two Vehicles with Block (velX-veh2:175, step 137 + 165)
@@ -100,28 +100,28 @@ c.Label.FontSize = 11;
 %     X2 = nan(1,nbStates2);
 %     Y2 = nan(1,nbStates2);
 %     for i = 1:nbStates2
-%        X2(i) = log.vehicles{1,2}.currLapLog(i).x0(1);
-%        Y2(i) = log.vehicles{1,2}.currLapLog(i).x0(2);
+%        X2(i) = log.vehicles{1,2}.currLapLog(i).x_0(1);
+%        Y2(i) = log.vehicles{1,2}.currLapLog(i).x_0(2);
 %     end
 %     plot(X2,Y2,'Color', color100(2,:),'LineWidth', 1)
 %     hold on
-%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,2}.currLapLog(137).x0, log.vehicles{1,2}.currLapLog(137).u(1), color100(2,:))
+%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,2}.currLapLog(137).x_0, log.vehicles{1,2}.currLapLog(137).U_opt(1), color100(2,:))
 %     hold on
-%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,2}.currLapLog(165).x0, log.vehicles{1,2}.currLapLog(165).u(1), color100(2,:))
+%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,2}.currLapLog(165).x_0, log.vehicles{1,2}.currLapLog(165).U_opt(1), color100(2,:))
 %     hold on
 %     
 %     nbStates1 = length(log.vehicles{1,1}.lapLog{1,1}) + 1;
 %     X1 = nan(1,nbStates1);
 %     Y1 = nan(1,nbStates1);
 %     for i = 1:nbStates1
-%        X1(i) = log.vehicles{1,1}.currLapLog(i).x0(1);
-%        Y1(i) = log.vehicles{1,1}.currLapLog(i).x0(2);
+%        X1(i) = log.vehicles{1,1}.currLapLog(i).x_0(1);
+%        Y1(i) = log.vehicles{1,1}.currLapLog(i).x_0(2);
 %     end
 %     plot(X1,Y1,'Color', color100(5,:),'LineWidth', 1)
 %     hold on
-%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,1}.currLapLog(137).x0, log.vehicles{1,1}.currLapLog(137).u(1), color100(5,:))
+%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,1}.currLapLog(137).x_0, log.vehicles{1,1}.currLapLog(137).U_opt(1), color100(5,:))
 %     hold on
-%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,1}.currLapLog(165).x0, log.vehicles{1,1}.currLapLog(165).u(1), color100(5,:))
+%     plot_vehicle(scenario.vehicles{1,1}, log.vehicles{1,1}.currLapLog(165).x_0, log.vehicles{1,1}.currLapLog(165).U_opt(1), color100(5,:))
 
 
 %% (7) one-four-eight Vehicles
@@ -130,10 +130,10 @@ c.Label.FontSize = 11;
 %     Y1 = nan(1,nbStates1);
 %     vel1 = nan(1,nbStates1);
 %     for i = 1:nbStates1
-%        X1(i) = log1.vehicles{1,1}.currLapLog(i).x0(1);
-%        Y1(i) = log1.vehicles{1,1}.currLapLog(i).x0(2);
-%        vel1Xi = log1.vehicles{1,1}.currLapLog(i).x0(3);
-%        vel1Yi = log1.vehicles{1,1}.currLapLog(i).x0(4);
+%        X1(i) = log1.vehicles{1,1}.currLapLog(i).x_0(1);
+%        Y1(i) = log1.vehicles{1,1}.currLapLog(i).x_0(2);
+%        vel1Xi = log1.vehicles{1,1}.currLapLog(i).x_0(3);
+%        vel1Yi = log1.vehicles{1,1}.currLapLog(i).x_0(4);
 %        vel1(i) = sqrt(vel1Xi^2 + vel1Yi^2);
 %     end
 %     surface('XData', [X1; X1],             ... % N.B.  XYZC Data must have at least 2 cols
@@ -150,10 +150,10 @@ c.Label.FontSize = 11;
 %     Y2 = nan(1,nbStates2);
 %     vel2 = nan(1,nbStates2);
 %     for i = 1:nbStates2
-%        X2(i) = log2.vehicles{1,1}.currLapLog(i).x0(1);
-%        Y2(i) = log2.vehicles{1,1}.currLapLog(i).x0(2);
-%        vel2Xi = log2.vehicles{1,1}.currLapLog(i).x0(3);
-%        vel2Yi = log2.vehicles{1,1}.currLapLog(i).x0(4);
+%        X2(i) = log2.vehicles{1,1}.currLapLog(i).x_0(1);
+%        Y2(i) = log2.vehicles{1,1}.currLapLog(i).x_0(2);
+%        vel2Xi = log2.vehicles{1,1}.currLapLog(i).x_0(3);
+%        vel2Yi = log2.vehicles{1,1}.currLapLog(i).x_0(4);
 %        vel2(i) = sqrt(vel2Xi^2 + vel2Yi^2);
 %     end
 %     surface('XData', [X2; X2],             ... % N.B.  XYZC Data must have at least 2 cols

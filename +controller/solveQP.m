@@ -1,12 +1,12 @@
-function [x_new, u_new, optimization_log] = solveQP(...
+function [X_opt, U_opt, log] = solveQP(...
     cfg, p_vehicle, n_vars, idx_x, idx_u, idx_slack, quad_objective, lin_objective,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper)
 %% Solve QP
-optimization_log = struct;
+log = struct;
 
 % use CPLEX to solve QP, if available, else fallback to MATLAB
 if cfg.env.cplex.is_available
-    [qp_vars,optimization_log.fval,optimization_log.exitflag,optimization_log.output,optimization_log.lambda] = ...
+    [qp_vars,log.fval,log.exitflag,log.output,log.lambda] = ...
         cplexqp(quad_objective,lin_objective,A_ineq,b_ineq,A_eq,b_eq,bound_lower,bound_upper,[],[]);
     
     % Exitflag values: (acc. to
@@ -15,7 +15,7 @@ if cfg.env.cplex.is_available
     
     % "If you want to write the model out to a file, then you need to set:
     % opt.exportmodel = 'myModel.lp';"
-    switch optimization_log.exitflag
+    switch log.exitflag
         % case ~=1 and >=0: CPLEX qp has problematic solution
         case 6; warning('CPLEX qp exitflag 6: Non-optimal Solution available.');
         case 5; warning('CPLEX qp exitflag 5: Solution with numerical issues.');
@@ -35,11 +35,11 @@ if cfg.env.cplex.is_available
 else
     options = optimoptions('quadprog', 'Display', 'none');
     quad_objective_sp = sparse(quad_objective);
-    [qp_vars,optimization_log.fval,optimization_log.exitflag,optimization_log.output,optimization_log.lambda] = ...
+    [qp_vars,log.fval,log.exitflag,log.output,log.lambda] = ...
         quadprog(quad_objective_sp,lin_objective,A_ineq,b_ineq,A_eq,b_eq,bound_lower,bound_upper,[],options); 
     
     % exitflags acc. to quadprog documentation
-    switch optimization_log.exitflag
+    switch log.exitflag
         % case ~=1 and >=0: MATLAB quadprog has problematic solution
         case 1 %disp('MATLAB quadprog exitflag 1: Function converged to the solution x.');
         case 0; warning('MATLAB quadprog exitflag 0: Number of iterations exceeded options.MaxIterations.');
@@ -64,7 +64,7 @@ elseif length(qp_vars) ~= n_vars
 end
 
 % save results
-x_new(:, 1:p_vehicle.Hp) = qp_vars(idx_x(1:p_vehicle.Hp, :))';
-u_new(:, 1:p_vehicle.Hp) = qp_vars(idx_u(1:p_vehicle.Hp, :))';
-optimization_log.slack = qp_vars(idx_slack);
+X_opt(:, 1:p_vehicle.Hp) = qp_vars(idx_x(1:p_vehicle.Hp, :))';
+U_opt(:, 1:p_vehicle.Hp) = qp_vars(idx_u(1:p_vehicle.Hp, :))';
+log.slack = qp_vars(idx_slack);
 end

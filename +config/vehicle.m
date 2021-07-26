@@ -28,7 +28,6 @@ cfg_vh.p.n_acceleration_limits = 16;
 cfg_vh.p.trust_region_size = 0.5; % from Kloock, 1:43 scale? ST model
 
 
-
 %% Controller: Approximation Method
 % arbitrary IDs, saved for later usage
 SL = 10; SCR = 20;

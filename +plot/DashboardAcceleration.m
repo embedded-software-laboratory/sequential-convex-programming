@@ -18,7 +18,7 @@ classdef DashboardAcceleration < plot.Base
             
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
-            u = ws.vs{i_vehicle}.u;
+            U_opt = ws.vs{i_vehicle}.U_opt;
                 
             % plot base track initially
             if ~obj.is_background_plotted
@@ -53,8 +53,8 @@ classdef DashboardAcceleration < plot.Base
                 obj.clear_tmp()
             end
             
-            obj.add_tmp_handle(plot(u(1,:),u(2,:),'*-', 'Color', color));
-            obj.add_tmp_handle(plot(u(1,1),u(2,1),'o', 'MarkerSize',10, 'MarkerEdgeColor','k', 'MarkerFaceColor',color));
+            obj.add_tmp_handle(plot(U_opt(1,:),U_opt(2,:),'*-', 'Color', color));
+            obj.add_tmp_handle(plot(U_opt(1,1),U_opt(2,1),'o', 'MarkerSize',10, 'MarkerEdgeColor','k', 'MarkerFaceColor',color));
         end
     end
 end

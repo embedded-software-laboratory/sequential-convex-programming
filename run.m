@@ -60,21 +60,21 @@ try
         %   state: keep last state entry (stand still -> duplicated)
         %   input: last input entry to 0s
         for i = 1:length(cfg.scn.vs)
-            ws.vs{i}.x(:, 1:end-1) = ws.vs{i}.x(:, 2:end);
+            ws.vs{i}.X_opt(:, 1:end-1) = ws.vs{i}.X_opt(:, 2:end);
             
             %FIXME 
-%             ws.vs{i}.u(:, 1:end-1) = ws.vs{i}.u(:, 2:end);
-%             ws.vs{i}.u(:, end)     = [0; 0];
-            ws.vs{i}.u(:, 1:end)   = ws.vs{i}.u(:, 1:end); % no shift of inputs as u1 input is needed for linearization together with x0
+%             ws.vs{i}.U_opt(:, 1:end-1) = ws.vs{i}.U_opt(:, 2:end);
+%             ws.vs{i}.U_opt(:, end)     = [0; 0];
+            ws.vs{i}.U_opt(:, 1:end)   = ws.vs{i}.U_opt(:, 1:end); % no shift of inputs as u1 input is needed for linearization together with x_0
         end
 
         %% Current CP, position and lap
         if cfg.log.level >= cfg.log.LOG
-            % Get current checkpoints (corresponding to x0) and current laps
+            % Get current checkpoints (corresponding to x_0) and current laps
             for i = 1:length(cfg.scn.vs)
                 % update checkpoints
                 cp_curr = utils.find_closest_track_checkpoint_index(...
-                    ws.vs{i}.x0(cfg.scn.vs{i}.model.idx_pos), cfg.scn.track_center, 1);
+                    ws.vs{i}.x_0(cfg.scn.vs{i}.model.idx_pos), cfg.scn.track_center, 1);
                 ws.vs{i}.cp_prev = ws.vs{i}.cp_curr;
                 ws.vs{i}.cp_curr = cp_curr;
 
@@ -126,11 +126,11 @@ try
         for i = 1:length(cfg.scn.vs) % ego vehicle
             for j = 1:length(cfg.scn.vs) % opposing vehicles
                if (i ~= j) && ...
-                       ( norm(ws.vs{i}.x0(3:4)) < norm(ws.vs{1,j}.x0(3:4)) ) && ...
+                       ( norm(ws.vs{i}.x_0(3:4)) < norm(ws.vs{1,j}.x_0(3:4)) ) && ...
                        ( ws.obstacleTable(i,j) == 0 ) && ...
-                       ( ( norm(ws.vs{i}.x0(1:2) - ws.vs{1,j}.x(1:2,1)) <= 0.1 ) )%|| ...
-    %                    ( norm(ws.vs{i}.x0(1:2) - ws.vs{j}.x(1:2, 2)) <= 0.3 ) || ...
-    %                    ( norm(ws.vs{i}.x0(1:2) - ws.vs{j}.x(1:2, 3)) <= 0.3 ) )
+                       ( ( norm(ws.vs{i}.x_0(1:2) - ws.vs{1,j}.X_opt(1:2,1)) <= 0.1 ) )%|| ...
+    %                    ( norm(ws.vs{i}.x_0(1:2) - ws.vs{j}.X_opt(1:2, 2)) <= 0.3 ) || ...
+    %                    ( norm(ws.vs{i}.x_0(1:2) - ws.vs{j}.X_opt(1:2, 3)) <= 0.3 ) )
                    ws.blockingTable(i,j) = 1;
                else
                    ws.blockingTable(i,j) = 0;
@@ -140,13 +140,12 @@ try
 
         %% Controller
         for i = 1:length(cfg.scn.vs)
-            % evaluate controller & save output of current vehicle to output-struct for all vehicles
             ws.vs{i}.controller_output = controller.find_solution(cfg, ws, i);
+            % evaluate controller & save *raw* output
 
-            % Write controller output (output-struct) for each vehicle to
-            % (trajectory-struct)
-            ws.vs{i}.x = ws.vs{i}.controller_output.x_final;
-            ws.vs{i}.u = ws.vs{i}.controller_output.u_final;
+            % Write controller output (output-struct) to (trajectory-struct)
+            ws.vs{i}.X_opt = ws.vs{i}.controller_output(end).X_opt;
+                ws.vs{i}.U_opt = ws.vs{i}.controller_output(end).U_opt;
         end
         
 
@@ -161,7 +160,7 @@ try
         end
 
         %% Visualization
-        % Visualization plots x0 (current state) of last time step and
+        % Visualization plots x_0 (current state) of last time step and
         % predictions of Hp states x calculated in the current time step.
         % In other words - the visualization takes place before the
         % simulation/application of the control inputs.
@@ -179,7 +178,7 @@ try
             if cfg.scn.vs{i}.isModelSimulationLinear
                 % calc next timestep's state
                 % equals to controller output `ws.vs{i}.x0 = ws.vs{i}.controller_output.x(:,1)`;
-                ws.vs{i}.x0 = ws.vs{i}.x0 + cfg.scn.vs{i}.model_simulation.ode(ws.vs{i}.x0, ws.vs{i}.u(:,1));
+                ws.vs{i}.x_0 = ws.vs{i}.x_0 + cfg.scn.vs{i}.model_simulation.ode(ws.vs{i}.x_0, ws.vs{i}.U_opt(:,1));
             else
                 ws.vs{i}.x0 = simulate_ode(ws.vs{i}, cfg.scn.vs{i});
             end
@@ -263,15 +262,15 @@ function ws = init_ws(cfg)
     for i = 1:length(cfg.scn.vs)
         % controller-specifics
         ws.vs{i}.controller_output = NaN;
-        ws.vs{i}.x0 = cfg.scn.vs{i}.x_start;
-        ws.vs{i}.x = repmat(ws.vs{i}.x0, 1, cfg.scn.vs{i}.p.Hp);
-        ws.vs{i}.u = repmat([0;0], 1, cfg.scn.vs{i}.p.Hp);
+        ws.vs{i}.x_0 = cfg.scn.vs{i}.x_start;
+        ws.vs{i}.X_opt = repmat(ws.vs{i}.x_0, 1, cfg.scn.vs{i}.p.Hp);
+        ws.vs{i}.U_opt = repmat([0;0], 1, cfg.scn.vs{i}.p.Hp);
 
         % lap-specific
-        cp_x0 = utils.find_closest_track_checkpoint_index(...
-            ws.vs{i}.x0(cfg.scn.vs{i}.model.idx_pos), cfg.scn.track_center, 1);
-        ws.vs{i}.cp_prev = cp_x0;
-        ws.vs{i}.cp_curr = cp_x0;
+        cp_x_0 = utils.find_closest_track_checkpoint_index(...
+            ws.vs{i}.x_0(cfg.scn.vs{i}.model.idx_pos), cfg.scn.track_center, 1);
+        ws.vs{i}.cp_prev = cp_x_0;
+        ws.vs{i}.cp_curr = cp_x_0;
         ws.vs{i}.lap_count = 0; % start with 0 finished laps
         ws.vs{i}.pos = 0; % ego vehicle position relative to all other vehicles
     end

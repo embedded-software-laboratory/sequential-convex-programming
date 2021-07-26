@@ -30,13 +30,13 @@ classdef DashboardStatesNInputs < plot.Base
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             %% Prepare data
-            x = ws.vs{i_veh}.x;
-            x = [ws.vs{i_veh}.x0 x];
+            X = ws.vs{i_veh}.X_opt;
+            X = [ws.vs{i_veh}.x_0 X];
 
-            u = ws.vs{i_veh}.u;
-            u = [u u(:,end)]; % Duplicate last entry for better visibility in plot
+            U = ws.vs{i_veh}.U_opt;
+            U = [U U(:,end)]; % Duplicate last entry for better visibility in plot
 
-            Hp = size(ws.vs{i_veh}.x,2);
+            Hp = size(ws.vs{i_veh}.X_opt, 2);
             Tx = 0:1:Hp;
             Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
@@ -49,7 +49,7 @@ classdef DashboardStatesNInputs < plot.Base
                 
                 % create plots
                 subplot(3,3,1);
-            	obj.subplot_plot_handles{1} = plot(Tx, x(3,:), 'Color', color);
+            	obj.subplot_plot_handles{1} = plot(Tx, X(3,:), 'Color', color);
                 title('v_x [m/s]')
                 if bounds_available
                     ylim(model_p.bounds(:, 3)' .* 1.1)
@@ -59,7 +59,7 @@ classdef DashboardStatesNInputs < plot.Base
                 grid on
 
                 subplot(3,3,2);
-                obj.subplot_plot_handles{2} = plot(Tx, x(4,:), 'Color', color);
+                obj.subplot_plot_handles{2} = plot(Tx, X(4,:), 'Color', color);
                 title('v_y [m/s]')
                 if bounds_available
                     ylim(model_p.bounds(:, 4)' .* 1.1)
@@ -68,9 +68,9 @@ classdef DashboardStatesNInputs < plot.Base
                 xlim([Tx(1) Tx(end)])
                 grid on
 
-                if length(x(:, 1)) >=6 % TODO make state dependent
+                if length(X(:, 1)) >=6 % TODO make state dependent
                     subplot(3,3,4);
-                    obj.subplot_plot_handles{3} = plot(Tx, x(5,:), 'Color', color);
+                    obj.subplot_plot_handles{3} = plot(Tx, X(5,:), 'Color', color);
                     title('Yaw Angle Phi [rad]')
                     if bounds_available
                         ylim(model_p.bounds(:, 5)' .* 1.1)
@@ -82,7 +82,7 @@ classdef DashboardStatesNInputs < plot.Base
                     grid on
 
                     subplot(3,3,5);
-                    obj.subplot_plot_handles{4} = plot(Tx, x(6,:), 'Color', color);
+                    obj.subplot_plot_handles{4} = plot(Tx, X(6,:), 'Color', color);
                     title('Yaw Rate W [rad/sec]')
                     if bounds_available
                         ylim(model_p.bounds(:, 6)' .* 1.1)
@@ -98,10 +98,10 @@ classdef DashboardStatesNInputs < plot.Base
                 obj.subplot_plot_handles{5} = plot(Tu, u(1,:), 'Color', color);
                 title('Input Steering Angle [rad]')
                 if bounds_available
-                    ylim(model_p.bounds(:, length(x(:, 1)) + 1)' .* 1.1)
+                    ylim(model_p.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
                     % if bounds are real
-                    if ~any(isinf(model_p.bounds(:, length(x(:, 1)) + 1)'))
-                        yline(model_p.bounds(:, length(x(:, 1)) + 1)', '--r')
+                    if ~any(isinf(model_p.bounds(:, length(X(:, 1)) + 1)'))
+                        yline(model_p.bounds(:, length(X(:, 1)) + 1)', '--r')
                     end
                 end
                 xlim([Tu(1) Tu(end)])
@@ -111,10 +111,10 @@ classdef DashboardStatesNInputs < plot.Base
                 obj.subplot_plot_handles{6} = plot(Tu, u(2,:), 'Color', color);
                 title('Input Torque [% or Nm]')
                 if bounds_available
-                    ylim(model_p.bounds(:, length(x(:, 1)) + 2)' .* 1.1)
+                    ylim(model_p.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
                     % if bounds are real
-                    if ~any(isinf(model_p.bounds(:, length(x(:, 1)) + 2)'))
-                        yline(model_p.bounds(:, length(x(:, 1)) + 2)', '--r')
+                    if ~any(isinf(model_p.bounds(:, length(X(:, 1)) + 2)'))
+                        yline(model_p.bounds(:, length(X(:, 1)) + 2)', '--r')
                     end
                 end
                 xlim([Tu(1) Tu(end)])
@@ -163,17 +163,17 @@ classdef DashboardStatesNInputs < plot.Base
 
             % update plots
             set(obj.subplot_plot_handles{1}, 'XData', Tx);
-            set(obj.subplot_plot_handles{1}, 'YData', x(3,:));
+            set(obj.subplot_plot_handles{1}, 'YData', X(3,:));
             
             set(obj.subplot_plot_handles{2}, 'XData', Tx);
-            set(obj.subplot_plot_handles{2}, 'YData', x(4,:));
+            set(obj.subplot_plot_handles{2}, 'YData', X(4,:));
             
-            if length(x(:, 1)) >=6 % TODO make state dependent
+            if length(X(:, 1)) >=6 % TODO make state dependent
                 set(obj.subplot_plot_handles{3}, 'XData', Tx);
-                set(obj.subplot_plot_handles{3}, 'YData', x(5,:));
+                set(obj.subplot_plot_handles{3}, 'YData', X(5,:));
                 
                 set(obj.subplot_plot_handles{4}, 'XData', Tx);
-                set(obj.subplot_plot_handles{4}, 'YData', x(6,:));
+                set(obj.subplot_plot_handles{4}, 'YData', X(6,:));
             end
 
             
