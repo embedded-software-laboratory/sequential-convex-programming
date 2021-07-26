@@ -99,7 +99,10 @@ classdef DashboardStatesNInputs < plot.Base
                 title('Input Steering Angle [rad]')
                 if bounds_available
                     ylim(model_p.bounds(:, length(x(:, 1)) + 1)' .* 1.1)
-                    yline(model_p.bounds(:, length(x(:, 1)) + 1)', '--r')
+                    % if bounds are real
+                    if ~any(isinf(model_p.bounds(:, length(x(:, 1)) + 1)'))
+                        yline(model_p.bounds(:, length(x(:, 1)) + 1)', '--r')
+                    end
                 end
                 xlim([Tu(1) Tu(end)])
                 grid on
@@ -109,7 +112,10 @@ classdef DashboardStatesNInputs < plot.Base
                 title('Input Torque [% or Nm]')
                 if bounds_available
                     ylim(model_p.bounds(:, length(x(:, 1)) + 2)' .* 1.1)
-                    yline(model_p.bounds(:, length(x(:, 1)) + 2)', '--r')
+                    % if bounds are real
+                    if ~any(isinf(model_p.bounds(:, length(x(:, 1)) + 2)'))
+                        yline(model_p.bounds(:, length(x(:, 1)) + 2)', '--r')
+                    end
                 end
                 xlim([Tu(1) Tu(end)])
                 grid on
@@ -170,9 +176,10 @@ classdef DashboardStatesNInputs < plot.Base
                 set(obj.subplot_plot_handles{4}, 'YData', x(6,:));
             end
 
+            
             set(obj.subplot_plot_handles{5}, 'XData', Tu);
             set(obj.subplot_plot_handles{5}, 'YData', u(1,:));
-            
+
             set(obj.subplot_plot_handles{6}, 'XData', Tu);
             set(obj.subplot_plot_handles{6}, 'YData', u(2,:));
         end
