@@ -13,18 +13,19 @@ classdef Linear < model.vehicle.Base
         function p = getParamsDefault(dt)
             % CarMaker model from B. Alrifaee and J. Maczijewski, ‘Real-time Trajectory optimization for Autonomous Vehicle Racing using Sequential Linearization’, in 2018 IEEE Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483, doi: 10.1109/IVS.2018.8500634.
             % Linear model: x1 = Ax + Bu
-            ddt = dt * dt / 2;
+            ddt = dt^2 / 2;
             p.paramsName = 'Default Linear';
-            p.Ad = [
-                1 0 dt 0;
-                0 1 0 dt;
-                0 0 1 0;
-                0 0 0 1];
+            p.Ad = [      % global coordinates
+                1 0 dt 0; % p_x
+                0 1 0 dt; % p_y
+                0 0 1 0;  % v_x
+                0 0 0 1]; % v_y
             p.Bd = [
                 ddt 0;
-                0 ddt;
-                dt 0;
-                0 dt];
+                0   ddt;
+                dt  0;
+                0   dt];
+            %   a_x a_y (globally)
         end
     end
     
@@ -153,7 +154,7 @@ classdef Linear < model.vehicle.Base
                 t_end_index = t_end / dt_sim;
                 Hp = 1; % arbitrarym not used here
 
-                m = model.vehicle.SingleTrack(Hp, dt_sim, model.vehicle.SingleTrack.getParamsLinigerRC_1_43());
+                m = model.vehicle.SingleTrack(Hp, dt_sim, model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds());
 
                 t_sim = (0:t_end_index) * dt_sim;
 
@@ -313,6 +314,42 @@ classdef Linear < model.vehicle.Base
                         fprintf('for v_x %f & delta %f got a_y %f\n', v, delta, output_)
                 end
             end
+        end
+        
+        function p = getParamsSingleTrackLiniger_WithKloocksBounds(dt, filename, shallPlot)
+            % extends ST Liniger modell with Kloocks bounds
+            p = model.vehicle.Linear.getParamsSingleTrackLiniger(dt, filename, shallPlot);
+            
+            % Bounds (first row upper, second lower bounds)
+            %    states                          inputs
+            %    p_x  p_y  v_x  v_y
+            %    m    m    m/s  m/s
+            % CAVE position bounds are not considered in QP creation
+            p.bounds = ...
+                [-Inf -Inf  .05 -2 ;
+                  Inf  Inf  2    2];
+            % CAVE FIXME delta not considered in QP creation
+            p.bounds_delta = ...
+                [-Inf -Inf -Inf -Inf ;
+                  Inf  Inf  Inf  Inf];
+        end
+        
+        function p = getParamsSingleTrackLiniger_WithLinigersBounds(dt, filename, shallPlot)
+            % extends ST Liniger modell with Kloocks bounds
+            p = model.vehicle.Linear.getParamsSingleTrackLiniger(dt, filename, shallPlot);
+              
+            % Bounds (first row lower, second upper bounds)
+            %    states                          inputs
+            %    p_x  p_y  v_x  v_y
+            %    m    m    m/s  m/s
+            % CAVE position bounds are not considered in QP creation
+            p.bounds = ...
+                [-Inf -Inf -.1  -2 ;
+                  Inf  Inf  4    2];
+            % CAVE FIXME delta not considered in QP creation
+            p.bounds_delta = ...
+                [-Inf -Inf -Inf -Inf ;
+                  Inf  Inf  Inf  Inf];
         end
     end
 end

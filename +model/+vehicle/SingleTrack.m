@@ -2,7 +2,7 @@ classdef SingleTrack < model.vehicle.BaseOde
     % input: /delta steering angle, /tau torque rear wheels
     % as defined in A. Liniger, ‘Path Planning and Control for Autonomous Racing’, Dissertation, ETH Zurich, 2018.
     methods (Static)
-        function p = getParamsLinigerRC_1_43
+        function p = getParamsLinigerRC_1_43_WithLinigerBounds
             % Liniger RC 1:43 MPCC from GitHub https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getModelParams.m
             % Bounds adapted from https://github.com/alexliniger/MPCC/blob/84cc61d628a165a424c805bbe071fe96b88da2d0/Matlab/getMPC_vars.m
             
@@ -43,11 +43,11 @@ classdef SingleTrack < model.vehicle.BaseOde
                   Inf  Inf  Inf  Inf  Inf  Inf    1    1 ];
         end
         
-        function p = getParamsKloockRC_1_43
+        function p = getParamsKloockRC_1_43_WithLinigerBounds
             % Liniger, acc. to M. Kloock, P. Scheffe, L. Botz, J. Maczijewski, B. Alrifaee, and S. Kowalewski, ‘Networked Model Predictive Vehicle Race Control’, in 2019 IEEE Intelligent Transportation Systems Conference (ITSC), Auckland, New Zealand, Oct. 2019, pp. 1552–1557, doi: 10.1109/ITSC.2019.8917222.
             
             % get defaults, then overwrite changes
-            p = model.vehicle.SingleTrack.getParamsLinigerRC_1_43();
+            p = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
             
             p.paramsName = 'ST from Kloock via Plots ST Liniger 1:43';
             
@@ -73,7 +73,7 @@ classdef SingleTrack < model.vehicle.BaseOde
         
         function p = getParamsKloockRC_1_43_WithKloocksBounds
             % get defaults, then overwrite changes
-            p = model.vehicle.SingleTrack.getParamsKloockRC_1_43();
+            p = model.vehicle.SingleTrack.getParamsKloockRC_1_43_WithLinigerBounds();
             
             p.paramsName = 'ST from Kloock via Plots ST Liniger 1:43, plus custom bounds';
             

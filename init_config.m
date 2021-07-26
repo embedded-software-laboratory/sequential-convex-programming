@@ -34,6 +34,10 @@ for i = 1:length(cfg.scn.vs)
     cfg.scn.vs{i}.model_simulation = ...
         cfg.scn.vs{i}.model_simulation(cfg.scn.vs{i}.p.Hp, cfg.scn.vs{i}.p.dt, cfg.scn.vs{i}.model_simulation_p);
     
+    if ~isfield(cfg.scn.vs{i}.model_p, 'bounds')
+        warning("Vehicle's %i model has no bounds", i);
+    end
+    
     % expand start states to match model states
     assert(isequal(size(cfg.scn.vs{i}.x_start), [4 1]))
     cfg.scn.vs{i}.x_start = [cfg.scn.vs{i}.x_start' zeros(1, cfg.scn.vs{i}.model.nx - 4)]';

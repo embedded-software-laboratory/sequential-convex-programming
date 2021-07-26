@@ -23,6 +23,7 @@ classdef DashboardStatesNInputs < plot.Base
             % choose vehicle
             i_veh = 1;
             model_p = cfg.scn.vs{i_veh}.model_p;
+            bounds_available = isfield(model_p, 'bounds');
             colors = utils.getRwthColors(100);
             color = colors(i_veh, :); % need to store color for later plot updates (else Matlab's gc will delete)
             
@@ -50,16 +51,20 @@ classdef DashboardStatesNInputs < plot.Base
                 subplot(3,3,1);
             	obj.subplot_plot_handles{1} = plot(Tx, x(3,:), 'Color', color);
                 title('v_x [m/s]')
-                ylim(model_p.bounds(:, 3)' .* 1.1)
-                yline(model_p.bounds(:, 3)', '--r')
+                if bounds_available
+                    ylim(model_p.bounds(:, 3)' .* 1.1)
+                    yline(model_p.bounds(:, 3)', '--r')
+                end
                 xlim([Tx(1) Tx(end)])
                 grid on
 
                 subplot(3,3,2);
                 obj.subplot_plot_handles{2} = plot(Tx, x(4,:), 'Color', color);
                 title('v_y [m/s]')
-                ylim(model_p.bounds(:, 4)' .* 1.1)
-                yline(model_p.bounds(:, 4)', '--r')
+                if bounds_available
+                    ylim(model_p.bounds(:, 4)' .* 1.1)
+                    yline(model_p.bounds(:, 4)', '--r')
+                end
                 xlim([Tx(1) Tx(end)])
                 grid on
 
@@ -67,8 +72,10 @@ classdef DashboardStatesNInputs < plot.Base
                     subplot(3,3,4);
                     obj.subplot_plot_handles{3} = plot(Tx, x(5,:), 'Color', color);
                     title('Yaw Angle Phi [rad]')
-                    ylim(model_p.bounds(:, 5)' .* 1.1)
-                    yline(model_p.bounds(:, 5)', '--r')
+                    if bounds_available
+                        ylim(model_p.bounds(:, 5)' .* 1.1)
+                        yline(model_p.bounds(:, 5)', '--r')
+                    end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
                     yticklabels({'-3\pi','-2\pi','-\pi','0','\pi','2\pi','3\pi'})
@@ -77,8 +84,10 @@ classdef DashboardStatesNInputs < plot.Base
                     subplot(3,3,5);
                     obj.subplot_plot_handles{4} = plot(Tx, x(6,:), 'Color', color);
                     title('Yaw Rate W [rad/sec]')
-                    ylim(model_p.bounds(:, 6)' .* 1.1)
-                    yline(model_p.bounds(:, 6)', '--r')
+                    if bounds_available
+                        ylim(model_p.bounds(:, 6)' .* 1.1)
+                        yline(model_p.bounds(:, 6)', '--r')
+                    end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
                     yticklabels({'-3\pi/s','-2\pi/s','-\pi/s','0','\pi/s','2\pi/s','3\pi/s'})
@@ -88,16 +97,20 @@ classdef DashboardStatesNInputs < plot.Base
                 subplot(3,3,7);
                 obj.subplot_plot_handles{5} = plot(Tu, u(1,:), 'Color', color);
                 title('Input Steering Angle [rad]')
-                ylim(model_p.bounds(:, length(x(:, 1)) + 1)' .* 1.1)
-                yline(model_p.bounds(:, length(x(:, 1)) + 1)', '--r')
+                if bounds_available
+                    ylim(model_p.bounds(:, length(x(:, 1)) + 1)' .* 1.1)
+                    yline(model_p.bounds(:, length(x(:, 1)) + 1)', '--r')
+                end
                 xlim([Tu(1) Tu(end)])
                 grid on
 
                 subplot(3,3,8);
                 obj.subplot_plot_handles{6} = plot(Tu, u(2,:), 'Color', color);
-                title('Input Torque [Nm]')
-                ylim(model_p.bounds(:, length(x(:, 1)) + 2)' .* 1.1)
-                yline(model_p.bounds(:, length(x(:, 1)) + 2)', '--r')
+                title('Input Torque [% or Nm]')
+                if bounds_available
+                    ylim(model_p.bounds(:, length(x(:, 1)) + 2)' .* 1.1)
+                    yline(model_p.bounds(:, length(x(:, 1)) + 2)', '--r')
+                end
                 xlim([Tu(1) Tu(end)])
                 grid on
                 

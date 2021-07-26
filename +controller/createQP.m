@@ -352,7 +352,7 @@ if ~isModelLinear
     %bound_upper(idx_u(end, :)) = 0.15 * bound_upper(idx_u(end, :));
 
     % Bounded states
-    % (all except position, as this is done above via trust region)
+    % (all except position, as this is done above via trust region if required)
     bound_lower(idx_x(:, 3:end)) = repmat(model.p.bounds(1, model.idx_x(3:end)), length(idx_x(:, 3:end)), 1);
     bound_upper(idx_x(:, 3:end)) = repmat(model.p.bounds(2, model.idx_x(3:end)), length(idx_x(:, 3:end)), 1);
 
