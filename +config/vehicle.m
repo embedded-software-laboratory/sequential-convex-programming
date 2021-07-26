@@ -1,7 +1,8 @@
 % Default config for a single vehicle
 
 function cfg_vh = vehicle(cfg)
-cfg_vh = struct;
+% required for ST to lin Liniger conversion
+cfg_vh.tempFileSingleTrackAMax = [cfg.tempPath 'singleTrackAMax.mat'];
 
 %% Controller: General Optimization
 cfg_vh.p.iterations = 2;

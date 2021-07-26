@@ -1,6 +1,5 @@
-% vehicle similar to SL paper (B. Alrifaee and J. Maczijewski, “Real-time Trajectory optimization for Autonomous Vehicle Racing using Sequential Linearization,” in 2018 IEEE Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483. doi: 10.1109/IVS.2018.8500634.)
-function cfg_vh = vehicle_paperSL(cfg)
-cfg_vh = config.vehicle(cfg);
+function cfg_vh = vehicle_paperSL(cfg_vh)
+% adapts vehicle similar to SL paper (B. Alrifaee and J. Maczijewski, “Real-time Trajectory optimization for Autonomous Vehicle Racing using Sequential Linearization,” in 2018 IEEE Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483. doi: 10.1109/IVS.2018.8500634.)
 
 %% Controller: General Optimization
 cfg_vh.p.iterations = 1;

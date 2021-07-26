@@ -1,7 +1,5 @@
-% Default config for a single vehicle
-
-function cfg_vh = vehicle_ST_Kloock(cfg)
-cfg_vh = config.vehicle(cfg);
+function cfg_vh = vehicle_ST_Kloock(cfg_vh)
+%adapts vehicle to Single Track Model Kloock
 
 % FIXME really different weight necessary?
 cfg_vh.p.R = 350 * eye(2); % Penalty weight for control changes over time
