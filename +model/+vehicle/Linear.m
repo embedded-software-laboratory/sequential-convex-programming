@@ -125,7 +125,7 @@ classdef Linear < model.vehicle.Base
             end
             
             p.a_forward_max = a_forward_max;
-            p.a_backward_max = abs(a_backward_max); %FIXME why is positive required?
+            p.a_backward_max = abs(a_backward_max); %CAVE positive values are required
             p.a_lateral_max = a_lateral_max;
             
             p.a_max = max([
@@ -156,7 +156,8 @@ classdef Linear < model.vehicle.Base
                 t_end_index = t_end / dt_sim;
                 Hp = 1; % arbitrarym not used here
 
-                m = model.vehicle.SingleTrack(Hp, dt_sim, model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds());
+                m_params = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
+                m = model.vehicle.SingleTrack(Hp, dt_sim, m_params);
 
                 t_sim = (0:t_end_index) * dt_sim;
 
@@ -172,13 +173,12 @@ classdef Linear < model.vehicle.Base
 
                 u = NaN(length(t_sim), 2);
                 switch mode
-                    %FIXME use bounded states
                     case mode_long_forward
                         u(:, 1) = 0; % delta
-                        u(:, 2) = 1; % torque
+                        u(:, 2) = m_params.bounds(2, end); % torque
                     case mode_long_backward
                         u(:, 1) = 0; % delta
-                        u(:, 2) = -.1; % torque
+                        u(:, 2) = m_params.bounds(1, end); % torque
                     case mode_lat
                         % Increasing steering angle in 2nd half of simulation -> first
                         % reach steady state of velocity
@@ -263,7 +263,7 @@ classdef Linear < model.vehicle.Base
                         a_backward_max_ = calculate_a_max(shallPlot, 11, v_max, v_measure_);
 
                         %% lateral map creation (recursive calls)
-                        delta_max = 0.35;
+                        delta_max = m_params.bounds(2, end-1);
                         % measure loop for steady state
                         vs = [0:0.5:v_max v_max];
                         deltas = 0:0.05:delta_max;
@@ -282,7 +282,7 @@ classdef Linear < model.vehicle.Base
 
                             disp('Pausing, press key to continue..'); pause
                         end
-                        % FIXME simplistic approach to select fixed steering angle for
+                        % CAVE simplistic approach to select fixed steering angle for
                         % finding max a_y (ok for now because of tire model not beeing
                         % non-convex)
                         [~, i_delta] = max(sum(a_lateral_max_all));
@@ -334,10 +334,10 @@ classdef Linear < model.vehicle.Base
             p.bounds = ...
                 [-Inf -Inf  .05 -2     -Inf  -Inf ;
                   Inf  Inf  2    2      Inf   Inf];
-            % CAVE FIXME delta not considered in QP creation
-            p.bounds_delta = ...
-                [-Inf -Inf -Inf -Inf   -Inf  -Inf ;
-                  Inf  Inf  Inf  Inf    Inf   Inf];
+            % CAVE delta not considered in QP creation
+            %p.bounds_delta = ...
+            %    [-Inf -Inf -Inf -Inf   -Inf  -Inf ;
+            %      Inf  Inf  Inf  Inf    Inf   Inf];
         end
         
         function p = getParamsSingleTrackLiniger_WithLinigersBounds(dt, filename, shallPlot)
@@ -356,10 +356,10 @@ classdef Linear < model.vehicle.Base
             p.bounds = ...
                 [-Inf -Inf -.1  -2     -Inf  -Inf ;
                   Inf  Inf  4    2      Inf   Inf];
-            % CAVE FIXME delta not considered in QP creation
-            p.bounds_delta = ...
-                [-Inf -Inf -Inf -Inf   -Inf  -Inf ;
-                  Inf  Inf  Inf  Inf    Inf   Inf];
+            % CAVE delta not considered in QP creation
+            %p.bounds_delta = ...
+            %    [-Inf -Inf -Inf -Inf   -Inf  -Inf ;
+            %      Inf  Inf  Inf  Inf    Inf   Inf];
         end
     end
 end

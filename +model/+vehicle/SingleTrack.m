@@ -37,10 +37,10 @@ classdef SingleTrack < model.vehicle.BaseOde
             p.bounds = ...
                 [-Inf -Inf -.1  -2   -10  -7    -.35  -.1 ;
                   Inf  Inf  4    2    10   7     .35   1 ];
-            % CAVE FIXME delta not considered in QP creation
-            p.bounds_delta = ...
-                [-Inf -Inf -Inf -Inf -Inf -Inf   -1   -1  ;
-                  Inf  Inf  Inf  Inf  Inf  Inf    1    1 ];
+            % CAVE delta not considered in QP creation
+            %p.bounds_delta = ...
+            %    [-Inf -Inf -Inf -Inf -Inf -Inf   -1   -1  ;
+            %      Inf  Inf  Inf  Inf  Inf  Inf    1    1 ];
         end
         
         function p = getParamsKloockRC_1_43_WithLinigerBounds
@@ -85,10 +85,10 @@ classdef SingleTrack < model.vehicle.BaseOde
             p.bounds = ...
                 [-Inf -Inf  .05 -2   -Inf -2*pi  -.4   -.08 ;
                   Inf  Inf  2    2    Inf  2*pi   .4    .08];
-            % CAVE FIXME delta not considered in QP creation
-            p.bounds_delta = ...
-                [-Inf -Inf -Inf -Inf -Inf -Inf   -Inf  -Inf ;
-                  Inf  Inf  Inf  Inf  Inf  Inf    Inf   Inf];
+            % CAVE delta not considered in QP creation
+            %p.bounds_delta = ...
+            %    [-Inf -Inf -Inf -Inf -Inf -Inf   -Inf  -Inf ;
+            %      Inf  Inf  Inf  Inf  Inf  Inf    Inf   Inf];
         end
     end
     
