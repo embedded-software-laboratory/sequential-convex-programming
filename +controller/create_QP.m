@@ -353,7 +353,6 @@ bound_lower(idx_slack) = 0;
 % linearization error could increase too much
 % (could use delta bounds instead, but not supported by solvers)
 if vh.approximationIsSL
-    % FIXME scale trust region size with track
     bound_lower(idx_pos) = (X_opt_prev(model.idx_pos, :) - p.trust_region_size)';
     bound_upper(idx_pos) = (X_opt_prev(model.idx_pos, :) + p.trust_region_size)';
 end
@@ -377,9 +376,9 @@ if ~isControlModelLinear
     bound_lower(idx_x(:, 3:end)) = repmat(model.p.bounds(1, model.idx_x(3:end)), length(idx_x(:, 3:end)), 1);
     bound_upper(idx_x(:, 3:end)) = repmat(model.p.bounds(2, model.idx_x(3:end)), length(idx_x(:, 3:end)), 1);
 
-    % "Terminal Constraints"
-    % FIXME
-    % Bounded states for last prediction step instead of term. constr.
+    % Terminal Constraints
+    % 	Choosing small numerical values for last prediction step
+	% 	(instead of terminal equality)
     bound_upper(idx_x(end,3)) = 0.01;
     bound_upper(idx_x(end,4)) = 0.01;
     bound_upper(idx_x(end,6)) = 0.02;

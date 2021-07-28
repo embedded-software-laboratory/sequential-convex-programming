@@ -4,8 +4,9 @@ function [checkpoints, creation_scale] = HockenheimGrandPrix
 % races of model scale cars of scale 1:43. However, the track layout
 % has a scale of about 1:145. This makes it more difficult for the cars
 % to maneuver.
-% FIXME: which scale? trackWidth is the same as other HockenheimShort, but
-% states other scale
+% 
+% FIXME which scale? trackWidth is the same as other HockenheimShort, but
+% 	states other scale
 creation_scale = 1/145;
 
 trackWidth = 0.25;

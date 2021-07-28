@@ -37,7 +37,7 @@ hold on
 %% Plot Driven Paths
 
 %% (1) one Vehicle
-% FIXME: restrict data input to one lap only
+% FIXME restrict data input to one lap only
 x_0 = [log.vehicles{1}.x_0];
 X = x_0(1, :);
 Y = x_0(2, :);

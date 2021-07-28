@@ -22,8 +22,7 @@ cfg_vh.p.R = 0.05 * eye(2); % Penalty weight for control changes over time
 cfg_vh.p.n_acceleration_limits = 16;
 
 % Linearization (SL): size of Trust Region for position
-% FIXME adapt to scale
-% FIXME choose value
+% FIXME scale trust region size with track
 %cfg_vh.p.trust_region_size = 3; % fram Janis, 1:1 scale? linear vehicle model
 cfg_vh.p.trust_region_size = 0.5; % from Kloock, 1:43 scale? ST model
 

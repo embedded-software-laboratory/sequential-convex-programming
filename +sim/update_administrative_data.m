@@ -15,7 +15,7 @@ if cfg.log.level >= cfg.log.LOG
         ws.vhs{i}.cp_curr = cp_curr;
 
         % new lap: advance lap counter
-        % FIXME: robust lap detection?
+        % FIXME robust lap detection?
         if (ws.vhs{i}.cp_prev ~= ws.vhs{i}.cp_curr) && ...
             (ws.vhs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
             (ws.vhs{i}.cp_curr / length(cfg.scn.track) < 1)
