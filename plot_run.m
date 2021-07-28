@@ -14,8 +14,8 @@ for j = 1:length(log.lap)
     tic
     % reconstruct ws from log
     ws = log.lap{j};
-    for i = 1:length(cfg.scn.vs)
-        ws.vs{i} = log.vehicles{i}(j);
+    for i = 1:length(cfg.scn.vhs)
+        ws.vhs{i} = log.vehicles{i}(j);
     end
     
     for i = 1:length(cfg.plot.plots_to_draw)
@@ -25,7 +25,7 @@ for j = 1:length(log.lap)
 
     % pause to simulate real time
     % FIXME what if different prediction step sizes?
-    delta = cfg.scn.vs{1}.p.dt - toc;
+    delta = cfg.scn.vhs{1}.p.dt - toc;
     if delta > 0
         pause(delta);
     else

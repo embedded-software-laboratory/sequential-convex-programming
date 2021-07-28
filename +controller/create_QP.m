@@ -1,11 +1,11 @@
 function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
-    createQP(...
-        vh, x_0, X_opt_prev, U_opt_prev,...
-        checkpoints, checkpoint_indices,...
-        track_polygons, track_polygon_indices,...
-        iter, i_vehicle,...
-        obstacleTable, blockingTable, vhs)
+        create_QP(...
+            vh, x_0, X_opt_prev, U_opt_prev,...
+            checkpoints, checkpoint_indices,...
+            track_polygons, track_polygon_indices,...
+            iter, i_vehicle,...
+            obstacleTable, blockingTable, vhs)
 % QP formulation: create and solve convexified problem
 % track can be represented as SCR or SL
 % SL: Sequential Linearization controller: QP approximated (linearised, thus relaxed) variant
@@ -196,7 +196,7 @@ for k = 1:p.Hp
         if (iter >= 2) && (sum(obstacleTable(i_vehicle,:)) >= 1)
 
             % iterate over all opponents
-            for j = 1:length(cfg.scn.vs)
+            for j = 1:length(cfg.scn.vhs)
                 % Extend predicted trajectory of opponent if the opponent's prediction horizon is shorter than the own horizon
                 % TODO: very simplistic approach
                 if k <= size(vhs{1, j}.X_opt,2) % Choose correponding trajectory point if prediciton step is within scope
@@ -213,30 +213,30 @@ for k = 1:p.Hp
 
                     if strcmp(cfg.scn.Dsafe,'Circle')
                         D_vel_1 = sqrt((V_diff(1) * p.dt)^2 + (V_diff(2) * p.dt)^2);  % safety distance due to velocity of objects
-                        D_size_1 = 2*cfg.scn.vs{1,j}.distSafe2CenterVal_1;       % safety distance due to object size
+                        D_size_1 = 2*cfg.scn.vhs{1,j}.distSafe2CenterVal_1;       % safety distance due to object size
                         Dsafe_1 = D_vel_1 + D_size_1;
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_1; % intersection of safe radius and connection between trajectory point and obstacle center
                     elseif strcmp(cfg.scn.Dsafe,'Ellipse')
                         D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
                         yaw_ang = X_opt_prev(5,k);
                         Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
-                        D_size_2 = normal_vector' * (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2);
+                        D_size_2 = normal_vector' * (Rot_yaw * cfg.scn.vhs{1,j}.distSafe2CenterVal_2);
                         Dsafe_2 = norm( D_vel_2 + D_size_2 );
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_2; % intersection of safe radius and connection between trajectory point and obstacle center
                     elseif strcmp(cfg.scn.Dsafe,'CircleImpr')
                         D_vel_1 = ( normal_vector' * V_diff ) * p.dt; % Improved
     %                         D_vel_1 = 0;
-                        D_size_1 = 2*cfg.scn.vs{1,j}.distSafe2CenterVal_1;
+                        D_size_1 = 2*cfg.scn.vhs{1,j}.distSafe2CenterVal_1;
                         Dsafe_1 = D_vel_1 + D_size_1;
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_1;
                     elseif strcmp(cfg.scn.Dsafe,'EllipseImpr')
                         D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
                         yaw_ang = X_opt_opp(5); % FIXME add support for linear model: calculate yaw angle
                         Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
-    %                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2) );
+    %                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * cfg.scn.vhs{1,j}.distSafe2CenterVal_2) );
     %                         Dsafe_2 = D_vel_2 + D_size_2;
     %                         closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_2;
-                        safety_ellipseA = Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2;
+                        safety_ellipseA = Rot_yaw * cfg.scn.vhs{1,j}.distSafe2CenterVal_2;
                         closest_obst_point = X_opt_opp(1:2) + [ safety_ellipseA(1)*(-normal_vector(1)) ; safety_ellipseA(2)*(-normal_vector(2)) ]  - normal_vector * D_vel_2;
                     end
 

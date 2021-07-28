@@ -22,7 +22,7 @@ classdef DashboardStatesNInputs < plot.Base
     
             % choose vehicle
             i_veh = 1;
-            model_p = cfg.scn.vs{i_veh}.model_p;
+            model_p = cfg.scn.vhs{i_veh}.model_p;
             bounds_available = isfield(model_p, 'bounds');
             colors = utils.getRwthColors(100);
             color = colors(i_veh, :); % need to store color for later plot updates (else Matlab's gc will delete)
@@ -30,13 +30,13 @@ classdef DashboardStatesNInputs < plot.Base
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             %% Prepare data
-            X = ws.vs{i_veh}.X_controller;
-            X = [ws.vs{i_veh}.x_0_controller X];
+            X = ws.vhs{i_veh}.X_controller;
+            X = [ws.vhs{i_veh}.x_0_controller X];
 
-            U = ws.vs{i_veh}.U_controller;
+            U = ws.vhs{i_veh}.U_controller;
             U = [U U(:,end)]; % Duplicate last entry for better visibility in plot
 
-            Hp = size(ws.vs{i_veh}.X_controller, 2);
+            Hp = size(ws.vhs{i_veh}.X_controller, 2);
             Tx = 0:1:Hp;
             Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
@@ -133,8 +133,8 @@ classdef DashboardStatesNInputs < plot.Base
                 obj.add_table_line('Track Creation Scale', utils.rat2str(cfg.scn.track_creation_scale));
                 
                 
-                for i = 1:length(cfg.scn.vs)
-                    vh = cfg.scn.vs{i};                
+                for i = 1:length(cfg.scn.vhs)
+                    vh = cfg.scn.vhs{i};                
                     obj.add_table_line('', '');
                     obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
                     obj.add_table_line('Vehicle Model', class(vh.model));

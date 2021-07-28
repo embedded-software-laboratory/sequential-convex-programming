@@ -22,42 +22,42 @@ else
 end
 
 %% Vehicle Models
-for i = 1:length(cfg.scn.vs)
+for i = 1:length(cfg.scn.vhs)
     % detect if model is linear
-    cfg.scn.vs{i}.isControlModelLinear = isequal(cfg.scn.vs{i}.model, @model.vehicle.Linear);
-    cfg.scn.vs{i}.isSimulationModelLinear = isequal(cfg.scn.vs{i}.model_simulation, @model.vehicle.Linear);
+    cfg.scn.vhs{i}.isControlModelLinear = isequal(cfg.scn.vhs{i}.model, @model.vehicle.Linear);
+    cfg.scn.vhs{i}.isSimulationModelLinear = isequal(cfg.scn.vhs{i}.model_simulation, @model.vehicle.Linear);
     
     % Instantiate vehicle models, in partiuclar, the initialization of the
     % jacobians is crucial for gaining computation speed
-    cfg.scn.vs{i}.model = ...
-        cfg.scn.vs{i}.model(cfg.scn.vs{i}.p.Hp, cfg.scn.vs{i}.p.dt, cfg.scn.vs{i}.model_p);
-    cfg.scn.vs{i}.model_simulation = ...
-        cfg.scn.vs{i}.model_simulation(cfg.scn.vs{i}.p.Hp, cfg.scn.vs{i}.p.dt, cfg.scn.vs{i}.model_simulation_p);
+    cfg.scn.vhs{i}.model = ...
+        cfg.scn.vhs{i}.model(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_p);
+    cfg.scn.vhs{i}.model_simulation = ...
+        cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_simulation_p);
     
-    if ~isfield(cfg.scn.vs{i}.model_p, 'bounds')
+    if ~isfield(cfg.scn.vhs{i}.model_p, 'bounds')
         warning("Vehicle's %i model has no bounds", i);
     end
     
     % expand start states to match simulation model states
-    assert(isequal(size(cfg.scn.vs{i}.x_start), [4 1]))
-    cfg.scn.vs{i}.x_start = [cfg.scn.vs{i}.x_start' zeros(1, cfg.scn.vs{i}.model_simulation.nx - 4)]';
+    assert(isequal(size(cfg.scn.vhs{i}.x_start), [4 1]))
+    cfg.scn.vhs{i}.x_start = [cfg.scn.vhs{i}.x_start' zeros(1, cfg.scn.vhs{i}.model_simulation.nx - 4)]';
     
     %% Inputs
     % SL Acceleration: pre-compute for speed
-    delta_angle = 2*pi / cfg.scn.vs{i}.p.n_acceleration_limits;
-    tmp = (1:cfg.scn.vs{i}.p.n_acceleration_limits)' .* delta_angle;
-    cfg.scn.vs{i}.p.acceleration_cos = cos(tmp);
-    cfg.scn.vs{i}.p.acceleration_sin = sin(tmp);
+    delta_angle = 2*pi / cfg.scn.vhs{i}.p.n_acceleration_limits;
+    tmp = (1:cfg.scn.vhs{i}.p.n_acceleration_limits)' .* delta_angle;
+    cfg.scn.vhs{i}.p.acceleration_cos = cos(tmp);
+    cfg.scn.vhs{i}.p.acceleration_sin = sin(tmp);
 end
 
 %% Approximation
-for i = 1:length(cfg.scn.vs)
-    cfg.scn.vs{i}.approximationIsSL = ...
-        cfg.scn.vs{i}.approximation == cfg.scn.vs{i}.approximationSL;
-    cfg.scn.vs{i}.approximationIsSCR = ...
-        cfg.scn.vs{i}.approximation == cfg.scn.vs{i}.approximationSCR;
+for i = 1:length(cfg.scn.vhs)
+    cfg.scn.vhs{i}.approximationIsSL = ...
+        cfg.scn.vhs{i}.approximation == cfg.scn.vhs{i}.approximationSL;
+    cfg.scn.vhs{i}.approximationIsSCR = ...
+        cfg.scn.vhs{i}.approximation == cfg.scn.vhs{i}.approximationSCR;
     
-    if ~cfg.scn.vs{i}.approximationIsSL && ~cfg.scn.vs{i}.approximationIsSCR
+    if ~cfg.scn.vhs{i}.approximationIsSL && ~cfg.scn.vhs{i}.approximationIsSCR
         throw ME('No valid approximation chosen')
     end
 end
@@ -72,8 +72,8 @@ plot.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.
 
 % Polygon Creation (for SCR)
 % if any vehicle uses SCR controller
-for i = 1:length(cfg.scn.vs)
-    if cfg.scn.vs{i}.approximationIsSCR
+for i = 1:length(cfg.scn.vhs)
+    if cfg.scn.vhs{i}.approximationIsSCR
         cfg.scn.track_polygons = controller.gen_track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance).polygons;
         break
     end

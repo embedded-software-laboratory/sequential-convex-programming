@@ -14,11 +14,11 @@ classdef DashboardAcceleration < plot.Base
             
             
             % only plot for linear models (having accelerations as input)
-            if ~cfg.scn.vs{i_vehicle}.isControlModelLinear; return; end
+            if ~cfg.scn.vhs{i_vehicle}.isControlModelLinear; return; end
             
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
-            U_opt = ws.vs{i_vehicle}.U_opt;
+            U_opt = ws.vhs{i_vehicle}.U_opt;
                 
             % plot base track initially
             if ~obj.is_background_plotted
@@ -28,7 +28,7 @@ classdef DashboardAcceleration < plot.Base
                 hold on
                 box on
 
-                model_p = cfg.scn.vs{i_vehicle}.model_p;
+                model_p = cfg.scn.vhs{i_vehicle}.model_p;
                 u_max = max([max(model_p.a_backward_max) max(model_p.a_forward_max) max(model_p.a_lateral_max)]);
 
                 a = linspace(0,2*pi,50);

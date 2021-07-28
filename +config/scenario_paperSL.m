@@ -11,8 +11,8 @@ cfg.scn.track_SCR_epsilon_area_tolerance = .5;
 % x_start [pos_x pox_y v_x v_y] will be initialized to match model states
 
 % Vehicle
-cfg.scn.vs = {}; % remove any vehicles
+cfg.scn.vhs = {}; % remove any vehicles
 vehicle_ = config.vehicle_paperSL(cfg);
 vehicle_.x_start = [0 0 .1 0]';
-cfg.scn.vs{end + 1} = vehicle_;
+cfg.scn.vhs{end + 1} = vehicle_;
 end
