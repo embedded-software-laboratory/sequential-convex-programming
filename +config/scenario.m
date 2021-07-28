@@ -1,16 +1,11 @@
-%   Adds scenario specific settings to cfg: track,  
-%   vehicles based on config_vehicle_, obstacles, etc.
-%
-%   Default values of e.g. vehicles can be overwritten. In doing so,
-%   ensure that the start position of the vehicles is on the first
-%   lap regarding the track center-checkpoints.
-
 function cfg = scenario(cfg)
+% basic components of a scenario
 cfg.scn.obstacles = {};
 cfg.scn.vhs = {};
 
 %% General
 cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImpr' or 'EllipseImpr' 
+cfg.race.n_laps = 3;            % Number of laps to be driven
 
 %% Track
 % e.g. HockenheimShort, testCircuitE, testCircuitLiniger
@@ -20,54 +15,8 @@ cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 
 %% Vehicles
 % x_start [pos_x pox_y v_x v_y] will be initialized to match model states
-
-vehicle_default = config.vehicle(cfg);
-
-% Vehicle
-vehicle_ = config.vehicle_ST_Liniger(vehicle_default);
-vehicle_.x_start = [0 0 .1 0]';
-
-cfg.scn.vhs{end + 1} = vehicle_;
-
-% vehicle 2
-vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
-%vehicle_.x_start = [0 -0.05 0.1 0]';
-% vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
-% vehicle_.p.a_max = 17; % decrease accel for SCR
-vehicle_.model_simulation = @model.vehicle.SingleTrack;
-vehicle_.model_simulation_p = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
-% vehicle_.p.R = 50 * eye(2); 
-% vehicle_.p.dt = vehicle_.p.dt/2; % Size of prediction step
-% vehicle_.p.Hp = vehicle_.p.Hp*2; % Number of prediction steps
-cfg.scn.vhs{end + 1} = vehicle_;
-
-% vehicle 3
-vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
-vehicle_.x_start = [0.9 0.05 0.1 0]';
-cfg.scn.vhs{end + 1} = vehicle_;
-
-% % vehicle 4
-% vehicle_ = config.vehicle_ST_Kloock(cfg);
-% vehicle_.x_start = [1.3 -0.05 0.1 0]';
-% cfg.scn.vhs{end + 1} = vehicle_;
-% 
-% % vehicle 5
-% vehicle_ = config_vehicle
-% vehicle_.x_start = [1.7 0.05 0.1 0]';
-% cfg.scn.vhs{end + 1} = vehicle_;
-% 
-% % vehicle 6
-% vehicle_ = config_vehicle
-% vehicle_.x_start = [2.1 -0.05 0.1 0]';
-% cfg.scn.vhs{end + 1} = vehicle_;
-% 
-% % vehicle 7
-% vehicle_ = config_vehicle
-% vehicle_.x_start = [2.5 0.05 0.1 0]';
-% cfg.scn.vhs{end + 1} = vehicle_;
-% 
-% % vehicle 8
-% vehicle_ = config_vehicle
-% vehicle_.x_start = [2.8 -0.05 0.1 0]';
-% cfg.scn.vhs{end + 1} = vehicle_;
+% CAVE here you need to add vehicles
+%   ensure that the start position of the vehicles is on the first
+%   lap regarding the track center-checkpoints (find examples in scenario
+%   files)
 end

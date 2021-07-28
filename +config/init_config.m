@@ -5,6 +5,10 @@ function cfg = init_config(cfg)
 %
 % Returns: initialized config struct
 
+if isempty(cfg.scn.vhs)
+    error('scenario without vehicles!')
+end
+
 %% CPLEX Detection
 % if CPLEX is in path: use it
 if exist(cfg.env.cplex.path, 'dir')

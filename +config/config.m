@@ -9,11 +9,12 @@ warning off backtrace
 % typical installation dir: 'C:\Program Files\IBM\ILOG\CPLEX_Studio1210\cplex\matlab\x64_win64';
 cfg.env.cplex.path = 'D:\#local Apps\CPLEX_MATLAB_x64';
 
-cfg.outputPath = ['output\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
-cfg.tempPath = 'temp\';
-    
-%% Race
-cfg.race.n_laps = 3;            % Number of laps to be driven
+% paths
+cfg.outputPath = ['out\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
+cfg.tempPath = 'tmp\';
+% create output & temp dir if non-existing
+if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
+if ~isfolder(cfg.tempPath); mkdir(cfg.tempPath); end
 
 %% Logging
 cfg.log.DEBUG   = 4;
@@ -21,6 +22,7 @@ cfg.log.LOG     = 3;
 cfg.log.INFO    = 2;
 cfg.log.WARN    = 1;
 cfg.log.ERROR   = 0;
+
 cfg.log.level   = cfg.log.DEBUG; % log level: choose from above
 
 %% Plotting
