@@ -1,19 +1,26 @@
 function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
-    createQP(cfg, x_0, x, u, checkpoint_indices, track_polygon_indices, iter, i_vehicle, ws)
+    createQP(...
+        vh, x_0, X_opt_prev, U_opt_prev,...
+        checkpoints, checkpoint_indices,...
+        track_polygons, track_polygon_indices,...
+        iter, i_vehicle,...
+        obstacleTable, blockingTable, vhs)
 % QP formulation: create and solve convexified problem
 % track can be represented as SCR or SL
 % SL: Sequential Linearization controller: QP approximated (linearised, thus relaxed) variant
 % SCR: Sequential Convex Restriction controller: QP in a restrictive variant
+% 
+% Inputs
+%   X_opt: last iterations calculated optimal states
+%   U_opt: last iterations calculated optimal inputs
+%   vhs: current vehicle working set
+%       requires fields x_0, X_opt, cp_curr
 
 % Assign for better readability/access
-vh = cfg.scn.vs{i_vehicle};
 p = vh.p;
-checkpoints = cfg.scn.track;
-if vh.approximationIsSCR; track_polygons = cfg.scn.track_polygons; end
-model = cfg.scn.vs{i_vehicle}.model;
-% TODO unify
-isModelLinear = cfg.scn.vs{i_vehicle}.isModelLinear;
+model = vh.model;
+isControlModelLinear = vh.isControlModelLinear;
 
 if vh.approximationIsSL
     % Verification if indices-matrix has only one row and Hp columns
@@ -35,7 +42,7 @@ idx_slack  = model.ns * p.Hp + 1;
 %% Problem size
 n_vars = model.ns * p.Hp + 1; % number of variables: (states + inputs) * prediction steps + slack variable
 n_eqns = model.nx * p.Hp; % number of equations: state equations * prediction steps
-if isModelLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
+if isControlModelLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
 % if ~isLinear; n_eqns = n_eqns + 3; end % terminating conditions (v_x, v_y, dt/dyaw)
 
 n_ineq = 0;
@@ -51,13 +58,13 @@ elseif vh.approximationIsSCR
     end
 end
 
-if isModelLinear
+if isControlModelLinear
     n_ineq = n_ineq + p.n_acceleration_limits * p.Hp; % acceleration bounds at every time step
 end
 if p.areObstaclesConsidered
     % at first iteration no obstacle constraints are respected
-    if ~((sum(ws.obstacleTable(i_vehicle,:)) == 0) || ((sum(ws.obstacleTable(i_vehicle,:)) ~= 0) && (iter == 1)))
-        n_ineq = n_ineq + sum(ws.obstacleTable(i_vehicle,:)) * p.Hp;  % relevant obstacle constraints at every time step
+    if ~((sum(obstacleTable(i_vehicle,:)) == 0) || ((sum(obstacleTable(i_vehicle,:)) ~= 0) && (iter == 1)))
+        n_ineq = n_ineq + sum(obstacleTable(i_vehicle,:)) * p.Hp;  % relevant obstacle constraints at every time step
     end
 end
 
@@ -74,26 +81,40 @@ bound_upper     =   inf(n_vars, 1);
 n_rows = 0; % for double check against defined problem size above
 
 % Get linearized and discretized system matrices
-% x_k+1 = Ad * x_k + Bd * u_k+1 + Ed
-[Ad, Bd, Ed] = model.calculatePredictionMatrices([x_0 x(:, 1:end-1)], u);
+%   x_{k+1] = Ad * x_k + Bd * u_{k+1} + Ed
+%       -> linearization requires combination of x_k and u_{k+1}
+%   NOTE linear models give back static prediction matrices
+%       (-> independent of previous optimal trajectory)
+%   x_0 x_1 x_2 ... x_{n-1} 
+%       x are already shifted, was
+%       x_{1,controller} -> x_{0,sim}         -> x_0
+%       x_{2,controller} -> x_{2,controller}  -> x_1
+%       .
+%       .
+%       .
+%
+%   u_1 u_2 u_3 ... u_n
+[Ad, Bd, Ed] = model.calculatePredictionMatrices(...
+    [x_0 X_opt_prev(:, 1:end-1)],...
+    U_opt_prev);
 
 % k = 1
 n_rows = n_rows(end) + (1:model.nx);
-A_eq(n_rows, idx_x(1,:)) = eye(model.nx);                                % Coeff. x_k+1
-A_eq(n_rows, idx_u(1,:)) = -Bd(:,:,1);                 % Coeff. u_k+1
-b_eq(n_rows) = Ad(:,:,1) * x_0 + Ed(:,1);   % Ad * x_k + Ed with x_k = x_0 (current state)
+A_eq(n_rows, idx_x(1,:)) = eye(model.nx);    % Coeff. x_k+1
+A_eq(n_rows, idx_u(1,:)) = -Bd(:,:,1);       % Coeff. u_k+1
+b_eq(n_rows) = Ad(:,:,1) * x_0 + Ed(:,1);    % Ad * x_k + Ed with x_k = x_0 (current state)
 
 % k = 2:Hp
 for k = 2:p.Hp
     n_rows = n_rows(end) + (1:model.nx);
-    A_eq(n_rows, idx_x(k,:)) = eye(model.nx);                  % Coeff. x_k+1
+    A_eq(n_rows, idx_x(k,:)) = eye(model.nx); % Coeff. x_k+1
     A_eq(n_rows, idx_x(k-1,:)) = -Ad(:,:,k);  % Coeff. x_k
     A_eq(n_rows, idx_u(k,:)) = -Bd(:,:,k);    % Coeff. u_k+1
     b_eq(n_rows) = Ed(:,k);                   % Ed
 end
 
 %% Terminating conditions
-if isModelLinear
+if isControlModelLinear
     % v_{x,y}{Hp} = 0 (b_eq already inited to 0)
     n_rows = n_rows(end) + (1:2);
     A_eq(n_rows, idx_x(k, 3:4)) = eye(2);
@@ -137,13 +158,13 @@ for k = 1:p.Hp
         n_rows = n_rows(end);
     end
     
-    if isModelLinear
+    if isControlModelLinear
         %% Acceleration limits
         % inequalities required due to complex shape of input limits due to
         % not modelling the actual technical inputs but the resulting
         % accelerations
         [Au_acc, b_acc] = controller.get_acceleration_ellipses(...
-            vh.model_p, p, (1:p.n_acceleration_limits)', x(:, k));
+            vh.model_p, p, (1:p.n_acceleration_limits)', X_opt_prev(:, k));
         n_rows = n_rows(end) + p.n_acceleration_limits;
         
         A_ineq(n_rows - p.n_acceleration_limits + 1:n_rows, idx_u(k,:)) = Au_acc;
@@ -162,7 +183,7 @@ for k = 1:p.Hp
         %         trackCenter2obst_vec = (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector;
         %         xOpp = trajectories.vehicles{1,2}.X_opt(:,k);
         %         if ( norm(trackCenter2ego_vec,2) < norm(trackCenter2obst_vec,2) ) && ...
-        %             ( trajectories.blockingTable(vehNr,1) == 1 ) && ...
+        %             ( blockingTable(vehNr,1) == 1 ) && ...
         %             ( abs( (x(1:2,k) - xOpp(1:2))' *  checkpoint_c.forward_vector ) <= 0.075 ) && ...
         %             ( j ~= vehNr )
         %             if (xOpp(1:2) - checkpoint_c.center)' * left_unit_vector > 0 % obstacle on left side
@@ -172,23 +193,23 @@ for k = 1:p.Hp
         %             end
         %         end
 
-        if (iter >= 2) && (sum(ws.obstacleTable(i_vehicle,:)) >= 1)
+        if (iter >= 2) && (sum(obstacleTable(i_vehicle,:)) >= 1)
 
             % iterate over all opponents
             for j = 1:length(cfg.scn.vs)
                 % Extend predicted trajectory of opponent if the opponent's prediction horizon is shorter than the own horizon
                 % TODO: very simplistic approach
-                if k <= size(ws.vs{1, j}.X_opt,2) % Choose correponding trajectory point if prediciton step is within scope
-                    X_opt_opp = ws.vs{1, j}.X_opt(:, k);
+                if k <= size(vhs{1, j}.X_opt,2) % Choose correponding trajectory point if prediciton step is within scope
+                    X_opt_opp = vhs{1, j}.X_opt(:, k);
                 else % If prediction step is not within scope, choose last trajectory point
-                    X_opt_opp = ws.vs{1, j}.X_opt(:, end);
+                    X_opt_opp = vhs{1, j}.X_opt(:, end);
                 end    
 
                 % Respect only constraints for opponents marked as obstacles
-                if ws.obstacleTable(i_vehicle,j) == 1
-                    d = pdist([x(1:2,k)';X_opt_opp(1:2)'],'euclidean'); % calculate distance
-                    normal_vector = - (x(1:2,k)-X_opt_opp(1:2))/d; % normal vector in direction from trajectory point to obstacle center
-                    V_diff = x(3:4,k) - X_opt_opp(3:4);    % velocity difference between ego and opponent
+                if obstacleTable(i_vehicle,j) == 1
+                    d = pdist([X_opt_prev(1:2,k)';X_opt_opp(1:2)'],'euclidean'); % calculate distance
+                    normal_vector = - (X_opt_prev(1:2,k)-X_opt_opp(1:2))/d; % normal vector in direction from trajectory point to obstacle center
+                    V_diff = X_opt_prev(3:4,k) - X_opt_opp(3:4);    % velocity difference between ego and opponent
 
                     if strcmp(cfg.scn.Dsafe,'Circle')
                         D_vel_1 = sqrt((V_diff(1) * p.dt)^2 + (V_diff(2) * p.dt)^2);  % safety distance due to velocity of objects
@@ -197,7 +218,7 @@ for k = 1:p.Hp
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_1; % intersection of safe radius and connection between trajectory point and obstacle center
                     elseif strcmp(cfg.scn.Dsafe,'Ellipse')
                         D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
-                        yaw_ang = x(5,k);
+                        yaw_ang = X_opt_prev(5,k);
                         Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
                         D_size_2 = normal_vector' * (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2);
                         Dsafe_2 = norm( D_vel_2 + D_size_2 );
@@ -210,7 +231,7 @@ for k = 1:p.Hp
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_1;
                     elseif strcmp(cfg.scn.Dsafe,'EllipseImpr')
                         D_vel_2 = ( normal_vector' * V_diff ) * p.dt;
-                        yaw_ang = X_opt_opp(5);
+                        yaw_ang = X_opt_opp(5); % FIXME add support for linear model: calculate yaw angle
                         Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
     %                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * cfg.scn.vs{1,j}.distSafe2CenterVal_2) );
     %                         Dsafe_2 = D_vel_2 + D_size_2;
@@ -291,7 +312,7 @@ objective_lin(idx_slack) = p.S;
 %% Blocking: minimize lateral delta to opponent if blocking is recommended
 if p.isBlockingEnabled
     n_affectedTrajSteps = 3;
-    if ws.blockingTable(i_vehicle,1) == 1
+    if blockingTable(i_vehicle,1) == 1
         for k = 1:n_affectedTrajSteps
             % ease access
             checkpoint_c = checkpoints(checkpoint_indices(k));
@@ -301,11 +322,11 @@ if p.isBlockingEnabled
             T_ego = checkpoint_c.center;
             
             % nearest checkpoint of opp
-            n0_opp = checkpoints(ws.vs{1,1}.cp_curr).normal_vector;
-            T0_opp = checkpoints(ws.vs{1,1}.cp_curr).center;
+            n0_opp = checkpoints(vhs{1,1}.cp_curr).normal_vector;
+            T0_opp = checkpoints(vhs{1,1}.cp_curr).center;
             
             % current position of attacking opponent
-            p0_opp = ws.vs{1,1}.x_0(1:2);
+            p0_opp = vhs{1,1}.x_0(1:2);
             
             n1 = n_ego(1); n2 = n_ego(2);
             T1 = T_ego(1); T2 = T_ego(2);
@@ -333,8 +354,8 @@ bound_lower(idx_slack) = 0;
 % (could use delta bounds instead, but not supported by solvers)
 if vh.approximationIsSL
     % FIXME scale trust region size with track
-    bound_lower(idx_pos) = (x(model.idx_pos, :) - p.trust_region_size)';
-    bound_upper(idx_pos) = (x(model.idx_pos, :) + p.trust_region_size)';
+    bound_lower(idx_pos) = (X_opt_prev(model.idx_pos, :) - p.trust_region_size)';
+    bound_upper(idx_pos) = (X_opt_prev(model.idx_pos, :) + p.trust_region_size)';
 end
 
 % Additional State and Input bounds
@@ -343,7 +364,7 @@ end
 %   - states are only position and acceleration, of which...
 %       - position is only restircted via trust region (above)
 %       - acceleration is already restricted via inequalities (ellipses)
-if ~isModelLinear
+if ~isControlModelLinear
     % Bounded inputs
     bound_lower(idx_u) = repmat(model.p.bounds(1, model.idx_u), length(idx_u), 1);
     bound_upper(idx_u) = repmat(model.p.bounds(2, model.idx_u), length(idx_u), 1);

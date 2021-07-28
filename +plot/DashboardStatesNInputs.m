@@ -30,13 +30,13 @@ classdef DashboardStatesNInputs < plot.Base
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             %% Prepare data
-            X = ws.vs{i_veh}.X_opt;
-            X = [ws.vs{i_veh}.x_0 X];
+            X = ws.vs{i_veh}.X_controller;
+            X = [ws.vs{i_veh}.x_0_controller X];
 
-            U = ws.vs{i_veh}.U_opt;
+            U = ws.vs{i_veh}.U_controller;
             U = [U U(:,end)]; % Duplicate last entry for better visibility in plot
 
-            Hp = size(ws.vs{i_veh}.X_opt, 2);
+            Hp = size(ws.vs{i_veh}.X_controller, 2);
             Tx = 0:1:Hp;
             Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
@@ -95,7 +95,7 @@ classdef DashboardStatesNInputs < plot.Base
                 end
 
                 subplot(3,3,7);
-                obj.subplot_plot_handles{5} = plot(Tu, u(1,:), 'Color', color);
+                obj.subplot_plot_handles{5} = plot(Tu, U(1,:), 'Color', color);
                 title('Input Steering Angle [rad]')
                 if bounds_available
                     ylim(model_p.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
@@ -108,7 +108,7 @@ classdef DashboardStatesNInputs < plot.Base
                 grid on
 
                 subplot(3,3,8);
-                obj.subplot_plot_handles{6} = plot(Tu, u(2,:), 'Color', color);
+                obj.subplot_plot_handles{6} = plot(Tu, U(2,:), 'Color', color);
                 title('Input Torque [% or Nm]')
                 if bounds_available
                     ylim(model_p.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
@@ -178,10 +178,10 @@ classdef DashboardStatesNInputs < plot.Base
 
             
             set(obj.subplot_plot_handles{5}, 'XData', Tu);
-            set(obj.subplot_plot_handles{5}, 'YData', u(1,:));
+            set(obj.subplot_plot_handles{5}, 'YData', U(1,:));
 
             set(obj.subplot_plot_handles{6}, 'XData', Tu);
-            set(obj.subplot_plot_handles{6}, 'YData', u(2,:));
+            set(obj.subplot_plot_handles{6}, 'YData', U(2,:));
         end
         
         function add_table_line(obj, desc, val)

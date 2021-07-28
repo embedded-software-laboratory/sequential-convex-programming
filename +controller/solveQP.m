@@ -1,11 +1,11 @@
 function [X_opt, U_opt, log] = solveQP(...
-    cfg, p_vehicle, n_vars, idx_x, idx_u, idx_slack, quad_objective, lin_objective,...
+    isCplexAvailable, n_vars, idx_x, idx_u, idx_slack, quad_objective, lin_objective,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper)
 %% Solve QP
 log = struct;
 
 % use CPLEX to solve QP, if available, else fallback to MATLAB
-if cfg.env.cplex.is_available
+if isCplexAvailable
     [qp_vars,log.fval,log.exitflag,log.output,log.lambda] = ...
         cplexqp(quad_objective,lin_objective,A_ineq,b_ineq,A_eq,b_eq,bound_lower,bound_upper,[],[]);
     
@@ -64,7 +64,7 @@ elseif length(qp_vars) ~= n_vars
 end
 
 % save results
-X_opt(:, 1:p_vehicle.Hp) = qp_vars(idx_x(1:p_vehicle.Hp, :))';
-U_opt(:, 1:p_vehicle.Hp) = qp_vars(idx_u(1:p_vehicle.Hp, :))';
+X_opt = qp_vars(idx_x)';
+U_opt = qp_vars(idx_u)';
 log.slack = qp_vars(idx_slack);
 end

@@ -45,17 +45,17 @@ classdef Race < plot.Base
             c = utils.getRwthColors(100);
             for k = 1:length(scn.vs)
                 % Value asignments for better readability
-                x_0 = ws.vs{k}.x_0;
-                X_opt = ws.vs{k}.X_opt;
+                x_0 = ws.vs{k}.x_0_controller;
+                X_controller = ws.vs{k}.X_controller;
                 p = scn.vs{k}.p;
                 vehLength = scn.vs{k}.lengthVal;
                 vehWidth = scn.vs{k}.widthVal;
 
                 %% Planned trajectory
-                obj.add_tmp_handle(plot(X_opt(1,:),X_opt(2,:),'.-','color',c(k, :),'MarkerSize',7));    
+                obj.add_tmp_handle(plot(X_controller(1,:),X_controller(2,:),'.-','color',c(k, :),'MarkerSize',7));    
 
                 %% Vehicle Box
-                if length(x_0) < 5
+                if length(x_0) <= 4
                 % Vehicle box (is old version: get vehicle
                 % direction from current vehicle velocity vector)
                     if x_0(3:4) ~= [0;0]
@@ -88,7 +88,7 @@ classdef Race < plot.Base
                 %     fill(obstaclePolygon(1,:),obstaclePolygon(2,:),[0 0 0]);
 
                 %% Track constraints for the trajectory point at prediction/control horizon
-                [~,lastCPindex] = min(sum(([scn.track.center] - repmat(X_opt(1:2,p.Hp),1,length(scn.track))).^2));
+                [~,lastCPindex] = min(sum(([scn.track.center] - repmat(X_controller(1:2,p.Hp),1,length(scn.track))).^2));
                 lastCP = scn.track(lastCPindex);
                 L = 1; % Length of plotted linear constraints
                 tangent_left = [(lastCP.left + L* lastCP.forward_vector) (lastCP.left - L* lastCP.forward_vector)];

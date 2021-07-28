@@ -24,21 +24,27 @@ cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 vehicle_default = config.vehicle(cfg);
 
 % Vehicle
-vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
+vehicle_ = config.vehicle_ST_Liniger(vehicle_default);
 vehicle_.x_start = [0 0 .1 0]';
+
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle 2
-vehicle_ = config.vehicle_ST_Liniger(vehicle_);
+vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
 %vehicle_.x_start = [0 -0.05 0.1 0]';
 % vehicle_.p.TR_velX = 1.5 * vehicle_.p.TR_velX; % increase max velocity for Bicycle
 % vehicle_.p.a_max = 17; % decrease accel for SCR
+vehicle_.model_simulation = @model.vehicle.SingleTrack;
+vehicle_.model_simulation_p = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
+% vehicle_.p.R = 50 * eye(2); 
+% vehicle_.p.dt = vehicle_.p.dt/2; % Size of prediction step
+% vehicle_.p.Hp = vehicle_.p.Hp*2; % Number of prediction steps
 cfg.scn.vs{end + 1} = vehicle_;
 
 % vehicle 3
-% vehicle_ = config.vehicle(cfg);
-% vehicle_.x_start = [0.9 0.05 0.1 0]';
-% cfg.scn.vs{end + 1} = vehicle_;
+vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
+vehicle_.x_start = [0.9 0.05 0.1 0]';
+cfg.scn.vs{end + 1} = vehicle_;
 
 % % vehicle 4
 % vehicle_ = config.vehicle_ST_Kloock(cfg);

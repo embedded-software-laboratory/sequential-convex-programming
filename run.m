@@ -7,6 +7,9 @@ function run(cfg)
 % Used Abbreviations
 %   ws:     abbreviation of working set, the struct which acts as "RAM".
 %           Contains only current status; every step is saved in log
+%               all variables are assumed to be simulation data, exceptions
+%               are declared (e.g. controller internal data with postfix
+%               "_controller")
 %   cp:     abbreviation of checkpoint, the points which define the track path
 %   cfg:    configuration
 %   scn:    scenario
@@ -32,8 +35,6 @@ if ~exist('cfg', 'var')
 else
     init_paths(cfg);
 end
-    
-
 
 % initialize working and logging structures
 step_sim = 0;
@@ -55,17 +56,17 @@ try
         step_sim = step_sim + 1;
         timer_loop = tic;
 
-        %% Shift last time-step's solution
-        % advance by one step, with terminal constraints:
+        %% Controller
+        %% Forward controller data to new time-step
+        % advance by one step (with terminal constraints) yields:
         %   state: keep last state entry (stand still -> duplicated)
-        %   input: last input entry to 0s
         for i = 1:length(cfg.scn.vs)
-            ws.vs{i}.X_opt(:, 1:end-1) = ws.vs{i}.X_opt(:, 2:end);
+            ws.vs{i}.X_controller(:, 1:end-1) = ws.vs{i}.X_controller(:, 2:end);
+            % X_{n-1} = X_{n} due to terminal constraint (yielding standstill)
             
-            %FIXME 
-%             ws.vs{i}.U_opt(:, 1:end-1) = ws.vs{i}.U_opt(:, 2:end);
-%             ws.vs{i}.U_opt(:, end)     = [0; 0];
-            ws.vs{i}.U_opt(:, 1:end)   = ws.vs{i}.U_opt(:, 1:end); % no shift of inputs as u1 input is needed for linearization together with x_0
+            ws.vs{i}.U_controller(:, 1:end-1) = ws.vs{i}.U_controller(:, 2:end);
+            ws.vs{i}.U_controller(:, end) = 0 .* ws.vs{i}.U_controller(:, end);
+            % U_{n} = zeros() due to terminal constraint (yielding standstill)
         end
 
         %% Current CP, position and lap
@@ -100,7 +101,6 @@ try
                 end
             end
         end
-        
 
         %% Determine obstacle relationship
         % Set obstacle-matrix entry to 1 if vehicle of row has to respect
@@ -128,9 +128,9 @@ try
                if (i ~= j) && ...
                        ( norm(ws.vs{i}.x_0(3:4)) < norm(ws.vs{1,j}.x_0(3:4)) ) && ...
                        ( ws.obstacleTable(i,j) == 0 ) && ...
-                       ( ( norm(ws.vs{i}.x_0(1:2) - ws.vs{1,j}.X_opt(1:2,1)) <= 0.1 ) )%|| ...
-    %                    ( norm(ws.vs{i}.x_0(1:2) - ws.vs{j}.X_opt(1:2, 2)) <= 0.3 ) || ...
-    %                    ( norm(ws.vs{i}.x_0(1:2) - ws.vs{j}.X_opt(1:2, 3)) <= 0.3 ) )
+                       ( ( norm(ws.vs{i}.x_0(1:2) - ws.vs{1,j}.X_controller(1:2,1)) <= 0.1 ) )%|| ...
+    %                    ( norm(ws.vs{i}.x_0(1:2) - ws.vs{j}.X_controller(1:2, 2)) <= 0.3 ) || ...
+    %                    ( norm(ws.vs{i}.x_0(1:2) - ws.vs{j}.X_controller(1:2, 3)) <= 0.3 ) )
                    ws.blockingTable(i,j) = 1;
                else
                    ws.blockingTable(i,j) = 0;
@@ -138,14 +138,46 @@ try
             end
         end        
 
-        %% Controller
+        %% Controller Execution
         for i = 1:length(cfg.scn.vs)
-            ws.vs{i}.controller_output = controller.find_solution(cfg, ws, i);
-            % evaluate controller & save *raw* output
+            %% Measuring
+            % "measure reality" (simulation) to models
+            %   only required for linear control combined with single-track
+            %   simulation models
+            if cfg.scn.vs{i}.isControlModelLinear && ~cfg.scn.vs{i}.isSimulationModelLinear 
+                % convert  states from Single Track to Linear
+                ws.vs{i}.x_0_controller = model.vehicle.state_st2lin(ws.vs{i}.x_0);
+            else
+                ws.vs{i}.x_0_controller = ws.vs{i}.x_0;
+            end
 
-            % Write controller output (output-struct) to (trajectory-struct)
-            ws.vs{i}.X_opt = ws.vs{i}.controller_output(end).X_opt;
-                ws.vs{i}.U_opt = ws.vs{i}.controller_output(end).U_opt;
+            %% Controller Execution
+            % prepare vehicle working set
+            vhs = cell(1, length(ws.vs));
+            for k = 1:length(ws.vs)
+                vhs{k}.x_0 = ws.vs{k}.x_0_controller;
+                vhs{k}.X_opt = ws.vs{k}.X_controller;
+                if k == i
+                    vhs{k}.U_opt = ws.vs{k}.U_controller;
+                end
+                vhs{k}.cp_curr = ws.vs{k}.cp_curr;
+            end
+
+            % save *raw* output
+            ws.vs{i}.controller_output = controller.find_solution(cfg,...
+                vhs, ws.obstacleTable, ws.blockingTable, i);
+
+            % save payload (predicted trajectories) for easier access
+            ws.vs{i}.X_controller = ws.vs{i}.controller_output(end).X_opt;
+            if cfg.scn.vs{i}.isControlModelLinear && ~cfg.scn.vs{i}.isSimulationModelLinear
+                ws.vs{i}.U_controller = ws.vs{i}.controller_output(end).U_opt;
+                % transform first control input for single-track simulation
+                ws.vs{i}.u_1 = cfg.scn.vs{i}.model_simulation.acceleration_controller(...
+                    ws.vs{i}.x_0, ws.vs{i}.U_controller(:, 1), ws.vs{i}.u_1);
+            else
+                ws.vs{i}.U_controller = ws.vs{i}.controller_output(end).U_opt;
+                ws.vs{i}.u_1 = ws.vs{i}.U_controller(:, 1);
+            end
         end
         
 
@@ -171,16 +203,26 @@ try
             drawnow
         end
 
-        %% Simulation: calc input response / next state
-        for i = 1:length(cfg.scn.vs)        
-            % TODO unify linear with non-linear models
-            % if linear model
-            if cfg.scn.vs{i}.isModelSimulationLinear
-                % calc next timestep's state
-                % equals to controller output `ws.vs{i}.x0 = ws.vs{i}.controller_output.x(:,1)`;
-                ws.vs{i}.x_0 = ws.vs{i}.x_0 + cfg.scn.vs{i}.model_simulation.ode(ws.vs{i}.x_0, ws.vs{i}.U_opt(:,1));
+        %% Simulation
+        % compute input response / advance to next state/x_0
+        for i = 1:length(cfg.scn.vs)
+            isCtrLin = cfg.scn.vs{i}.isControlModelLinear;
+            isSimLin = cfg.scn.vs{i}.isSimulationModelLinear;
+            % three cases:
+            % Controller Model  Simulation Model
+            %      Linear            Linear
+            %      Linear         Single Track
+            %   Single Track      Single Track
+            if isSimLin && isCtrLin
+                % equals to controller output `ws.vs{i}.x_0 = ws.vs{i}.controller_output.x(:,1)`;
+                ws.vs{i}.x_0 = ws.vs{i}.x_0 + cfg.scn.vs{i}.model_simulation.ode(ws.vs{i}.x_0, ws.vs{i}.u_1);
+            elseif ~isSimLin && isCtrLin
+                ws.vs{i}.x_0 = simulate_ode(ws.vs{i}.x_0, ws.vs{i}.u_1, cfg.scn.vs{i});
+            elseif ~isSimLin && ~isCtrLin
+                ws.vs{i}.x_0 = simulate_ode(ws.vs{i}.x_0, ws.vs{i}.u_1, cfg.scn.vs{i});
             else
-                ws.vs{i}.x0 = simulate_ode(ws.vs{i}, cfg.scn.vs{i});
+                % should never happen: why choose worse simulation model than controller?
+                error('Combination of controller and simulation vehicle model types not supported')
             end
         end
 
@@ -232,26 +274,25 @@ end
 end
 
 
-function x0_new = simulate_ode(ws_vehicle, veh_cfg)
+function x_0_new = simulate_ode(x_0, u_1, veh_cfg)
     % solve ode for individual vehicle with calculated inputs
     % Inputs:
     %   ws_vehicle (struct): working set of individual vehicle
     %   veh_cfg (struct): vehicle configuration
 
-    if ws_vehicle.x0(3) == 0
-       ws_vehicle.x0(3) = eps; 
+    if x_0(3) == 0
+       x_0(3) = eps; 
     end
     sim_timestep = veh_cfg.p.dt/10; % Size of time step [s]
     sim_dt = 0:sim_timestep:veh_cfg.p.dt; % Time span [s] -> n+ time points including n time steps
-    sim_u = repmat(ws_vehicle.u(:,1),1,length(sim_dt)); % ^n+1 constant control inputs
-    [~,sim_x0] = ode15s(...
+    [~,sim_x_0] = ode15s(...
         @(t,x)...
         veh_cfg.model_simulation.ode(...
-            x, sim_u(:,round(t/sim_timestep+1))),...
+            x, u_1),... constant control input across simulation step
         sim_dt,...
-        ws_vehicle.x0,...
+        x_0,...
         odeset('RelTol',1e-8,'AbsTol',1e-8));
-    x0_new = sim_x0(end,:)';
+    x_0_new = sim_x_0(end,:)';
 end
 
 function ws = init_ws(cfg)
@@ -263,8 +304,15 @@ function ws = init_ws(cfg)
         % controller-specifics
         ws.vs{i}.controller_output = NaN;
         ws.vs{i}.x_0 = cfg.scn.vs{i}.x_start;
-        ws.vs{i}.X_opt = repmat(ws.vs{i}.x_0, 1, cfg.scn.vs{i}.p.Hp);
-        ws.vs{i}.U_opt = repmat([0;0], 1, cfg.scn.vs{i}.p.Hp);
+        if cfg.scn.vs{i}.isControlModelLinear && ~cfg.scn.vs{i}.isSimulationModelLinear 
+            % convert states from Single Track to Linear
+            ws.vs{i}.x_0_controller = model.vehicle.state_st2lin(ws.vs{i}.x_0);
+        else
+            ws.vs{i}.x_0_controller = ws.vs{i}.x_0;
+        end
+        ws.vs{i}.X_controller = repmat(ws.vs{i}.x_0_controller, 1, cfg.scn.vs{i}.p.Hp);
+        ws.vs{i}.U_controller = repmat([0;0], 1, cfg.scn.vs{i}.p.Hp);
+        ws.vs{i}.u_1 = ws.vs{i}.U_controller(:, 1);
 
         % lap-specific
         cp_x_0 = utils.find_closest_track_checkpoint_index(...
@@ -292,9 +340,9 @@ function log = init_log(ws, cfg)
     log.lap = struct(fields{:});
 
     % copy structure from ws
-    fields = fieldnames(ws.vs{1})';
+    fields = fieldnames(ws.vs{2})';
     fields{2,1} = {};
-    for i = 1:length(cfg.scn.vs)
+    for i = 1:length(cfg.scn. vs)
         log.vehicles{i} = struct(fields{:});   % Struct to save all data for each lap
     end
 end

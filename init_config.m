@@ -24,8 +24,8 @@ end
 %% Vehicle Models
 for i = 1:length(cfg.scn.vs)
     % detect if model is linear
-    cfg.scn.vs{i}.isModelLinear = isequal(cfg.scn.vs{i}.model, @model.vehicle.Linear);
-    cfg.scn.vs{i}.isModelSimulationLinear = isequal(cfg.scn.vs{i}.model_simulation, @model.vehicle.Linear);
+    cfg.scn.vs{i}.isControlModelLinear = isequal(cfg.scn.vs{i}.model, @model.vehicle.Linear);
+    cfg.scn.vs{i}.isSimulationModelLinear = isequal(cfg.scn.vs{i}.model_simulation, @model.vehicle.Linear);
     
     % Instantiate vehicle models, in partiuclar, the initialization of the
     % jacobians is crucial for gaining computation speed
@@ -38,9 +38,9 @@ for i = 1:length(cfg.scn.vs)
         warning("Vehicle's %i model has no bounds", i);
     end
     
-    % expand start states to match model states
+    % expand start states to match simulation model states
     assert(isequal(size(cfg.scn.vs{i}.x_start), [4 1]))
-    cfg.scn.vs{i}.x_start = [cfg.scn.vs{i}.x_start' zeros(1, cfg.scn.vs{i}.model.nx - 4)]';
+    cfg.scn.vs{i}.x_start = [cfg.scn.vs{i}.x_start' zeros(1, cfg.scn.vs{i}.model_simulation.nx - 4)]';
     
     %% Inputs
     % SL Acceleration: pre-compute for speed

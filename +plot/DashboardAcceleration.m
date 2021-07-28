@@ -14,7 +14,7 @@ classdef DashboardAcceleration < plot.Base
             
             
             % only plot for linear models (having accelerations as input)
-            if ~cfg.scn.vs{i_vehicle}.isModelLinear; return; end
+            if ~cfg.scn.vs{i_vehicle}.isControlModelLinear; return; end
             
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
