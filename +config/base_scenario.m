@@ -1,4 +1,4 @@
-function cfg = scenario(cfg)
+function cfg = base_scenario(cfg)
 % basic components of a scenario
 cfg.scn.obstacles = {};
 cfg.scn.vhs = {};
@@ -6,6 +6,12 @@ cfg.scn.vhs = {};
 %% General
 cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImpr' or 'EllipseImpr' 
 cfg.race.n_laps = 3;            % Number of laps to be driven
+
+% only simulation for main vehicle (vehicle number 1)
+%   remaining vehicles are only for comparison of overlayed controller outputs
+%   main vehicle should have the most sophisticated simulation vehicle
+%   model, other vehicles' simulation models aren't used
+cfg.scn.is_main_vehicle_only = false;
 
 %% Track
 % e.g. HockenheimShort, testCircuitE, testCircuitLiniger

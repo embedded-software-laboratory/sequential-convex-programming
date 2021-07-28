@@ -133,8 +133,13 @@ classdef DashboardStatesNInputs < plot.Base
                     obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
                     obj.add_table_line('Vehicle Model', class(vh.model));
                     obj.add_table_line('Vehicle Params', vh.model.p.paramsName);
-                    obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
-                    obj.add_table_line('Vehicle Sim Params', vh.model_simulation.p.paramsName);
+                    if ~cfg.scn.is_main_vehicle_only || i == 1 % only for vehicles !=1 when main vehicle simulation mode
+                        obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
+                        obj.add_table_line('Vehicle Sim Params', vh.model_simulation.p.paramsName);
+                    else
+                        obj.add_table_line('Vehicle Sim Model', 'simulation via main vehicle #1');
+                        obj.add_table_line('Vehicle Sim Params', 'simulation via main vehicle #1');
+                    end
                     if vh.approximation == vh.approximationSL
                         approx = 'SL';
                     elseif vh.approximation == vh.approximationSCR

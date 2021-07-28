@@ -6,7 +6,7 @@ function cfg = scenario_models_comparison_linear(cfg)
 
 
 %% Vehicles
-vehicle_default = config.vehicle(cfg);
+vehicle_default = config.base_vehicle(cfg);
 
 vehicle_ = config.vehicle_ST_Liniger(vehicle_default);
 

@@ -1,6 +1,6 @@
 % Default config for a single vehicle
 
-function cfg_vh = vehicle(cfg)
+function cfg_vh = base_vehicle(cfg)
 % required for ST to lin Liniger conversion
 cfg_vh.tempFileSingleTrackAMax = [cfg.tempPath 'singleTrackAMax.mat'];
 
