@@ -1,4 +1,4 @@
-%% Rewatch Run
+%% Replay Simulation
 %% How to
 %   1. load a "log.mat" from the output directory into workspace
 %   2. run script
