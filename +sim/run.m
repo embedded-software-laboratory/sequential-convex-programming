@@ -15,11 +15,6 @@ function run(cfg)
 %   scn:    scenario
 %   vhs:    vehicles
 
-% TODO unify scaling and parameters
-%   SCR works preferably with hockenheim_simple?
-%   SL + Botz with Hockenheim 4 (even there will start slapping, but finds
-%   turn fast enough)
-
 %% Initialization
 timer_overall = tic;
 

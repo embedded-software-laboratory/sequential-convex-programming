@@ -1,4 +1,6 @@
 function [V,nr] = con2vert(A,b)
+% not used filed, original from Matlab File Exchange
+
 % CON2VERT - convert a convex set of constraint inequalities into the set
 %            of vertices at the intersections of those inequalities;i.e.,
 %            solve the "vertex enumeration" problem. Additionally,

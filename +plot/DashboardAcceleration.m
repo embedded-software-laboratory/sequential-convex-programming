@@ -1,12 +1,6 @@
 classdef DashboardAcceleration < plot.Base
-    %RACE Summary of this class goes here
-    %   Detailed explanation goes here
-    
     methods
         function plot(obj, cfg, ws)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            % TODO only using vehicle 1
             i_vehicle = 1;
             colors = utils.getRwthColors(100);
             color = colors(i_vehicle, :); % need to store color for later plot updates (else Matlab's gc will delete)

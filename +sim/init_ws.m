@@ -26,7 +26,9 @@ for i = 1:length(cfg.scn.vhs)
     ws.vhs{i}.pos = 0; % ego vehicle position relative to all other vehicles
 end
 
-% inter-vehicle working set content
-% TODO correct description? Initialize tables with indications for each vehicle (rows) which other vehicle has to be considered as an obstacle (colums) or wich other vehicle has to be blocked (columns)
+% inter-vehicle/obstacle data
+%   Initialize tables with indications for each vehicle (rows) which other
+%   vehicle has to be considered as an obstacle (colums) or wich other
+%   vehicle has to be blocked (columns)
 ws.obstacleTable = zeros(length(cfg.scn.vhs), length(cfg.scn.vhs));
 ws.blockingTable = zeros(length(cfg.scn.vhs), length(cfg.scn.vhs));

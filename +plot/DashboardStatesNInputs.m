@@ -1,7 +1,4 @@
 classdef DashboardStatesNInputs < plot.Base
-    %RACE Summary of this class goes here
-    %   Detailed explanation goes here
-    
     properties
         table_desc
         table_val
@@ -17,9 +14,6 @@ classdef DashboardStatesNInputs < plot.Base
         end
             
         function plot(obj, cfg, ws)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-    
             % choose vehicle
             i_veh = 1;
             model_p = cfg.scn.vhs{i_veh}.model_p;
