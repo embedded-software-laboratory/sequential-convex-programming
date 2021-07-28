@@ -1,14 +1,16 @@
-% rewatch run
-% load "log.mat", then run script
+%% Rewatch Run
+%% How to
+%   1. load a "log.mat" from the output directory into workspace
+%   2. run script
 
-% FIXME recreate figure handles
-cfg.plot.plots_to_draw = {
-    plot.Race(1)
-    plot.DashboardStatesNInputs(2)
-    plot.DashboardAcceleration(3)};
+% recreate figure handles
+cfg.plot.plots_to_draw = config.config().plot.plots_to_draw;
 
 %% Visualization
 disp('run plotting')
+
+
+warning('replaying at real-time speed of vehicle 1 (other vahicles may have other discretization time dt and thus a woring speed)')
 
 for j = 1:length(log.lap)
     tic
@@ -24,7 +26,7 @@ for j = 1:length(log.lap)
     drawnow
 
     % pause to simulate real time
-    % FIXME what if different prediction step sizes?
+    % CAVE replaying at real-time of vehicle 1
     delta = cfg.scn.vhs{1}.p.dt - toc;
     if delta > 0
         pause(delta);
@@ -33,4 +35,4 @@ for j = 1:length(log.lap)
     end 
 end
 
-disp('run finished')
+disp('replay finished')
