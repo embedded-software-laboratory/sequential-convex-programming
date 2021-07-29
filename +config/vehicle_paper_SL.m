@@ -15,6 +15,8 @@ cfg_vh.p.S = 10; % Penalty weight for slack (was 1e30 for usage in quad objectiv
 cfg_vh.p.Q = 1;
 cfg_vh.p.R = 0.01 * eye(2); % Penalty weight for control changes over time
 
+cfg_vh.approximation = cfg_vh.approximationSL;
+
 
 %% Contoller: Miscellaneous Modelling
 % Linearization (SL): size of Trust Region for position
@@ -25,5 +27,5 @@ cfg_vh.p.trust_region_size = 50; % from Janis, 1:1 scale
 cfg_vh.model = @model.vehicle.Linear;
 cfg_vh.model_p = model.vehicle.Linear.getParamsF1CarMaker(cfg_vh.p.dt);
 cfg_vh.model_simulation = cfg_vh.model;
-cfg_vh.model_simulation_p = model.vehicle.Linear.getParamsF1CarMaker(cfg_vh.p.dt);
+cfg_vh.model_simulation_p = cfg_vh.model_p;
 end

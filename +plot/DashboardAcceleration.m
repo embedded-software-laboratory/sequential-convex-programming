@@ -12,7 +12,7 @@ classdef DashboardAcceleration < plot.Base
             
             set(groot,'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
-            U_opt = ws.vhs{i_vehicle}.U_opt;
+            U_opt = ws.vhs{i_vehicle}.U_controller;
                 
             % plot base track initially
             if ~obj.is_background_plotted
