@@ -40,7 +40,7 @@ classdef Race < plot.Base
             c = utils.getRwthColors(100);
             for k = 1:length(scn.vhs)
                 % Value asignments for better readability
-                x_0 = ws.vhs{k}.x_0_controller;
+                x_0_controller = ws.vhs{k}.x_0_controller;
                 X_controller = ws.vhs{k}.X_controller;
                 p = scn.vhs{k}.p;
                 vehLength = scn.vhs{k}.lengthVal;
@@ -50,20 +50,20 @@ classdef Race < plot.Base
                 obj.add_tmp_handle(plot(X_controller(1,:),X_controller(2,:),'.-','color',c(k, :),'MarkerSize',7));    
 
                 %% Vehicle Box
-                if length(x_0) <= 4
+                if length(x_0_controller) <= 4 % if vehicle control model is linear
                 % Vehicle box (is old version: get vehicle
                 % direction from current vehicle velocity vector)
-                    if x_0(3:4) ~= [0;0]
-                        dist = x_0(3:4);
+                    if x_0_controller(3:4) ~= [0;0]
+                        dist = x_0_controller(3:4);
                     else
                         dist = [1;0];
                     end
                     dist = dist / norm(dist);
                 else
-                    dist = [cos(x_0(5));sin(x_0(5))]; % Get vehicle direction from angle to initial frame phi
+                    dist = [cos(x_0_controller(5));sin(x_0_controller(5))]; % yaw angle
                 end
                 R = [dist [-dist(2); dist(1)]];
-                vehicleRectangle = R * [vehLength/2 0;0 vehWidth/2] * [1 1 -1 -1;1 -1 -1 1] + repmat(x_0(1:2),1,4);
+                vehicleRectangle = R * [vehLength/2 0;0 vehWidth/2] * [1 1 -1 -1;1 -1 -1 1] + repmat(x_0_controller(1:2),1,4);
                 obj.add_tmp_handle(fill(vehicleRectangle(1,:),vehicleRectangle(2,:),c(k, :)));
                 daspect([1 1 1])
 
@@ -145,8 +145,8 @@ classdef Race < plot.Base
                     for j = 1:length(scn.vhs)
                         % Respect only constraints for opponents marked as obstacles
                         if ws.obstacleTable(k,j) == 1
-                            d = pdist([x_0(1:2)';ws.vhs{1,j}.x_0(1:2)'],'euclidean'); % calculate distance
-                            normal_vector = - (x_0(1:2)-ws.vhs{1,j}.x_0(1:2))/d; % normal vector in direction from trajectory point to obstacle center
+                            d = pdist([x_0_controller(1:2)';ws.vhs{1,j}.x_0(1:2)'],'euclidean'); % calculate distance
+                            normal_vector = - (x_0_controller(1:2)-ws.vhs{1,j}.x_0(1:2))/d; % normal vector in direction from trajectory point to obstacle center
                             closest_obst_point = ws.vhs{1,j}.x_0(1:2) - normal_vector * scn.vhs{1,j}.distSafe2CenterVal; % intersection of safe radius and connection between trajectory point and obstacle center 
                             tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
                             obj.add_tmp_handle(plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k, :),'LineWidth',1));

@@ -15,22 +15,36 @@ classdef DashboardStatesNInputs < plot.Base
             
         function plot(obj, cfg, ws)
             % choose vehicle
-            i_veh = 1;
-            model_p = cfg.scn.vhs{i_veh}.model_p;
+            i_vh = 1;
+            
+            % ease variable access
+            vh = ws.vhs{i_vh};
+            vh_cfg = cfg.scn.vhs{i_vh};
+            model_p = vh_cfg.model_p;
             bounds_available = isfield(model_p, 'bounds');
             colors = utils.getRwthColors(100);
-            color = colors(i_veh, :); % need to store color for later plot updates (else Matlab's gc will delete)
+            color = colors(i_vh, :); % need to store color for later plot updates (else Matlab's gc will delete)
             
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             %% Prepare data
-            X = ws.vhs{i_veh}.X_controller;
-            X = [ws.vhs{i_veh}.x_0_controller X];
+            X = vh.X_controller;
+            X = [vh.x_0_controller X];
+            % if you want "vehicle" reference frame velocities, outcomment
+            % following
+            % NOTE due to linear model, no slip angle is assumed. thus
+            % v_{lateral} = 0
+            %if vh_cfg.isControlModelLinear
+            %    % convert global to vehicle frame velocities
+            %    for k = 1:length(X)
+            %        X(3:4, k) = model.vehicle.velocity_global2local(X(3:4, k));
+            %    end
+            %end
 
-            U = ws.vhs{i_veh}.U_controller;
+            U = vh.U_controller;
             U = [U U(:,end)]; % Duplicate last entry for better visibility in plot
 
-            Hp = size(ws.vhs{i_veh}.X_controller, 2);
+            Hp = size(vh.X_controller, 2);
             Tx = 0:1:Hp;
             Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
@@ -40,11 +54,14 @@ classdef DashboardStatesNInputs < plot.Base
                 set(obj.figure_handle, 'Name', 'Dashboard: States & Inputs');
                 hold on
                 
-                
                 % create plots
                 subplot(3,3,1);
             	obj.subplot_plot_handles{1} = plot(Tx, X(3,:), 'Color', color);
-                title('v_x [m/s]')
+                if vh_cfg.isControlModelLinear
+                    title('Controller: v_{x} (global) [m/s]')
+                else
+                    title('Controller: v_{long} [m/s]')
+                end
                 if bounds_available
                     ylim(model_p.bounds(:, 3)' .* 1.1)
                     yline(model_p.bounds(:, 3)', '--r')
@@ -54,7 +71,11 @@ classdef DashboardStatesNInputs < plot.Base
 
                 subplot(3,3,2);
                 obj.subplot_plot_handles{2} = plot(Tx, X(4,:), 'Color', color);
-                title('v_y [m/s]')
+                if vh_cfg.isControlModelLinear
+                    title('Controller: v_{y} (global) [m/s]')
+                else
+                    title('Controller: v_{lateral} [m/s]')
+                end
                 if bounds_available
                     ylim(model_p.bounds(:, 4)' .* 1.1)
                     yline(model_p.bounds(:, 4)', '--r')
@@ -62,10 +83,10 @@ classdef DashboardStatesNInputs < plot.Base
                 xlim([Tx(1) Tx(end)])
                 grid on
 
-                if length(X(:, 1)) >=6 % TODO make state dependent
+                if ~vh_cfg.isControlModelLinear
                     subplot(3,3,4);
                     obj.subplot_plot_handles{3} = plot(Tx, X(5,:), 'Color', color);
-                    title('Yaw Angle Phi [rad]')
+                    title('Controller: Yaw Angle \phi [rad]')
                     if bounds_available
                         ylim(model_p.bounds(:, 5)' .* 1.1)
                         yline(model_p.bounds(:, 5)', '--r')
@@ -77,7 +98,7 @@ classdef DashboardStatesNInputs < plot.Base
 
                     subplot(3,3,5);
                     obj.subplot_plot_handles{4} = plot(Tx, X(6,:), 'Color', color);
-                    title('Yaw Rate W [rad/sec]')
+                    title('Controller: Yaw Rate \omega [rad/sec]')
                     if bounds_available
                         ylim(model_p.bounds(:, 6)' .* 1.1)
                         yline(model_p.bounds(:, 6)', '--r')
@@ -90,7 +111,11 @@ classdef DashboardStatesNInputs < plot.Base
 
                 subplot(3,3,7);
                 obj.subplot_plot_handles{5} = plot(Tu, U(1,:), 'Color', color);
-                title('Input Steering Angle [rad]')
+                if vh_cfg.isControlModelLinear
+                    title('Controller: a_{x} (global) [m/s^2]')
+                else
+                    title('Controller: Input Steering Angle [rad]')
+                end
                 if bounds_available
                     ylim(model_p.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
                     % if bounds are real
@@ -103,7 +128,12 @@ classdef DashboardStatesNInputs < plot.Base
 
                 subplot(3,3,8);
                 obj.subplot_plot_handles{6} = plot(Tu, U(2,:), 'Color', color);
-                title('Input Torque [% or Nm]')
+                
+                if vh_cfg.isControlModelLinear
+                    title('Controller: a_{y} (global) [m/s^2]')
+                else
+                    title('Controller: Input Torque [% or Nm]')
+                end
                 if bounds_available
                     ylim(model_p.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
                     % if bounds are real
