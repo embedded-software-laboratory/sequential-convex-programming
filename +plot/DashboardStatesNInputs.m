@@ -1,7 +1,4 @@
 classdef DashboardStatesNInputs < plot.Base
-    %RACE Summary of this class goes here
-    %   Detailed explanation goes here
-    
     properties
         table_desc
         table_val
@@ -17,19 +14,37 @@ classdef DashboardStatesNInputs < plot.Base
         end
             
         function plot(obj, cfg, ws)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-    
+            % choose vehicle
+            i_vh = 1;
+            
+            % ease variable access
+            vh = ws.vhs{i_vh};
+            vh_cfg = cfg.scn.vhs{i_vh};
+            model_p = vh_cfg.model_p;
+            bounds_available = isfield(model_p, 'bounds');
+            colors = utils.getRwthColors(100);
+            color = colors(i_vh, :); % need to store color for later plot updates (else Matlab's gc will delete)
+            
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
             %% Prepare data
-            x = ws.vs{1}.x;
-            x = [ws.vs{1}.x0 x];
+            X = vh.X_controller;
+            X = [vh.x_0_controller X];
+            % if you want "vehicle" reference frame velocities, outcomment
+            % following
+            % NOTE due to linear model, no slip angle is assumed. thus
+            % v_{lateral} = 0
+            %if vh_cfg.isControlModelLinear
+            %    % convert global to vehicle frame velocities
+            %    for k = 1:length(X)
+            %        X(3:4, k) = model.vehicle.velocity_global2local(X(3:4, k));
+            %    end
+            %end
 
-            u = ws.vs{1}.u;
-            u = [u u(:,end)]; % Duplicate last entry for better visibility in plot
+            U = vh.U_controller;
+            U = [U U(:,end)]; % Duplicate last entry for better visibility in plot
 
-            Hp = size(ws.vs{1}.x,2);
+            Hp = size(vh.X_controller, 2);
             Tx = 0:1:Hp;
             Tu = 1:(Hp + 1); % include Hp+1 to display the values at Hp as one stair step
             
@@ -41,33 +56,53 @@ classdef DashboardStatesNInputs < plot.Base
                 
                 % create plots
                 subplot(3,3,1);
-            	obj.subplot_plot_handles{1} = plot(Tx, x(3,:));
-                title('v_x [m/s]')
-%                 ylim([-3 3])
+            	obj.subplot_plot_handles{1} = plot(Tx, X(3,:), 'Color', color);
+                if vh_cfg.isControlModelLinear
+                    title('Controller: v_{x} (global) [m/s]')
+                else
+                    title('Controller: v_{long} [m/s]')
+                end
+                if bounds_available
+                    ylim(model_p.bounds(:, 3)' .* 1.1)
+                    yline(model_p.bounds(:, 3)', '--r')
+                end
                 xlim([Tx(1) Tx(end)])
                 grid on
 
                 subplot(3,3,2);
-                obj.subplot_plot_handles{2} = plot(Tx, x(4,:));
-                title('v_y [m/s]')
-%                 ylim([-0.7 0.7])
+                obj.subplot_plot_handles{2} = plot(Tx, X(4,:), 'Color', color);
+                if vh_cfg.isControlModelLinear
+                    title('Controller: v_{y} (global) [m/s]')
+                else
+                    title('Controller: v_{lateral} [m/s]')
+                end
+                if bounds_available
+                    ylim(model_p.bounds(:, 4)' .* 1.1)
+                    yline(model_p.bounds(:, 4)', '--r')
+                end
                 xlim([Tx(1) Tx(end)])
                 grid on
 
-                if length(x(:, 1)) >=6 % TODO make state dependent
+                if ~vh_cfg.isControlModelLinear
                     subplot(3,3,4);
-                    obj.subplot_plot_handles{3} = plot(Tx, x(5,:));
-                    title('Yaw Angle Phi [rad]')
-                    ylim([-3*pi 3*pi])
+                    obj.subplot_plot_handles{3} = plot(Tx, X(5,:), 'Color', color);
+                    title('Controller: Yaw Angle \phi [rad]')
+                    if bounds_available
+                        ylim(model_p.bounds(:, 5)' .* 1.1)
+                        yline(model_p.bounds(:, 5)', '--r')
+                    end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
                     yticklabels({'-3\pi','-2\pi','-\pi','0','\pi','2\pi','3\pi'})
                     grid on
 
                     subplot(3,3,5);
-                    obj.subplot_plot_handles{4} = plot(Tx, x(6,:));
-                    title('Yaw Rate W [rad/sec]')
-                    ylim([-3.5*pi 3.5*pi])
+                    obj.subplot_plot_handles{4} = plot(Tx, X(6,:), 'Color', color);
+                    title('Controller: Yaw Rate \omega [rad/sec]')
+                    if bounds_available
+                        ylim(model_p.bounds(:, 6)' .* 1.1)
+                        yline(model_p.bounds(:, 6)', '--r')
+                    end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
                     yticklabels({'-3\pi/s','-2\pi/s','-\pi/s','0','\pi/s','2\pi/s','3\pi/s'})
@@ -75,16 +110,37 @@ classdef DashboardStatesNInputs < plot.Base
                 end
 
                 subplot(3,3,7);
-                obj.subplot_plot_handles{5} = plot(Tu, u(1,:));
-                title('Input Steering Angle [rad]')
-%                 ylim([-0.4 0.4])
+                obj.subplot_plot_handles{5} = plot(Tu, U(1,:), 'Color', color);
+                if vh_cfg.isControlModelLinear
+                    title('Controller: a_{x} (global) [m/s^2]')
+                else
+                    title('Controller: Input Steering Angle [rad]')
+                end
+                if bounds_available
+                    ylim(model_p.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
+                    % if bounds are real
+                    if ~any(isinf(model_p.bounds(:, length(X(:, 1)) + 1)'))
+                        yline(model_p.bounds(:, length(X(:, 1)) + 1)', '--r')
+                    end
+                end
                 xlim([Tu(1) Tu(end)])
                 grid on
 
                 subplot(3,3,8);
-                obj.subplot_plot_handles{6} = plot(Tu, u(2,:));
-                title('Input Torque [Nm]')
-%                 ylim([-0.12 0.12])
+                obj.subplot_plot_handles{6} = plot(Tu, U(2,:), 'Color', color);
+                
+                if vh_cfg.isControlModelLinear
+                    title('Controller: a_{y} (global) [m/s^2]')
+                else
+                    title('Controller: Input Torque [% or Nm]')
+                end
+                if bounds_available
+                    ylim(model_p.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
+                    % if bounds are real
+                    if ~any(isinf(model_p.bounds(:, length(X(:, 1)) + 2)'))
+                        yline(model_p.bounds(:, length(X(:, 1)) + 2)', '--r')
+                    end
+                end
                 xlim([Tu(1) Tu(end)])
                 grid on
                 
@@ -92,19 +148,28 @@ classdef DashboardStatesNInputs < plot.Base
                 subplot(3,3,[3,6,9]);
                 axis off
                 
-                % assemble text
-                obj.add_table_line('Control: press ESC to abort, SPACE to pause', '');
+                %% assemble text
+                obj.add_table_line('\bfControl: press ESC to abort, SPACE to pause\rm', '');
                 obj.add_table_line('', '');
-                obj.add_table_line('Configuration', '');
+                obj.add_table_line('\bfConfiguration\rm', '');
                 % get name of function handle
                 obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
+                obj.add_table_line('Track Creation Scale', utils.rat2str(cfg.scn.track_creation_scale));
                 
-                for i = 1:length(cfg.scn.vs)
-                    vh = cfg.scn.vs{i};
+                
+                for i = 1:length(cfg.scn.vhs)
+                    vh = cfg.scn.vhs{i};                
                     obj.add_table_line('', '');
-                    obj.add_table_line(['Vehicle ' num2str(i)], '');
-                    obj.add_table_line('Vehicle Model', class(vh.model));
-                    obj.add_table_line('Vehicle Simulation Model', class(vh.model_simulation));
+                    obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
+                    obj.add_table_line('Vehicle Control Model', class(vh.model));
+                    obj.add_table_line('Vehicle Control Params', vh.model.p.paramsName);
+                    if ~cfg.scn.is_main_vehicle_only || i == 1 % only for vehicles !=1 when main vehicle simulation mode
+                        obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
+                        obj.add_table_line('Vehicle Sim Params', vh.model_simulation.p.paramsName);
+                    else
+                        obj.add_table_line('Vehicle Sim Model', 'simulation via main vehicle #1');
+                        obj.add_table_line('Vehicle Sim Params', 'simulation via main vehicle #1');
+                    end
                     if vh.approximation == vh.approximationSL
                         approx = 'SL';
                     elseif vh.approximation == vh.approximationSCR
@@ -117,7 +182,7 @@ classdef DashboardStatesNInputs < plot.Base
                 
                 % place text top left
                 text(0, 1, obj.table_desc, 'VerticalAlignment', 'top')
-                text(0.75, 1, obj.table_val, 'VerticalAlignment', 'top')
+                text(0.6, 1, obj.table_val, 'VerticalAlignment', 'top')
 
                 obj.is_background_plotted = true;
             else
@@ -127,24 +192,25 @@ classdef DashboardStatesNInputs < plot.Base
 
             % update plots
             set(obj.subplot_plot_handles{1}, 'XData', Tx);
-            set(obj.subplot_plot_handles{1}, 'YData', x(3,:));
+            set(obj.subplot_plot_handles{1}, 'YData', X(3,:));
             
             set(obj.subplot_plot_handles{2}, 'XData', Tx);
-            set(obj.subplot_plot_handles{2}, 'YData', x(4,:));
+            set(obj.subplot_plot_handles{2}, 'YData', X(4,:));
             
-            if length(x(:, 1)) >=6 % TODO make state dependent
+            if length(X(:, 1)) >=6 % TODO make state dependent
                 set(obj.subplot_plot_handles{3}, 'XData', Tx);
-                set(obj.subplot_plot_handles{3}, 'YData', x(5,:));
+                set(obj.subplot_plot_handles{3}, 'YData', X(5,:));
                 
                 set(obj.subplot_plot_handles{4}, 'XData', Tx);
-                set(obj.subplot_plot_handles{4}, 'YData', x(6,:));
+                set(obj.subplot_plot_handles{4}, 'YData', X(6,:));
             end
 
-            set(obj.subplot_plot_handles{5}, 'XData', Tu);
-            set(obj.subplot_plot_handles{5}, 'YData', u(1,:));
             
+            set(obj.subplot_plot_handles{5}, 'XData', Tu);
+            set(obj.subplot_plot_handles{5}, 'YData', U(1,:));
+
             set(obj.subplot_plot_handles{6}, 'XData', Tu);
-            set(obj.subplot_plot_handles{6}, 'YData', u(2,:));
+            set(obj.subplot_plot_handles{6}, 'YData', U(2,:));
         end
         
         function add_table_line(obj, desc, val)

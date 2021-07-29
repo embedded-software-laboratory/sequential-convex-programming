@@ -1,13 +1,6 @@
 classdef Race < plot.Base
-    %RACE Summary of this class goes here
-    %   Detailed explanation goes here
-    
-    
-    
     methods
         function plot(obj, cfg, ws)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
             scn = cfg.scn;
 
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
@@ -18,22 +11,22 @@ classdef Race < plot.Base
                 clf(obj.figure_handle)
                 
                 set(obj.figure_handle, 'color', [1 1 1]);
-                set(obj.figure_handle, 'Name', 'Race (States: Position x and y)');
+                set(obj.figure_handle, 'Name', ['Race (States: Position x and y) [track created with scale ' utils.rat2str(scn.track_creation_scale) ']']);
                 hold on
                 
                 % create legend accordingly to cars drawn below
                 c = utils.getRwthColors(100);
-                handles = zeros(length(scn.vs), 1);
-                names = cell(length(scn.vs), 1);
-                for k = 1:length(scn.vs)
-                    % pseudo plot fo coloring
+                handles = zeros(length(scn.vhs), 1);
+                names = cell(length(scn.vhs), 1);
+                for k = 1:length(scn.vhs)
+                    % pseudo plot for coloring
                     handles(k) = fill(NaN:NaN, NaN:NaN, c(k, :));
                     names{k} = ['Vehicle ' num2str(k)];
                 end
                 l = legend(handles, names, 'AutoUpdate', 'off', 'Location', 'northeast');
                 pos = get(l, 'Position');
             
-                obj.plot_track(scn.track, scn.vs{1}.widthVal)
+                obj.plot_track(scn.track, scn.vhs{1}.widthVal)
                 
                 set(l, 'Position', [pos(1) .9 pos(3) pos(4)]);
                 
@@ -45,32 +38,32 @@ classdef Race < plot.Base
             %% Plot vehicle specific elements
             %c = ['r','b','g','y','m','c','w','k',];
             c = utils.getRwthColors(100);
-            for k = 1:length(scn.vs)
+            for k = 1:length(scn.vhs)
                 % Value asignments for better readability
-                x0 = ws.vs{k}.x0;
-                x = ws.vs{k}.x;
-                p = scn.vs{k}.p;
-                vehLength = scn.vs{k}.lengthVal;
-                vehWidth = scn.vs{k}.widthVal;
+                x_0_controller = ws.vhs{k}.x_0_controller;
+                X_controller = ws.vhs{k}.X_controller;
+                p = scn.vhs{k}.p;
+                vehLength = scn.vhs{k}.lengthVal;
+                vehWidth = scn.vhs{k}.widthVal;
 
                 %% Planned trajectory
-                obj.add_tmp_handle(plot(x(1,:),x(2,:),'.-','color',c(k, :),'MarkerSize',7));    
+                obj.add_tmp_handle(plot(X_controller(1,:),X_controller(2,:),'.-','color',c(k, :),'MarkerSize',7));    
 
                 %% Vehicle Box
-                if length(x0) < 5
+                if length(x_0_controller) <= 4 % if vehicle control model is linear
                 % Vehicle box (is old version: get vehicle
                 % direction from current vehicle velocity vector)
-                    if x0(3:4) ~= [0;0]
-                        dist = x0(3:4);
+                    if x_0_controller(3:4) ~= [0;0]
+                        dist = x_0_controller(3:4);
                     else
                         dist = [1;0];
                     end
                     dist = dist / norm(dist);
                 else
-                    dist = [cos(x0(5));sin(x0(5))]; % Get vehicle direction from angle to initial frame phi
+                    dist = [cos(x_0_controller(5));sin(x_0_controller(5))]; % yaw angle
                 end
                 R = [dist [-dist(2); dist(1)]];
-                vehicleRectangle = R * [vehLength/2 0;0 vehWidth/2] * [1 1 -1 -1;1 -1 -1 1] + repmat(x0(1:2),1,4);
+                vehicleRectangle = R * [vehLength/2 0;0 vehWidth/2] * [1 1 -1 -1;1 -1 -1 1] + repmat(x_0_controller(1:2),1,4);
                 obj.add_tmp_handle(fill(vehicleRectangle(1,:),vehicleRectangle(2,:),c(k, :)));
                 daspect([1 1 1])
 
@@ -90,7 +83,7 @@ classdef Race < plot.Base
                 %     fill(obstaclePolygon(1,:),obstaclePolygon(2,:),[0 0 0]);
 
                 %% Track constraints for the trajectory point at prediction/control horizon
-                [~,lastCPindex] = min(sum(([scn.track.center] - repmat(x(1:2,p.Hp),1,length(scn.track))).^2));
+                [~,lastCPindex] = min(sum(([scn.track.center] - repmat(X_controller(1:2,p.Hp),1,length(scn.track))).^2));
                 lastCP = scn.track(lastCPindex);
                 L = 1; % Length of plotted linear constraints
                 tangent_left = [(lastCP.left + L* lastCP.forward_vector) (lastCP.left - L* lastCP.forward_vector)];
@@ -105,7 +98,7 @@ classdef Race < plot.Base
                 %         last_checkpoint = p.checkpoints(last_checkpoint_index);                 % Select checkpoint of last trajectory point
                 %         L = 30;                                                                 % Length of plotted linear constraints
                 %         
-                %         lastTrajectoryPoint = controller_output.x(p.ipos,p.Hp);                 % Select last trajectory point
+                %         lastTrajectoryPoint = controller_output.x(p.idx_pos,p.Hp);                 % Select last trajectory point
                 %         
                 %         dist = pdist([lastTrajectoryPoint'; [p.obstacle_1.xVal p.obstacle_1.yVal]],'euclidean');            % See SL_QP
                 %         normal_vector = - (lastTrajectoryPoint-[p.obstacle_1.xVal; p.obstacle_1.yVal])/dist;                % See SL_QP
@@ -149,12 +142,12 @@ classdef Race < plot.Base
                 %% Obstacle constraints for current position if obstacle has to be respected
                 if sum(ws.obstacleTable(k,:)) >= 1
                     % iterate over all opponents
-                    for j = 1:length(scn.vs)
+                    for j = 1:length(scn.vhs)
                         % Respect only constraints for opponents marked as obstacles
                         if ws.obstacleTable(k,j) == 1
-                            d = pdist([x0(1:2)';ws.vs{1,j}.x0(1:2)'],'euclidean'); % calculate distance
-                            normal_vector = - (x0(1:2)-ws.vs{1,j}.x0(1:2))/d; % normal vector in direction from trajectory point to obstacle center
-                            closest_obst_point = ws.vs{1,j}.x0(1:2) - normal_vector * scn.vs{1,j}.distSafe2CenterVal; % intersection of safe radius and connection between trajectory point and obstacle center 
+                            d = pdist([x_0_controller(1:2)';ws.vhs{1,j}.x_0(1:2)'],'euclidean'); % calculate distance
+                            normal_vector = - (x_0_controller(1:2)-ws.vhs{1,j}.x_0(1:2))/d; % normal vector in direction from trajectory point to obstacle center
+                            closest_obst_point = ws.vhs{1,j}.x_0(1:2) - normal_vector * scn.vhs{1,j}.distSafe2CenterVal; % intersection of safe radius and connection between trajectory point and obstacle center 
                             tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
                             obj.add_tmp_handle(plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k, :),'LineWidth',1));
                         end
@@ -189,7 +182,8 @@ classdef Race < plot.Base
                 plot([right_points(1,:) right_points(1,1)],[right_points(2,:) right_points(2,1)],'.k');
             end
 
-            % Center track in figure, add padding
+            % Center track in figure, add padding (else will move due to
+            % vehicle plotting
             bounds = [min([left_points right_points]');max([left_points right_points]')];    
             xlim(bounds(:,1))
             ylim(bounds(:,2))
@@ -198,6 +192,7 @@ classdef Race < plot.Base
             ylim(mean(ylim) + diff(ylim) * [-1 1] * 0.6)    
             daspect([1 1 1])
             axis off
+            xlabel('x [m]'); ylabel('y [m]')
             
             % add scale
             text(0.5, .6, 'Scale: 1m', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
