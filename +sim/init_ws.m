@@ -32,3 +32,6 @@ end
 %   vehicle has to be blocked (columns)
 ws.obstacleTable = zeros(length(cfg.scn.vhs), length(cfg.scn.vhs));
 ws.blockingTable = zeros(length(cfg.scn.vhs), length(cfg.scn.vhs));
+
+% init data (in simulation: executed every round)
+ws = sim.update_administrative_data(cfg, ws);

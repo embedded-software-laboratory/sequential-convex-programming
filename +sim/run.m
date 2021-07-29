@@ -40,13 +40,6 @@ try
         fprintf('------------------------- Step %i -------------------------\n', step_sim);
         step_sim = step_sim + 1;
         timer_loop = tic;
-        
-        % shift controller data acc. to simulation advance
-        ws = controller.shift_prev_data(length(cfg.scn.vhs), ws);
-        
-        % updates adminstrative data of working set to current simulation
-        % state
-        ws = sim.update_administrative_data(cfg, ws);
    
 
         %% Controller Execution
@@ -148,6 +141,13 @@ try
                 error('Combination of controller and simulation vehicle model types not supported')
             end
         end
+        
+        % shift controller data acc. to simulation advance
+        ws = controller.shift_prev_data(length(cfg.scn.vhs), ws);
+        
+        % updates adminstrative data of working set to current simulation
+        % state
+        ws = sim.update_administrative_data(cfg, ws);
 
         %% Execution control
         % Check if race finished

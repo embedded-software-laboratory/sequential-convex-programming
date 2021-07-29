@@ -5,34 +5,34 @@ function ws = update_administrative_data(cfg, ws)
 %   - update blocking & obstacles tables
 
 %% Current CP, position and lap
-if cfg.log.level >= cfg.log.LOG
-    % Get current checkpoints (corresponding to x_0) and current laps
-    for i = 1:length(cfg.scn.vhs)
-        % update checkpoints
-        cp_curr = utils.find_closest_track_checkpoint_index(...
-            ws.vhs{i}.x_0(cfg.scn.vhs{i}.model.idx_pos), cfg.scn.track_center, 1);
-        ws.vhs{i}.cp_prev = ws.vhs{i}.cp_curr;
-        ws.vhs{i}.cp_curr = cp_curr;
+% Get current checkpoints (corresponding to x_0) and current laps
+for i = 1:length(cfg.scn.vhs)
+    % update checkpoints
+    cp_curr = utils.find_closest_track_checkpoint_index(...
+        ws.vhs{i}.x_0(cfg.scn.vhs{i}.model.idx_pos), cfg.scn.track_center, 1);
+    ws.vhs{i}.cp_prev = ws.vhs{i}.cp_curr;
+    ws.vhs{i}.cp_curr = cp_curr;
 
-        % new lap: advance lap counter
-        % FIXME robust lap detection?
-        if (ws.vhs{i}.cp_prev ~= ws.vhs{i}.cp_curr) && ...
-            (ws.vhs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
-            (ws.vhs{i}.cp_curr / length(cfg.scn.track) < 1)
-            ws.vhs{i}.lap_count = ws.vhs{i}.lap_count + 1;
-        end
+    % new lap: advance lap counter
+    % FIXME robust lap detection?
+    if (ws.vhs{i}.cp_prev ~= ws.vhs{i}.cp_curr) && ...
+        (ws.vhs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
+        (ws.vhs{i}.cp_curr / length(cfg.scn.track) < 1)
+        ws.vhs{i}.lap_count = ws.vhs{i}.lap_count + 1;
+        % using warning just to stand out
+        warning('########## Vehicle %i has finished lap %i ##########', i, ws.vhs{i}.lap_count)
     end
+end
 
-    % Determine relative positions of racing vehicles corresponding to
-    % current checkpoints and current laps
-    for i = 1:length(cfg.scn.vhs)
-        ws.vhs{i}.pos = 1;
-        for j = 1:length(cfg.scn.vhs)
-            if (ws.vhs{i}.cp_curr < ws.vhs{1,j}.cp_curr) && ...
-                    (ws.vhs{i}.lap_count == ws.vhs{1,j}.lap_count) || ...
-                    (ws.vhs{i}.lap_count < ws.vhs{1,j}.lap_count)
-                ws.vhs{i}.pos = ws.vhs{i}.pos + 1;
-            end
+% Determine relative positions of racing vehicles corresponding to
+% current checkpoints and current laps
+for i = 1:length(cfg.scn.vhs)
+    ws.vhs{i}.pos = 1;
+    for j = 1:length(cfg.scn.vhs)
+        if (ws.vhs{i}.cp_curr < ws.vhs{1,j}.cp_curr) && ...
+                (ws.vhs{i}.lap_count == ws.vhs{1,j}.lap_count) || ...
+                (ws.vhs{i}.lap_count < ws.vhs{1,j}.lap_count)
+            ws.vhs{i}.pos = ws.vhs{i}.pos + 1;
         end
     end
 end
