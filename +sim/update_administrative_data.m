@@ -13,11 +13,13 @@ for i = 1:length(cfg.scn.vhs)
     ws.vhs{i}.cp_prev = ws.vhs{i}.cp_curr;
     ws.vhs{i}.cp_curr = cp_curr;
 
-    % new lap: advance lap counter
-    % FIXME robust lap detection?
+    % if new lap
+    %   CAVE may not be the most robust lap detection - depending on
+    %   vehicle speed & discretization
     if (ws.vhs{i}.cp_prev ~= ws.vhs{i}.cp_curr) && ...
-        (ws.vhs{i}.cp_prev / length(cfg.scn.track) >= 1) && ...
-        (ws.vhs{i}.cp_curr / length(cfg.scn.track) < 1)
+        (ws.vhs{i}.cp_prev > 0.9 * length(cfg.scn.track)) && ... % was in last 10% of lap
+        (ws.vhs{i}.cp_curr < 0.1 * length(cfg.scn.track)) % now is in first 10% of lap
+        % advance lap counter
         ws.vhs{i}.lap_count = ws.vhs{i}.lap_count + 1;
         % using warning just to stand out
         warning('########## Vehicle %i has finished lap %i ##########', i, ws.vhs{i}.lap_count)
