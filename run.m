@@ -18,7 +18,7 @@ cfg = config.config();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select scneario  by changing the indexnumber %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-scenario_selection = 5;
+scenario_selection = 4;
 
 % Default scenario
 scenarios(1) = config.base_scenario(cfg);
@@ -28,4 +28,13 @@ scenarios(5) = config.scenario_main_vehicle_SL_vs_SCR(config.base_scenario(cfg))
 
 
 %% Run Selected Scenario
-sim.run(scenarios(scenario_selection))
+output_file = sim.run(scenarios(scenario_selection));
+
+
+%% Evaluation
+% Loding saved file after finished scenario
+disp('Loaded output file of sim, so you can use evaluation scripts')
+load(output_file)
+
+% Run example evaluation scipts
+evaluation.plot_t_opts()

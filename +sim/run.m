@@ -1,4 +1,4 @@
-function run(cfg)
+function output_file = run(cfg)
 % Main file to run the scenario with any given configuration
 %
 % debug despite try/catch block: `dbstop if caught error`, disable with
@@ -186,7 +186,8 @@ if cfg.log.level >= cfg.log.LOG
 
     % remove figure handles, so they won't get saved
     cfg.plot.plots_to_draw = NaN;
-    save([cfg.outputPath '/log.mat'])
+    output_file = [cfg.outputPath '/log.mat'];
+    save(output_file)
 end
 
 % if error occured in race loop
