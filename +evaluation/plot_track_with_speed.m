@@ -1,43 +1,18 @@
-% Change inputs to (log1,log2) for plotting (1) and (7)
-addpath('../')
+%% Plot simulation times of different vehicles
+%% How to
+%   1. load a "log.mat" from the output directory into workspace
+%   2. run script
+
 colors = utils.getRwthColors(100);
 
-track_ = track.Hockenheim4();
-left_points = [track_(:).left];
-right_points = [track_(:).right];
-forward_vectors = [track_.forward_vector];
-
-n_vehicles = 1;
-
-f = figure(1321654541);
-set(f, 'Name', 'Track Velocity-Dependent');
-%     set(f,'units','centimeters','OuterPosition',[0,0,14.5,15])
-
 %% Plot track
-
-% Draw track area
-pts=[fliplr(right_points) right_points(:,end) left_points left_points(:,1)];
-fill(pts(1,:), pts(2,:),[1 1 1]*.8,'EdgeAlpha',0)
+f = figure(13541);
+plot.Race(13541).plot_track(cfg.scn.track);
 hold on
-
-% Draw track outline with extra width for the vehicle
-width = 0.045 / 2;
-normals = width*[0 -1;1 0]*forward_vectors;
-left_points = left_points + normals;
-right_points = right_points - normals;
-plot([left_points(1,:) left_points(1,1)],[left_points(2,:) left_points(2,1)],'k','LineWidth',1);
-hold on
-plot([right_points(1,:) right_points(1,1)],[right_points(2,:) right_points(2,1)],'k','LineWidth',1);
-hold on
-
-% Start / Finish Line
-plot([right_points(1,1) left_points(1,1)],[right_points(2,1) left_points(2,1)],':k')
-hold on
+set(f, 'Name', "Vehicle 1's Velocity on Track");
 
 %% Plot Driven Paths
-
 %% (1) one Vehicle
-% FIXME restrict data input to one lap only
 x_0 = [log.vehicles{1}.x_0];
 X = x_0(1, :);
 Y = x_0(2, :);
@@ -57,7 +32,7 @@ surface('XData', [X; X],             ... % N.B.  XYZC Data must have at least 2 
         'Marker', 'none',...
         'LineWidth', 2);
 colormap(jet(64))
-caxis([0 3]);
+%caxis([0 3]); % set limit
 c = colorbar;
 c.TickLabelInterpreter = 'latex';
 c.FontSize = 11;
@@ -173,24 +148,3 @@ c.Label.FontSize = 11;
 %     c.Label.String = '[m/s]';
 %     c.Label.Interpreter = 'latex';
 %     c.Label.FontSize = 11;
-
-
-%% Final Tuning
-
-bounds = [min([left_points right_points]');max([left_points right_points]')];    
-xlim([bounds(1,1)-0.1 bounds(2,1)+0.1])
-ylim([bounds(1,2)-0.1 bounds(2,2)+0.1])
-
-daspect([1 1 1])
-
-xlabel('X [m]','interpreter','latex','FontSize',11)
-ylabel('Y [m]','interpreter','latex','FontSize',11)
-set(gca,'ticklabelinterpreter','latex','FontSize',11)
-
-%% Save
-%     print -dsvg 20190318Eval_1_DrivenPaths_oneVeh
-
-%     print -dsvg 20190318Eval_4_DrivenPaths_twoVeh
-%     print -dsvg 20190318Eval_5_DrivenPaths_twoVehBlock
-%     
-%     print -dsvg 20190318Eval_7_DrivenPaths_1and8Veh

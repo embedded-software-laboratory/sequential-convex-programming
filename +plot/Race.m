@@ -26,7 +26,7 @@ classdef Race < plot.Base
                 l = legend(handles, names, 'AutoUpdate', 'off', 'Location', 'northeast');
                 pos = get(l, 'Position');
             
-                obj.plot_track(scn.track, scn.vhs{1}.widthVal)
+                obj.plot_track(scn.track);
                 
                 set(l, 'Position', [pos(1) .9 pos(3) pos(4)]);
                 
@@ -157,21 +157,22 @@ classdef Race < plot.Base
         end
     end
     
-    methods (Access = private, Static)
-        function plot_track(track_checkpoints, vehicle_width)
-            left_points = [track_checkpoints.left];
-            right_points = [track_checkpoints.right];
-            forward_vectors = [track_checkpoints.forward_vector];
+    methods (Static)
+        function plot_track(checkpoints)
+            left_points = [checkpoints.left];
+            right_points = [checkpoints.right];
+            
+            hold on
 
+            %% Account for extra width for the vehicle
+            % as widht was deducted for modelling
+            %width = vehicle_width / 2;
+            %normals = width*[0 -1;1 0]*forward_vectors;
+            %left_points = left_points + normals;
+            %right_points = right_points - normals;
             % Draw track area
             pts=[fliplr(right_points) right_points(:,end) left_points left_points(:,1)];
             fill(pts(1,:), pts(2,:),[1 1 1]*.8,'EdgeAlpha',0)
-
-            %% Draw track outline with extra width for the vehicle
-            width = vehicle_width / 2;
-            normals = width*[0 -1;1 0]*forward_vectors;
-            left_points = left_points + normals;
-            right_points = right_points - normals;
 
             if true
                 plot([left_points(1,:) left_points(1,1)],[left_points(2,:) left_points(2,1)],'k','LineWidth',1);
@@ -181,22 +182,24 @@ classdef Race < plot.Base
                 plot([left_points(1,:) left_points(1,1)],[left_points(2,:) left_points(2,1)],'.k');
                 plot([right_points(1,:) right_points(1,1)],[right_points(2,:) right_points(2,1)],'.k');
             end
+            
+            % Start / Finish Line
+            plot([right_points(1,1) left_points(1,1)], [right_points(2,1) left_points(2,1)],':k')
 
             % Center track in figure, add padding (else will move due to
             % vehicle plotting
-            bounds = [min([left_points right_points]');max([left_points right_points]')];    
-            xlim(bounds(:,1))
-            ylim(bounds(:,2))
-            set(gca, 'Position', [0 0 1 1])
+            bounds = [min([left_points right_points]');max([left_points right_points]')];
+            xlim([bounds(1,1)-0.1 bounds(2,1)+0.1])
+            ylim([bounds(1,2)-0.1 bounds(2,2)+0.1])
             xlim(mean(xlim) + diff(xlim) * [-1 1] * 0.6)
             ylim(mean(ylim) + diff(ylim) * [-1 1] * 0.6)    
             daspect([1 1 1])
-            axis off
             xlabel('x [m]'); ylabel('y [m]')
             
-            % add scale
-            text(0.5, .6, 'Scale: 1m', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
-            plot([0 1], [.5 .5], 'k', 'LineWidth', 1);
+            % add scale (e.g., if no labels used)
+            %axis off
+            %text(0.5, .6, 'Scale: 1m', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+            %plot([0 1], [.5 .5], 'k', 'LineWidth', 1);
         end
     end
 end
