@@ -39,7 +39,10 @@ for i = 1:length(cfg.scn.vhs)
         cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_simulation_p);
     
     if ~isfield(cfg.scn.vhs{i}.model_p, 'bounds')
-        warning("Vehicle's %i model has no bounds", i);
+        warning("Vehicle's %i controller model has no bounds (for linear models it doesn't matter)", i);
+    end
+    if ~isfield(cfg.scn.vhs{i}.model_simulation_p, 'bounds')
+        warning("Vehicle's %i simulation model has no bounds (for linear models it doesn't matter)", i);
     end
     
     % expand start states to match simulation model states

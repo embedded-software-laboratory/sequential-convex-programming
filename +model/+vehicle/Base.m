@@ -19,7 +19,7 @@ classdef Base < handle
     
     methods
         function obj = Base(nx, nu, Hp, dt, p)
-            % TODO nx and nu have to match ODE
+            % NOTE nx and nu have to match ODE
             obj.p = p;
             obj.nx = nx;
             obj.nu = nu;

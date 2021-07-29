@@ -6,20 +6,14 @@ function cfg = scenario_models_comparison_linear(cfg)
 
 
 %% Vehicles
-vehicle_default = config.base_vehicle(cfg);
-
-vehicle_ = config.vehicle_ST_Liniger(vehicle_default);
+base_vehicle = config.base_vehicle(cfg);
 
 % vehicle 1: single-track liniger
-cfg.scn.vhs{end + 1} = vehicle_;
+cfg.scn.vhs{end + 1} = config.vehicle_ST_Liniger(base_vehicle);
 
 % vehicle 2: linear liniger controller, single-track liniger simulation
-vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
-vehicle_.model_simulation = @model.vehicle.SingleTrack;
-vehicle_.model_simulation_p = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
-cfg.scn.vhs{end + 1} = vehicle_;
+cfg.scn.vhs{end + 1} = config.vehicle_lin_Liniger_ST_Liniger(base_vehicle);
 
 % vehicle 3: linear liniger
-vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
-cfg.scn.vhs{end + 1} = vehicle_;
+cfg.scn.vhs{end + 1} = config.vehicle_lin_Liniger(base_vehicle);
 end
