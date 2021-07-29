@@ -1,8 +1,11 @@
 classdef Linear < model.vehicle.Base
     % Linear vehicle model
-    % Controls:
+    % Controls (in global coordinates):
     %   a_x acceleration longitudinal
     %   a_y acceleration lateral
+    %
+    % Static bounds not useful due to global coordinate system
+
     
     properties
         Ad
@@ -316,50 +319,6 @@ classdef Linear < model.vehicle.Base
                         fprintf('for v_x %f & delta %f got a_y %f\n', v, delta, output_)
                 end
             end
-        end
-        
-        function p = getParamsSingleTrackLiniger_WithKloocksBounds(dt, filename, shallPlot)
-            % extends ST Liniger modell with Kloocks bounds
-            if exist('shallPlot', 'var')
-                p = model.vehicle.Linear.getParamsSingleTrackLiniger(dt, filename, shallPlot);
-            else
-                p = model.vehicle.Linear.getParamsSingleTrackLiniger(dt, filename);
-            end
-            
-            % Bounds (first row upper, second lower bounds)
-            %    states                inputs
-            %    p_x  p_y  v_x  v_y    a_y   a_y
-            %    m    m    m/s  m/s    m/s^2 m/s^2
-            % CAVE position bounds are not considered in QP creation
-            p.bounds = ...
-                [-Inf -Inf  .05 -2     -Inf  -Inf ;
-                  Inf  Inf  2    2      Inf   Inf];
-            % CAVE delta not considered in QP creation
-            %p.bounds_delta = ...
-            %    [-Inf -Inf -Inf -Inf   -Inf  -Inf ;
-            %      Inf  Inf  Inf  Inf    Inf   Inf];
-        end
-        
-        function p = getParamsSingleTrackLiniger_WithLinigersBounds(dt, filename, shallPlot)
-            % extends ST Liniger modell with Kloocks bounds
-            if exist('shallPlot', 'var')
-                p = model.vehicle.Linear.getParamsSingleTrackLiniger(dt, filename, shallPlot);
-            else
-                p = model.vehicle.Linear.getParamsSingleTrackLiniger(dt, filename);
-            end
-              
-            % Bounds (first row lower, second upper bounds)
-            %    states                inputs
-            %    p_x  p_y  v_x  v_y    a_y   a_y
-            %    m    m    m/s  m/s    m/s^2 m/s^2
-            % CAVE position bounds are not considered in QP creation
-            p.bounds = ...
-                [-Inf -Inf -.1  -2     -Inf  -Inf ;
-                  Inf  Inf  4    2      Inf   Inf];
-            % CAVE delta not considered in QP creation
-            %p.bounds_delta = ...
-            %    [-Inf -Inf -Inf -Inf   -Inf  -Inf ;
-            %      Inf  Inf  Inf  Inf    Inf   Inf];
         end
     end
 end
