@@ -131,8 +131,8 @@ classdef DashboardStatesNInputs < plot.Base
                     vh = cfg.scn.vhs{i};                
                     obj.add_table_line('', '');
                     obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
-                    obj.add_table_line('Vehicle Model', class(vh.model));
-                    obj.add_table_line('Vehicle Params', vh.model.p.paramsName);
+                    obj.add_table_line('Vehicle Control Model', class(vh.model));
+                    obj.add_table_line('Vehicle Control Params', vh.model.p.paramsName);
                     if ~cfg.scn.is_main_vehicle_only || i == 1 % only for vehicles !=1 when main vehicle simulation mode
                         obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
                         obj.add_table_line('Vehicle Sim Params', vh.model_simulation.p.paramsName);

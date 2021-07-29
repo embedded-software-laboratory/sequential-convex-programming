@@ -42,9 +42,13 @@ idx_slack  = model.ns * p.Hp + 1;
 %% Problem size
 n_vars = model.ns * p.Hp + 1; % number of variables: (states + inputs) * prediction steps + slack variable
 n_eqns = model.nx * p.Hp; % number of equations: state equations * prediction steps
-if isControlModelLinear; n_eqns = n_eqns + 2; end % terminating conditions (v_x, v_y)
-% if ~isLinear; n_eqns = n_eqns + 3; end % terminating conditions (v_x, v_y, dt/dyaw)
-
+if isControlModelLinear
+    n_eqns = n_eqns + 2; % terminating conditions (v_x, v_y)
+else
+    % terminal constraints are implemented as (softer) lower/upper bounds
+    % on prediction step H_p (see below, section "bounds")
+    %n_eqns = n_eqns + 3; % terminating conditions (v_x, v_y, dyaw/dt)
+end
 n_ineq = 0;
 
 
@@ -117,10 +121,16 @@ end
 if isControlModelLinear
     % v_{x,y}{Hp} = 0 (b_eq already inited to 0)
     n_rows = n_rows(end) + (1:2);
-    A_eq(n_rows, idx_x(k, 3:4)) = eye(2);
+    A_eq(n_rows, idx_x(k, 3:4)) = eye(2); %v_x, v_y
 else
     % terminal constraints are implemented as (softer) lower/upper bounds
-    % on last prediction step below
+    % on prediction step H_p (see below, section "bounds")
+    %n_rows = n_rows(end) + 1;
+    %A_eq(n_rows, idx_x(k, 3)) = 1; % v_x
+    %n_rows = n_rows(end) + 1;
+    %A_eq(n_rows, idx_x(k, 4)) = 1; % v_y
+    %n_rows = n_rows(end) + 1;
+    %A_eq(n_rows, idx_x(k, 6)) = 1; % dyaw/dt
 end
 
 assert(n_rows(end) == n_eqns);
@@ -379,6 +389,8 @@ if ~isControlModelLinear
     % Terminal Constraints
     % 	Choosing small numerical values for last prediction step
 	% 	(instead of terminal equality)
+    %
+    %   Overwriting bounds form above
     bound_upper(idx_x(end,3)) = 0.01;
     bound_upper(idx_x(end,4)) = 0.01;
     bound_upper(idx_x(end,6)) = 0.02;
