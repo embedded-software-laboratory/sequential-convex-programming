@@ -20,7 +20,6 @@ cfg.scn.track_handle = @model.track.HockenheimShort;
 cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 
 %% Vehicles
-% x_start [pos_x pox_y v_x v_y] will be initialized to match model states
 % CAVE here you need to add vehicles
 %   ensure that the start position of the vehicles is on the first
 %   lap regarding the track center-checkpoints (find examples in scenario

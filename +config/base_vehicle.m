@@ -48,8 +48,8 @@ cfg_vh.model_simulation = cfg_vh.model_controller;
 cfg_vh.modelParams_simulation = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
 
 %% Geometric
-% xStart [pos_x pox_y v_x v_y] will be initialized to match model states
-cfg_vh.x_start = [0 0 0 0]';
+% xStart [pos_x pox_y v_x v_y yaw dyaw/dt] will be initialized to match model states
+cfg_vh.x_start = [0 0 0 0 0 0]';
 
 % FIXME adapt to scale. Define in vehicle model
 cfg_vh.lengthVal = 0.075; % obstacle's size measured along its direction of movement [m]

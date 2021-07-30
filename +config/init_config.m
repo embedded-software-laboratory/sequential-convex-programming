@@ -47,9 +47,9 @@ for i = 1:length(cfg.scn.vhs)
         warning("Vehicle's %i model has no bounds", i);
     end
     
-    % expand start states to match simulation model states
-    assert(isequal(size(cfg.scn.vhs{i}.x_start), [4 1]))
-    cfg.scn.vhs{i}.x_start = [cfg.scn.vhs{i}.x_start' zeros(1, cfg.scn.vhs{i}.model_simulation.nx - 4)]';
+    % reduce start states to match simulation model states
+    assert(isequal(size(cfg.scn.vhs{i}.x_start), [6 1]))
+    cfg.scn.vhs{i}.x_start = cfg.scn.vhs{i}.x_start(1:cfg.scn.vhs{i}.model_simulation.nx);
     
     %% Inputs
     % SL Acceleration: pre-compute for speed

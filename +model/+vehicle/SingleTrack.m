@@ -95,10 +95,6 @@ classdef SingleTrack < model.vehicle.BaseOde
     methods
         function obj = SingleTrack(Hp, dt, p)
             obj@model.vehicle.BaseOde(6, 2, Hp, dt, p) % call superclass constructor
-            
-            warning('Acceleration controller for linear model is experimental, use with caution')
-            
-            obj.fsolve_options = optimoptions('fsolve','Display','off');
         end
         
         function dX = ode(obj, x, u)
