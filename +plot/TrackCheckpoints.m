@@ -18,24 +18,24 @@ classdef TrackCheckpoints < plot.Base
             
             hold on
             n = length(checkpoints);
-            center = [checkpoints.center];
-            left = [checkpoints.left];
-            right = [checkpoints.right];
+            center_points = [checkpoints.center];
+            left_points = [checkpoints.left];
+            right_points = [checkpoints.right];
 
             % center line points
-            scatter(center(1, :), center(2, :), 'm', '.')
+            scatter(center_points(1, :), center_points(2, :), 'm', '.')
 
             % normal vector
             plot(...
-                reshape([left(1,:);right(1,:);nan(1,n)],3*n,1),...
-                reshape([left(2,:);right(2,:);nan(1,n)],3*n,1),...
+                reshape([left_points(1,:);right_points(1,:);nan(1,n)],3*n,1),...
+                reshape([left_points(2,:);right_points(2,:);nan(1,n)],3*n,1),...
                 'Color',[1 1 1]*0.7);
 
-            % right points
-            plot([left(1,:) left(1,1)],[left(2,:) left(2,1)], 'b');
-
             % left points
-            plot([right(1,:) right(1,1)],[right(2,:) right(2,1)], 'r');
+            plot([left_points(1,:) left_points(1,1)],[left_points(2,:) left_points(2,1)], 'b');
+
+            % right points
+            plot([right_points(1,:) right_points(1,1)],[right_points(2,:) right_points(2,1)], 'r');
 
             
             if isobject(obj.figure_handle) || ~isnan(obj.figure_handle)

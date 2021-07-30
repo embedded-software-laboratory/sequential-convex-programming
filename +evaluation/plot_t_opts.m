@@ -31,7 +31,8 @@ for v = 1:length(t_opts)
 end
 
 %% Plot
-figure
+f = figure(9746);
+set(f, 'Name', 'Optimization Time Statistics');
 
 % vehicle (categories)
 cats = cell(1, length(stat));
