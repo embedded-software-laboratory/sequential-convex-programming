@@ -27,7 +27,7 @@ for j = 1:length(log.lap)
 
     % pause to simulate real time
     % CAVE replaying at real-time of vehicle 1
-    delta = cfg.scn.vhs{1}.p.dt - toc;
+    delta = cfg.scn.vhs{1}.p.dt_controller - toc;
     if delta > 0
         pause(delta);
     else

@@ -34,9 +34,9 @@ for i = 1:length(cfg.scn.vhs)
     % Instantiate vehicle models, in partiuclar, the initialization of the
     % jacobians is crucial for gaining computation speed
     cfg.scn.vhs{i}.model = ...
-        cfg.scn.vhs{i}.model(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_p);
+        cfg.scn.vhs{i}.model(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_controller, cfg.scn.vhs{i}.model_p);
     cfg.scn.vhs{i}.model_simulation = ...
-        cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_simulation_p);
+        cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_simulation, cfg.scn.vhs{i}.model_simulation_p);
     
     if ~isfield(cfg.scn.vhs{i}.model_p, 'bounds')
         warning("Vehicle's %i model has no bounds", i);

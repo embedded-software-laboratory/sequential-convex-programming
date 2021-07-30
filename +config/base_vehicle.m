@@ -12,8 +12,9 @@ cfg_vh.p.areObstaclesConsidered = false;
 
 cfg_vh.p.Hp = 50; % Number of prediction steps
 % SL 40, SCR 20, Botz 20, Liniger 40
-cfg_vh.p.dt = 0.1; % [s] size of prediction step
+cfg_vh.p.dt_controller = 0.1; % [s] size of prediction step for controller
 % SL 0.15, SCR 0.5, Botz 0.1, Liniger 0.02
+cfg_vh.p.dt_simulation = cfg_vh.p.dt_controller/10; % [s] size of simulation step
 
 cfg_vh.p.S = 1e5; % weight for slack
 % SL 10, SCR 1e5, Botz 1e40, (Liniger 250)
