@@ -7,8 +7,10 @@ function x_0_new = simulate_ode(x_0, u_1, veh_cfg)
 if x_0(3) == 0
    x_0(3) = eps; 
 end
-sim_timestep = veh_cfg.p.dt/10; % Size of time step [s]
-sim_dt = 0:sim_timestep:veh_cfg.p.dt; % Time span [s] -> n+ time points including n time steps
+
+% Time span [s] -> n+ time points including n time steps
+sim_dt = 0:veh_cfg.p.dt_simulation:veh_cfg.p.dt_controller; 
+
 [~,sim_x_0] = ode15s(...
     @(t,x)...
     veh_cfg.model_simulation.ode(...
