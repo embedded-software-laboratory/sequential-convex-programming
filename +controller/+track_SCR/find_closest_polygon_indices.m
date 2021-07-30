@@ -1,4 +1,4 @@
-function pg_indices = find_closest_track_polygon_index(pos, pg, Hp)
+function pg_indices = find_closest_polygon_indices(pos, pg, Hp)
 % For each trajectory point, find the closest track polygon.
 pg_indices = nan(Hp, 1);
 

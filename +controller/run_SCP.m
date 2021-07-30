@@ -1,8 +1,6 @@
-function controller_output = find_solution(cfg,...
+function controller_output = run_SCP(cfg,...
     vhs, obstacleTable, blockingTable, i_vehicle)
-% OPTIMIZER Optimize convexified solution using QP
-% This script prepares all information for the problem formulation and
-% solving.
+% run RTI/SCP
 
 %% Ease access
 vh = cfg.scn.vhs{i_vehicle};
@@ -29,7 +27,7 @@ for i = 1:vh.p.iterations
         % For each point of the projected trajectory, find the index
         % of the track polygon index
         track_polygons = cfg.scn.track_polygons;
-        track_polygon_indices = utils.find_closest_track_polygon_index(...
+        track_polygon_indices = controller.track_SCR.find_closest_polygon_indices(...
             X_opt(vh.model_controller.idx_pos, :), cfg.scn.track_polygons, vh.p.Hp);
     else
         track_polygons = NaN;
@@ -39,7 +37,7 @@ for i = 1:vh.p.iterations
     % not necessary for SCR, but vehicle obstacles & blocking
     %   For each point of the projected trajectory, find the index
     %   of the euclidian-distance-closest track checkpoint
-    checkpoint_indices = utils.find_closest_track_checkpoint_index(...
+    checkpoint_indices = controller.track_SL.find_closest_checkpoint_indices(...
         X_opt(vh.model_controller.idx_pos, :), cfg.scn.track_center, vh.p.Hp);
     
     %% Formulate QP

@@ -1,4 +1,4 @@
-function cp_indices = find_closest_track_checkpoint_index(pos, cp_center, Hp)
+function cp_indices = find_closest_checkpoint_indices(pos, cp_center, Hp)
 % find closest checkpoint(s) of track to given state(s) (position) x
 % Inputs:
 %   cp:     track or subset of track

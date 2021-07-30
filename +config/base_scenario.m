@@ -1,5 +1,7 @@
 function cfg = base_scenario(cfg)
-% basic components of a scenario
+% base configuration for any scenario
+%   contains all possible options
+
 cfg.scn.obstacles = {};
 cfg.scn.vhs = {};
 

@@ -25,15 +25,15 @@ classdef TrackPolygons < plot.Base
 
             % 1) tesselation (based on discret track checkpoints)
             ax2 = nexttile;
-            track = controller.gen_track_SCR.t1_tesselate(checkpoints);
+            track = controller.track_SCR.t1_tesselate(checkpoints);
             plotTrackPolygons_(track, sprintf('1) Tesselation to %i Polygons', length(track.polygons)))
             % 2) merge polygons
             ax3 = nexttile;
-            track = controller.gen_track_SCR.t2_merge(track, track_creation_scale, epsilon_area_tolerance);
+            track = controller.track_SCR.t2_merge(track, track_creation_scale, epsilon_area_tolerance);
             plotTrackPolygons_(track, sprintf('2) Merged to %i Polygons', length(track.polygons)))
             % 3) add overlaps
             ax4 = nexttile;
-            track = controller.gen_track_SCR.t3_overlap(track, track_creation_scale);
+            track = controller.track_SCR.t3_overlap(track, track_creation_scale);
             plotTrackPolygons_(track, sprintf('3) Overlapped %i Polygons', length(track.polygons)))
             
             linkaxes([ax1 ax2 ax3 ax4],'xy')

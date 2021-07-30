@@ -76,7 +76,7 @@ end
 
 %% Track
 [cfg.scn.track, cfg.scn.track_creation_scale] = cfg.scn.track_handle();
-% Precompute for speed
+% Preallocate for speed
 cfg.scn.track_center = [cfg.scn.track.center];
 
 % plot track, includes prerun of track SCR
@@ -86,7 +86,7 @@ plot.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vhs)
     if cfg.scn.vhs{i}.approximationIsSCR
-        cfg.scn.track_polygons = controller.gen_track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance).polygons;
+        cfg.scn.track_polygons = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance).polygons;
         break
     end
 end

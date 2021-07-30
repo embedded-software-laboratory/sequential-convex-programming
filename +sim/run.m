@@ -68,7 +68,7 @@ try
             end
 
             % save *raw* output
-            ws.vhs{i}.controller_output = controller.find_solution(cfg,...
+            ws.vhs{i}.controller_output = controller.run_SCP(cfg,...
                 vhs, ws.obstacleTable, ws.blockingTable, i);
 
             % save payload (predicted trajectories) for easier access

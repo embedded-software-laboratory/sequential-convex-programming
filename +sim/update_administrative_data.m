@@ -8,7 +8,7 @@ function ws = update_administrative_data(cfg, ws)
 % Get current checkpoints (corresponding to x_0) and current laps
 for i = 1:length(cfg.scn.vhs)
     % update checkpoints
-    cp_curr = utils.find_closest_track_checkpoint_index(...
+    cp_curr = controller.track_SL.find_closest_checkpoint_indices(...
         ws.vhs{i}.x_0(cfg.scn.vhs{i}.model_controller.idx_pos), cfg.scn.track_center, 1);
     ws.vhs{i}.cp_prev = ws.vhs{i}.cp_curr;
     ws.vhs{i}.cp_curr = cp_curr;
