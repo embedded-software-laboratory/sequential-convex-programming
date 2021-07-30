@@ -15,11 +15,14 @@ cfg.scn.vhs{end + 1} = vehicle_;
 
 % vehicle 2: linear liniger controller, single-track liniger simulation
 vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
-vehicle_.model_simulation = @model.vehicle.SingleTrack;
+vehicle_.model_simulation = @model.vehicle.SingleTrackWAccelerationController;
 vehicle_.modelParams_simulation = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
+vehicle_.x_start = [0 0 0.2 0 0 0]';
+vehicle_.p.Hp = 20; % Number of prediction steps
 cfg.scn.vhs{end + 1} = vehicle_;
 
 % vehicle 3: linear liniger
 vehicle_ = config.vehicle_lin_Liniger(vehicle_default);
+vehicle_.x_start = [0 0 0 0 0 0]';
 cfg.scn.vhs{end + 1} = vehicle_;
 end

@@ -5,11 +5,8 @@ function cfg = scenario_paperSL(cfg)
 cfg.scn.track_handle = @model.track.HockenheimShortCarMaker;
 cfg.scn.track_SCR_epsilon_area_tolerance = .5;
 
-%% Vehicles
-% x_start [pos_x pox_y v_x v_y] will be initialized to match model states
-
 % Vehicle
 vehicle_ = config.vehicle_paperSL(cfg);
-vehicle_.x_start = [0 0 .1 0]';
+vehicle_.x_start = [0 0 .1 0 0 0]';
 cfg.scn.vhs{end + 1} = vehicle_;
 end

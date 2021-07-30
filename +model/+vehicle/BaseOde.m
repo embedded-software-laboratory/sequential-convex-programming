@@ -9,7 +9,9 @@ classdef BaseOde < model.vehicle.Base
         function obj = BaseOde(nx, nu, Hp, dt, p)
             % call superclass constructor
             obj@model.vehicle.Base(nx, nu, Hp, dt, p)
-            
+        end
+        
+        function precomputeJacobian(obj)
             % pre-calc symbolic linearization
             obj.ode_jacobian = obj.linearize_model();
         end

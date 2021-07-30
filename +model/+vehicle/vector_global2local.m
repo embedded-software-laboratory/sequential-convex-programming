@@ -10,5 +10,5 @@ function vector_local = vector_global2local(vector_global, yaw)
     %   vector_long
     %   vector_lat
     %   yaw
-    vector_local = [ cos(yaw)/(cos(yaw)^2 + sin(yaw)^2), sin(yaw)/(cos(yaw)^2 + sin(yaw)^2);
-                    -sin(yaw)/(cos(yaw)^2 + sin(yaw)^2), cos(yaw)/(cos(yaw)^2 + sin(yaw)^2)] * vector_global;
+    vector_local = [ cos(yaw), sin(yaw);
+                    -sin(yaw), cos(yaw)] * vector_global;

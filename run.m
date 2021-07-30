@@ -18,7 +18,7 @@ cfg = config.config();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select scneario  by changing the indexnumber %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-scenario_selection = 4;
+scenario_selection = 2;
 
 % Default scenario
 scenarios(1) = config.base_scenario(cfg);
