@@ -73,15 +73,8 @@ try
 
             % save payload (predicted trajectories) for easier access
             ws.vhs{i}.X_controller = ws.vhs{i}.controller_output(end).X_opt;
-            if cfg.scn.vhs{i}.isControlModelLinear && ~cfg.scn.vhs{i}.isSimulationModelLinear
-                ws.vhs{i}.U_controller = ws.vhs{i}.controller_output(end).U_opt;
-                % transform first control input for single-track simulation
-                ws.vhs{i}.u_1 = cfg.scn.vhs{i}.model_simulation.acceleration_controller(...
-                    ws.vhs{i}.x_0, ws.vhs{i}.U_controller(:, 1), ws.vhs{i}.u_1);
-            else
-                ws.vhs{i}.U_controller = ws.vhs{i}.controller_output(end).U_opt;
-                ws.vhs{i}.u_1 = ws.vhs{i}.U_controller(:, 1);
-            end
+            ws.vhs{i}.U_controller = ws.vhs{i}.controller_output(end).U_opt;
+            ws.vhs{i}.u_1 = ws.vhs{i}.U_controller(:, 1);
         end
         
 
