@@ -31,10 +31,15 @@ for i = 1:length(cfg.scn.vhs)
     cfg.scn.vhs{i}.isControlModelLinear = isequal(cfg.scn.vhs{i}.model_controller, @model.vehicle.Linear);
     cfg.scn.vhs{i}.isSimulationModelLinear = isequal(cfg.scn.vhs{i}.model_simulation, @model.vehicle.Linear);
     
-    % Instantiate vehicle models, in partiuclar, the initialization of the
-    % jacobians is crucial for gaining computation speed
+    % Instantiate vehicle models
     cfg.scn.vhs{i}.model_controller = ...
         cfg.scn.vhs{i}.model_controller(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_controller, cfg.scn.vhs{i}.modelParams_controller);
+    % initialization of the jacobians for linearization is crucial for
+    %   gaining computational speed in case of controllers
+    if ~cfg.scn.vhs{i}.isControlModelLinear
+        cfg.scn.vhs{i}.model_controller.precomputeJacobian();
+    end
+    
     cfg.scn.vhs{i}.model_simulation = ...
         cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_simulation, cfg.scn.vhs{i}.modelParams_simulation);
     
