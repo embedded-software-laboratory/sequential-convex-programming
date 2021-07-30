@@ -30,7 +30,7 @@ for i = 1:vh.p.iterations
         % of the track polygon index
         track_polygons = cfg.scn.track_polygons;
         track_polygon_indices = utils.find_closest_track_polygon_index(...
-            X_opt(vh.model.idx_pos, :), cfg.scn.track_polygons, vh.p.Hp);
+            X_opt(vh.model_controller.idx_pos, :), cfg.scn.track_polygons, vh.p.Hp);
     else
         track_polygons = NaN;
         track_polygon_indices = NaN;
@@ -40,7 +40,7 @@ for i = 1:vh.p.iterations
     %   For each point of the projected trajectory, find the index
     %   of the euclidian-distance-closest track checkpoint
     checkpoint_indices = utils.find_closest_track_checkpoint_index(...
-        X_opt(vh.model.idx_pos, :), cfg.scn.track_center, vh.p.Hp);
+        X_opt(vh.model_controller.idx_pos, :), cfg.scn.track_center, vh.p.Hp);
     
     %% Formulate QP
     [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin, ...

@@ -22,8 +22,8 @@ classdef DashboardAcceleration < plot.Base
                 hold on
                 box on
 
-                model_p = cfg.scn.vhs{i_vehicle}.model_p;
-                u_max = max([max(model_p.a_backward_max) max(model_p.a_forward_max) max(model_p.a_lateral_max)]);
+                modelParams_controller = cfg.scn.vhs{i_vehicle}.modelParams_controller;
+                u_max = max([max(modelParams_controller.a_backward_max) max(modelParams_controller.a_forward_max) max(modelParams_controller.a_lateral_max)]);
 
                 a = linspace(0,2*pi,50);
                 c = cos(a);

@@ -4,17 +4,17 @@
 % x = [px,py,vx,vy] (previous state vector)
 
 % Resulting constraint: Ax * [px,py,vx,vy] + Au * [ax,ay] <= b
-function [Au, b] = get_acceleration_ellipses(model_p,p,k,x)
+function [Au, b] = get_acceleration_ellipses(modelParams_controller,p,k,x)
     vx = x(3);
     vy = x(4);
     v_sq = vx^2 + vy^2;
     v = sqrt(v_sq);
     
-    v_idx = model_p.v_idx(v);
-    ay_max = model_p.a_lateral_max(v_idx);
+    v_idx = modelParams_controller.v_idx(v);
+    ay_max = modelParams_controller.a_lateral_max(v_idx);
     
-    ax_max = model_p.a_forward_max(v_idx) .* ones(size(k));
-    ax_max(p.acceleration_cos <= 0) = model_p.a_backward_max(v_idx);
+    ax_max = modelParams_controller.a_forward_max(v_idx) .* ones(size(k));
+    ax_max(p.acceleration_cos <= 0) = modelParams_controller.a_backward_max(v_idx);
     
     % simultaneously converting acceleration from global to vehicle reference frame
     % vectorized from
