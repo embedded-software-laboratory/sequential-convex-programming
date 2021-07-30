@@ -15,10 +15,13 @@ cfg = config.config();
 % Default scenario (not runable)
 scenarios(1) = config.base_scenario(cfg);
 
-% one vehicle only
+% one vehicle only (and endless race)
 scenarios(10) = config.scenario_endless_race(config.scenario_1_vehicle(config.base_scenario(cfg), @config.vehicle_ST_Liniger));
 scenarios(11) = config.scenario_endless_race(config.scenario_1_vehicle(config.base_scenario(cfg), @config.vehicle_lin_Liniger_ST_Liniger));
 scenarios(12) = config.scenario_endless_race(config.scenario_1_vehicle(config.base_scenario(cfg), @config.vehicle_lin_Liniger));
+
+% .. with reduced checkpoints
+scenarios(15) = config.scenario_SL_reduce_checkpoints(config.scenario_endless_race(config.scenario_1_vehicle(config.base_scenario(cfg), @config.vehicle_lin_Liniger)));
 
 % different controller per vehicle
 scenarios(20) = config.scenario_models_comparison_linear(config.base_scenario(cfg));
@@ -35,9 +38,12 @@ scenarios(41) = config.scenario_paper_SL(config.base_scenario(cfg));
 %% Run Selected Scenario
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select scneario  by changing the indexnumber %
+%                                              %
+%                             here  ||         %
+%                                   vv         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if true
-    output_file = sim.run(scenarios(10));
+    output_file = sim.run(scenarios(12));
 else % alternative: run all scenarios from above
     for i = 1:length(scenarios) %#ok<UNRCH>
         scenario = scenarios(i);

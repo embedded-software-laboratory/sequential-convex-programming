@@ -6,7 +6,7 @@ function cfg_vh = vehicle_paper_SL(cfg_vh)
 %   doi: 10.1109/IVS.2018.8500634.)
 
 %% Controller: General Optimization
-cfg_vh.p.iterations = 1;
+cfg_vh.p.SCP_iterations = 1;
 
 cfg_vh.p.Hp = 40; % Number of prediction steps
 cfg_vh.p.dt_controller = 0.15; % Size of prediction step

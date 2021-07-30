@@ -76,6 +76,8 @@ end
 
 %% Track
 [cfg.scn.track, cfg.scn.track_creation_scale] = cfg.scn.track_handle();
+% Reduce checkpoints
+cfg.scn.track = controller.track_SL.reduce_checkpoints(cfg.scn.track, cfg.scn.track_checkpoints_distance_min, cfg.scn.track_creation_scale);
 % Preallocate for speed
 cfg.scn.track_center = [cfg.scn.track.center];
 

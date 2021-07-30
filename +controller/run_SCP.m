@@ -16,11 +16,11 @@ U_opt = vhs{i_vehicle}.U_opt; % Hp stages: last cycle's u(1), u(2), u(3), ..., u
 % Preallocate for speed
 controller_output = struct('X_opt', 'U_opt', 'log_opt',...
     'checkpoint_indices', 'track_polygon_indices', 't_opt');
-controller_output.X_opt(vh.p.iterations) = NaN;
+controller_output.X_opt(vh.p.SCP_iterations) = NaN;
 
 
 %% Optimization Iterations
-for i = 1:vh.p.iterations
+for i = 1:vh.p.SCP_iterations
     timer = tic;
  
     if vh.approximationIsSCR
@@ -75,6 +75,6 @@ end
 
 fprintf('vehicle %i t_opt %6.0fms flag %i iter %3i slack %6.2f fval %6.1f\n',...
     i_vehicle, sum([controller_output.t_opt]) * 1000,...
-    log_solver.exitflag, vh.p.iterations, log_solver.slack,...
+    log_solver.exitflag, vh.p.SCP_iterations, log_solver.slack,...
     log_solver.fval);
 end

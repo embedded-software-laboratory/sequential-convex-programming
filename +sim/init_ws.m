@@ -18,8 +18,8 @@ for i = 1:length(cfg.scn.vhs)
     ws.vhs{i}.u_1 = ws.vhs{i}.U_controller(:, 1);
 
     % lap-specific
-    cp_x_0 = controller.track_SL.find_closest_checkpoint_indices(...
-        ws.vhs{i}.x_0(cfg.scn.vhs{i}.model_controller.idx_pos), cfg.scn.track_center, 1);
+    cp_x_0 = controller.track_SL.find_closest_checkpoint_index(...
+        ws.vhs{i}.x_0(cfg.scn.vhs{i}.model_controller.idx_pos), cfg.scn.track_center);
     ws.vhs{i}.cp_prev = cp_x_0;
     ws.vhs{i}.cp_curr = cp_x_0;
     ws.vhs{i}.lap_count = -1; % start with 0 finished laps (but -1 because vehicles start just short of finish line)

@@ -21,6 +21,11 @@ cfg.scn.track_handle = @model.track.HockenheimShort;
 % TODO SCR only works with hockenheim_simple?
 cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 
+% minimum distance between checkpoints
+%   zero won't change anything at given track
+%   will be scaled arroding to track scale
+cfg.scn.track_checkpoints_distance_min = 0;
+
 %% Vehicles
 % CAVE here you need to add vehicles
 %   ensure that the start position of the vehicles is on the first

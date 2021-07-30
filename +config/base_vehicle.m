@@ -6,12 +6,12 @@ function cfg_vh = base_vehicle(cfg)
 cfg_vh.tempFileSingleTrackAMax = [cfg.tempPath 'singleTrackAMax.mat'];
 
 %% Controller: General Optimization
-cfg_vh.p.iterations = 2;
+cfg_vh.p.SCP_iterations = 1;
 % SL 1, SCR 2, Botz 1
 cfg_vh.p.isBlockingEnabled = false;
 cfg_vh.p.areObstaclesConsidered = false;
 
-cfg_vh.p.Hp = 50; % Number of prediction steps
+cfg_vh.p.Hp = 40; % Number of prediction steps
 % SL 40, SCR 20, Botz 20, Liniger 40
 cfg_vh.p.dt_controller = 0.1; % [s] size of prediction step for controller
 % SL 0.15, SCR 0.5, Botz 0.1, Liniger 0.02
