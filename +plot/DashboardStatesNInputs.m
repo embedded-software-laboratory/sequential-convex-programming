@@ -20,8 +20,8 @@ classdef DashboardStatesNInputs < plot.Base
             % ease variable access
             vh = ws.vhs{i_vh};
             vh_cfg = cfg.scn.vhs{i_vh};
-            model_p = vh_cfg.model_p;
-            bounds_available = isfield(model_p, 'bounds');
+            modelParams_controller = vh_cfg.modelParams_controller;
+            bounds_available = isfield(modelParams_controller, 'bounds');
             colors = utils.getRwthColors(100);
             color = colors(i_vh, :); % need to store color for later plot updates (else Matlab's gc will delete)
             
@@ -63,8 +63,8 @@ classdef DashboardStatesNInputs < plot.Base
                     title('Controller: v_{long} [m/s]')
                 end
                 if bounds_available
-                    ylim(model_p.bounds(:, 3)' .* 1.1)
-                    yline(model_p.bounds(:, 3)', '--r')
+                    ylim(modelParams_controller.bounds(:, 3)' .* 1.1)
+                    yline(modelParams_controller.bounds(:, 3)', '--r')
                 end
                 xlim([Tx(1) Tx(end)])
                 grid on
@@ -77,8 +77,8 @@ classdef DashboardStatesNInputs < plot.Base
                     title('Controller: v_{lateral} [m/s]')
                 end
                 if bounds_available
-                    ylim(model_p.bounds(:, 4)' .* 1.1)
-                    yline(model_p.bounds(:, 4)', '--r')
+                    ylim(modelParams_controller.bounds(:, 4)' .* 1.1)
+                    yline(modelParams_controller.bounds(:, 4)', '--r')
                 end
                 xlim([Tx(1) Tx(end)])
                 grid on
@@ -88,8 +88,8 @@ classdef DashboardStatesNInputs < plot.Base
                     obj.subplot_plot_handles{3} = plot(Tx, X(5,:), 'Color', color);
                     title('Controller: Yaw Angle \phi [rad]')
                     if bounds_available
-                        ylim(model_p.bounds(:, 5)' .* 1.1)
-                        yline(model_p.bounds(:, 5)', '--r')
+                        ylim(modelParams_controller.bounds(:, 5)' .* 1.1)
+                        yline(modelParams_controller.bounds(:, 5)', '--r')
                     end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
@@ -100,8 +100,8 @@ classdef DashboardStatesNInputs < plot.Base
                     obj.subplot_plot_handles{4} = plot(Tx, X(6,:), 'Color', color);
                     title('Controller: Yaw Rate \omega [rad/sec]')
                     if bounds_available
-                        ylim(model_p.bounds(:, 6)' .* 1.1)
-                        yline(model_p.bounds(:, 6)', '--r')
+                        ylim(modelParams_controller.bounds(:, 6)' .* 1.1)
+                        yline(modelParams_controller.bounds(:, 6)', '--r')
                     end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
@@ -117,10 +117,10 @@ classdef DashboardStatesNInputs < plot.Base
                     title('Controller: Input Steering Angle [rad]')
                 end
                 if bounds_available
-                    ylim(model_p.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
+                    ylim(modelParams_controller.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
                     % if bounds are real
-                    if ~any(isinf(model_p.bounds(:, length(X(:, 1)) + 1)'))
-                        yline(model_p.bounds(:, length(X(:, 1)) + 1)', '--r')
+                    if ~any(isinf(modelParams_controller.bounds(:, length(X(:, 1)) + 1)'))
+                        yline(modelParams_controller.bounds(:, length(X(:, 1)) + 1)', '--r')
                     end
                 end
                 xlim([Tu(1) Tu(end)])
@@ -135,10 +135,10 @@ classdef DashboardStatesNInputs < plot.Base
                     title('Controller: Input Torque [% or Nm]')
                 end
                 if bounds_available
-                    ylim(model_p.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
+                    ylim(modelParams_controller.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
                     % if bounds are real
-                    if ~any(isinf(model_p.bounds(:, length(X(:, 1)) + 2)'))
-                        yline(model_p.bounds(:, length(X(:, 1)) + 2)', '--r')
+                    if ~any(isinf(modelParams_controller.bounds(:, length(X(:, 1)) + 2)'))
+                        yline(modelParams_controller.bounds(:, length(X(:, 1)) + 2)', '--r')
                     end
                 end
                 xlim([Tu(1) Tu(end)])
@@ -161,8 +161,8 @@ classdef DashboardStatesNInputs < plot.Base
                     vh = cfg.scn.vhs{i};                
                     obj.add_table_line('', '');
                     obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
-                    obj.add_table_line('Vehicle Control Model', class(vh.model));
-                    obj.add_table_line('Vehicle Control Params', vh.model.p.paramsName);
+                    obj.add_table_line('Vehicle Control Model', class(vh.model_controller));
+                    obj.add_table_line('Vehicle Control Params', vh.model_controller.p.paramsName);
                     if ~cfg.scn.is_main_vehicle_only || i == 1 % only for vehicles !=1 when main vehicle simulation mode
                         obj.add_table_line('Vehicle Sim Model', class(vh.model_simulation));
                         obj.add_table_line('Vehicle Sim Params', vh.model_simulation.p.paramsName);

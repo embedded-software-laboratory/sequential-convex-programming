@@ -9,6 +9,7 @@ clear
 cfg = config.config();
 
 %% Scenarios
+% some preconfigured scenarios are provided in the following
 % just cascade scenario options to your like
 
 % Default scenario (not runable)
@@ -36,7 +37,7 @@ scenarios(41) = config.scenario_paper_SL(config.base_scenario(cfg));
 % select scneario  by changing the indexnumber %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if true
-    output_file = sim.run(scenarios(11));
+    output_file = sim.run(scenarios(10));
 else % alternative: run all scenarios from above
     for i = 1:length(scenarios) %#ok<UNRCH>
         scenario = scenarios(i);

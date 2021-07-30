@@ -40,8 +40,6 @@ classdef Linear < model.vehicle.Base
         end
             
         function dx = ode(obj, x, u)
-            % TODO - is it correct? at least needs matching dt to obj.p.dt
-            % for simulation
             dx = (obj.p.Ad - eye(size(obj.p.Ad))) * x + obj.p.Bd * u;
         end
         

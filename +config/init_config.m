@@ -28,26 +28,31 @@ end
 %% Vehicle Models
 for i = 1:length(cfg.scn.vhs)
     % detect if model is linear
-    cfg.scn.vhs{i}.isControlModelLinear = isequal(cfg.scn.vhs{i}.model, @model.vehicle.Linear);
+    cfg.scn.vhs{i}.isControlModelLinear = isequal(cfg.scn.vhs{i}.model_controller, @model.vehicle.Linear);
     cfg.scn.vhs{i}.isSimulationModelLinear = isequal(cfg.scn.vhs{i}.model_simulation, @model.vehicle.Linear);
     
-    % Instantiate vehicle models, in partiuclar, the initialization of the
-    % jacobians is crucial for gaining computation speed
-    cfg.scn.vhs{i}.model = ...
-        cfg.scn.vhs{i}.model(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_p);
-    cfg.scn.vhs{i}.model_simulation = ...
-        cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt, cfg.scn.vhs{i}.model_simulation_p);
+    % Instantiate vehicle models
+    cfg.scn.vhs{i}.model_controller = ...
+        cfg.scn.vhs{i}.model_controller(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_controller, cfg.scn.vhs{i}.modelParams_controller);
+    % initialization of the jacobians for linearization is crucial for
+    %   gaining computational speed in case of controllers
+    if ~cfg.scn.vhs{i}.isControlModelLinear
+        cfg.scn.vhs{i}.model_controller.precomputeJacobian();
+    end
     
-    if ~isfield(cfg.scn.vhs{i}.model_p, 'bounds')
+    cfg.scn.vhs{i}.model_simulation = ...
+        cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_simulation, cfg.scn.vhs{i}.modelParams_simulation);
+    
+    if ~isfield(cfg.scn.vhs{i}.modelParams_controller, 'bounds')
         warning("Vehicle's %i controller model has no bounds (for linear models it doesn't matter)", i);
     end
-    if ~isfield(cfg.scn.vhs{i}.model_simulation_p, 'bounds')
+    if ~isfield(cfg.scn.vhs{i}.modelParams_simulation, 'bounds')
         warning("Vehicle's %i simulation model has no bounds (for linear models it doesn't matter)", i);
     end
     
-    % expand start states to match simulation model states
-    assert(isequal(size(cfg.scn.vhs{i}.x_start), [4 1]))
-    cfg.scn.vhs{i}.x_start = [cfg.scn.vhs{i}.x_start' zeros(1, cfg.scn.vhs{i}.model_simulation.nx - 4)]';
+    % reduce start states to match simulation model states
+    assert(isequal(size(cfg.scn.vhs{i}.x_start), [6 1]))
+    cfg.scn.vhs{i}.x_start = cfg.scn.vhs{i}.x_start(1:cfg.scn.vhs{i}.model_simulation.nx);
     
     %% Inputs
     % SL Acceleration: pre-compute for speed

@@ -91,44 +91,10 @@ classdef SingleTrack < model.vehicle.BaseOde
             %      Inf  Inf  Inf  Inf  Inf  Inf    Inf   Inf];
         end
     end
-    
-    methods (Access = private)
-        function f = accelerationEquations(obj, delta, torque, dyaw, v_x, v_y, u_1_lin)
-            % Equations copied from method "ode"
-            % all variables in local vehicle reference frame
-            
-            % current desired local acceleration values
-            a_x = u_1_lin(1);
-            a_y = u_1_lin(2);
-
-            %% Tire forces
-            % front/rear tire side slip angle
-            alpha_f = -atan2(dyaw * obj.p.l_f + v_y, v_x) + delta;
-            alpha_r =  atan2(dyaw * obj.p.l_r - v_y, v_x);
-            % front/rear tire lateral force
-            F_fy = obj.p.Df * sin(obj.p.Cf * atan(obj.p.Bf * alpha_f));
-            F_ry = obj.p.Dr * sin(obj.p.Cr * atan(obj.p.Br * alpha_r));
-            % rear tire longitudinal force
-            F_rx = (obj.p.Cm1 - obj.p.Cm2 * v_x) * torque - obj.p.Cr0 - obj.p.Cr2 * v_x^2;
-
-            %%
-            % rearranged to fit form 0 = F(x)
-            f(1) = -a_x + 1/obj.p.m * (F_rx - F_fy * sin(delta) + obj.p.m * v_y * dyaw);
-            f(2) = -a_y + 1/obj.p.m * (F_ry + F_fy * cos(delta) - obj.p.m * v_x * dyaw);
-        end
-    end
-    
-    properties
-        fsolve_options
-    end
 
     methods
         function obj = SingleTrack(Hp, dt, p)
             obj@model.vehicle.BaseOde(6, 2, Hp, dt, p) % call superclass constructor
-            
-            warning('Acceleration controller for linear model is experimental, use with caution')
-            
-            obj.fsolve_options = optimoptions('fsolve','Display','off');
         end
         
         function dX = ode(obj, x, u)
@@ -157,8 +123,8 @@ classdef SingleTrack < model.vehicle.BaseOde
 
             %% Readability
             % States
-            v_x   = x(3);
-            v_y   = x(4);
+            v_long   = x(3);
+            v_lat   = x(4);
             yaw   = x(5);
             dyaw  = x(6);
             % Inputs
@@ -167,68 +133,23 @@ classdef SingleTrack < model.vehicle.BaseOde
 
             %% Tire forces
             % front/rear tire side slip angle
-            alpha_f = -atan2(dyaw * obj.p.l_f + v_y, v_x) + delta;
-            alpha_r =  atan2(dyaw * obj.p.l_r - v_y, v_x);
+            alpha_f = -atan2(dyaw * obj.p.l_f + v_lat, v_long) + delta;
+            alpha_r =  atan2(dyaw * obj.p.l_r - v_lat, v_long);
             % front/rear tire lateral force
             F_fy = obj.p.Df * sin(obj.p.Cf * atan(obj.p.Bf * alpha_f));
             F_ry = obj.p.Dr * sin(obj.p.Cr * atan(obj.p.Br * alpha_r));
             % rear tire longitudinal force
-            F_rx = (obj.p.Cm1 - obj.p.Cm2 * v_x) * t - obj.p.Cr0 - obj.p.Cr2 * v_x^2;
+            F_rx = (obj.p.Cm1 - obj.p.Cm2 * v_long) * t - obj.p.Cr0 - obj.p.Cr2 * v_long^2;
+            
 
             %% ODE
             dX = [
-                v_x * cos(yaw) - v_y * sin(yaw);
-                v_x * sin(yaw) + v_y * cos(yaw);
-                1/obj.p.m * (F_rx - F_fy * sin(delta) + obj.p.m * v_y * dyaw);
-                1/obj.p.m * (F_ry + F_fy * cos(delta) - obj.p.m * v_x * dyaw);
+                v_long * cos(yaw) - v_lat * sin(yaw);
+                v_long * sin(yaw) + v_lat * cos(yaw);
+                1/obj.p.m * (F_rx - F_fy * sin(delta) + obj.p.m * v_lat * dyaw); % a_long
+                1/obj.p.m * (F_ry + F_fy * cos(delta) - obj.p.m * v_long * dyaw); % a_lat
                 dyaw;
                 1/obj.p.Iz * (F_fy * obj.p.l_f * cos(delta) - F_ry * obj.p.l_r)];
         end
-        
-        function u_1_ST = acceleration_controller(obj, x_0, u_1_lin, u_1_ST_prev)
-            % CAVE EXPERIMENTAL
-            % acceleration controller: converting from desired acceleration
-            % to single-track inputs (namely torque and steering angle)
-            %
-            % Inputs
-            %   u_1_lin is controller output (global acceleration values)
-            %   u_1_ST_prev is previous ST output (for this specific
-            %       vehicle with given x_0 and u_1_lin
-
-            %% Parameters
-            v_long = x_0(3);
-            v_lat  = x_0(4);
-            yaw    = x_0(5);
-            dyaw   = x_0(6);
-            
-            % convert global to vehicle reference frame
-            a_local = model.vehicle.vector_global2local(u_1_lin, yaw);
-            
-            % prevent division by zero in ST model
-            if v_long == 0
-               v_long = 5* eps; 
-            end
-
-            % create wrapper for fsolve
-            f = @(x) obj.accelerationEquations(x(1), x(2), dyaw, v_long, v_lat, a_local);
-            
-            [u_1_ST, ~, exitflag] = fsolve(f, u_1_ST_prev, obj.fsolve_options);
-            % TODO possibly use `UseParallel`?
-           
-            % FIXME check input limits (even better: at some central instance)
-            
-            if exitflag <= 0
-                % TODO better avoidance strategy?
-                % FIXME stable avoidance strategy
-                warning('acceleration controller solver failed with exitflag %i, setting u_1_ST conservatively to zeros', exitflag);
-                %u_1_ST = 0 .* u_1_ST;
-                %u_1_ST = u_1_ST_prev;
-                k = 0.6; u_1_ST = (1-k) .* 0.5 .* u_1_ST + k .* u_1_ST_prev;
-            end
-            
-            fprintf('accel_ctrl: (with v_long %.2f, v_lat %.2f, yaw %.2f, dyaw %.2f)\n\t(a_x, a_y) (%.2f, %.2f) -> (a_long, a_lat) (%.2f, %.2f)-> delta %.2f, torque %.2f\n',...
-                v_long, v_lat, yaw, dyaw,...
-                u_1_lin(1), u_1_lin(2), a_local(1), a_local(2), u_1_ST(1), u_1_ST(2));
-         end
     end
 end

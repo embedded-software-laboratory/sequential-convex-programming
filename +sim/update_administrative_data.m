@@ -9,7 +9,7 @@ function ws = update_administrative_data(cfg, ws)
 for i = 1:length(cfg.scn.vhs)
     % update checkpoints
     cp_curr = utils.find_closest_track_checkpoint_index(...
-        ws.vhs{i}.x_0(cfg.scn.vhs{i}.model.idx_pos), cfg.scn.track_center, 1);
+        ws.vhs{i}.x_0(cfg.scn.vhs{i}.model_controller.idx_pos), cfg.scn.track_center, 1);
     ws.vhs{i}.cp_prev = ws.vhs{i}.cp_curr;
     ws.vhs{i}.cp_curr = cp_curr;
 
