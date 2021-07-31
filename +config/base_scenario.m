@@ -16,8 +16,8 @@ cfg.race.n_laps = 1;            % Number of laps to be driven
 cfg.scn.is_main_vehicle_only = false;
 
 %% Track
-% e.g. HockenheimShort, testCircuitE, testCircuitLiniger
-cfg.scn.track_handle = @model.track.HockenheimShort;
+% e.g. HockenheimShort, testCircuitA testOvalB testOvalD, testCircuitLiniger
+cfg.scn.track_handle = @model.track.HockenheimShort; 
 % TODO SCR only works with hockenheim_simple?
 cfg.scn.track_SCR_epsilon_area_tolerance = .05;
 

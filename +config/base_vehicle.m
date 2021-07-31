@@ -23,9 +23,9 @@ cfg_vh.p.dt_simulation = cfg_vh.p.dt_controller/10; % [s] size of simulation ste
 
 cfg_vh.p.S = 1e5; % weight for slack
 % SL 10, SCR 1e5, Botz 1e40, (Liniger 250)
-cfg_vh.p.Q = 1; % weight for maximization of position on track
+cfg_vh.p.Q = 10; % weight for maximization of position on track
 % SL 1, SCR 1, Botz 1, (Liniger 0.1 ... 10)
-cfg_vh.p.R = 0.05; % weight for control changes over time
+cfg_vh.p.R = 10 * diag([10 .1]); % weight for control changes over time
 % SL 0.01, SCR 0.01, Botz 500, (Liniger 0.01 ... 1)
 
 
@@ -35,7 +35,7 @@ cfg_vh.p.n_acceleration_limits = 16;
 
 % Linearization (SL): size of Trust Region for position
 % FIXME scale trust region size with track
-cfg_vh.p.trust_region_size = 0.5;
+cfg_vh.p.trust_region_size = 0.1;
 % SL 50, SCR not required, Botz 0.06
 
 %% Controller: Approximation Method
