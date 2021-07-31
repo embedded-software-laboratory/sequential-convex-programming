@@ -1,11 +1,11 @@
-classdef DashboardStatesNInputs < plot.Base
+classdef Dashboard < plot.Base
     properties
         table_desc
         table_val
     end
     
     methods
-        function obj = DashboardStatesNInputs(figure_handle_number)
+        function obj = Dashboard(figure_handle_number)
             % call superclass constructor
             obj@plot.Base(figure_handle_number)
             
@@ -85,13 +85,18 @@ classdef DashboardStatesNInputs < plot.Base
 
                 if ~vh_cfg.isControlModelLinear
                     subplot(3,3,4);
+                    % plot multiple parallel yaw angles:
+                    %obj.subplot_plot_handles{3} = plot(Tx, [X(5,:); X(5,:) + 2*pi; X(5,:) - 2*pi], 'Color', color);
                     obj.subplot_plot_handles{3} = plot(Tx, X(5,:), 'Color', color);
                     title('Controller: Yaw Angle \phi [rad]')
                     if bounds_available
-                        ylim(modelParams_controller.bounds(:, 5)' .* 1.1)
-                        % if bounds are real
+                        % if bounds of model are real
                         if ~any(isinf(modelParams_controller.bounds(:, 5)'))
+                            ylim(modelParams_controller.bounds(:, 5)' .* 1.1)
                             yline(modelParams_controller.bounds(:, 5)', '--r')
+                        else % use default bounds
+                            bounds = [-pi, pi]; % use periodicity
+                            ylim(bounds .* 1.1)
                         end
                     end
                     xlim([Tx(1) Tx(end)])
@@ -202,7 +207,9 @@ classdef DashboardStatesNInputs < plot.Base
             
             if length(X(:, 1)) >=6 % TODO make state dependent
                 set(obj.subplot_plot_handles{3}, 'XData', Tx);
-                set(obj.subplot_plot_handles{3}, 'YData', X(5,:));
+                % plot multiple parallel yaw angles:
+                %set(obj.subplot_plot_handles{3}, {'YData'}, num2cell([utils.removePiPeriodicity(X(5,:)); utils.removePiPeriodicity(X(5,:)) + 2*pi; utils.removePiPeriodicity(X(5,:)) - 2*pi], 2));
+                set(obj.subplot_plot_handles{3}, 'YData', utils.removePiPeriodicity(X(5,:)));
                 
                 set(obj.subplot_plot_handles{4}, 'XData', Tx);
                 set(obj.subplot_plot_handles{4}, 'YData', X(6,:));
