@@ -32,6 +32,7 @@ end
 
 %% Plot
 f = figure(9746);
+clf(f)
 set(f, 'Name', 'Optimization Time Statistics');
 
 % vehicle (categories)
