@@ -34,9 +34,11 @@ classdef SingleTrack < model.vehicle.BaseOde
             %    p_x  p_y  v_x  v_y  yaw  dyaw   delta d
             %    m    m    m/s  m/s       1/s    rad   %
             % CAVE position bounds are not considered in QP creation
+            % Liniger yaw bound was +-10, but periodicity of yaw makes no
+            %   sense with these bounds -> removed
             p.bounds = ...
-                [-Inf -Inf -.1  -2   -10  -7    -.35  -.1 ;
-                  Inf  Inf  4    2    10   7     .35   1 ];
+                [-Inf -Inf -.1  -2   -Inf -7    -.35  -.1 ;
+                  Inf  Inf  1    2    Inf  7     .35   1 ];
             % CAVE delta not considered in QP creation
             %p.bounds_delta = ...
             %    [-Inf -Inf -Inf -Inf -Inf -Inf   -1   -1  ;
