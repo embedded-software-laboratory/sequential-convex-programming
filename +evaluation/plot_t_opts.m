@@ -31,7 +31,7 @@ for v = 1:length(t_opts)
 end
 
 %% Plot
-f = figure(9746);
+f = figure(1010);
 clf(f)
 set(f, 'Name', 'Optimization Time Statistics');
 

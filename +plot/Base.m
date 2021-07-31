@@ -16,7 +16,7 @@ classdef Base < handle
             
             % set random handle if no is given
             if ~exist('figure_handle_number', 'var')
-                figure_handle_number = 1000 + randi(99);
+                figure_handle_number = 100 + randi(99);
             end
             
             % in case plot is used as tile
