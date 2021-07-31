@@ -304,7 +304,7 @@ elseif vh.approximationIsSCR
     objective_lin(idx_pos(vhP.Hp, :)) = -vhP.Q * track_polygons(track_polygon_indices(vhP.Hp)).forward_direction;
 end
 
-% Minimize control change over time (36)
+% Minimize control change over time
 % create repetetive structure
 for i = 1:vhP.Hp - 1
     objective_quad(idx_u(  i, :), idx_u(  i, :)) = 2 * vhP.R;  
@@ -315,9 +315,10 @@ end
 objective_quad(idx_u(1,:), idx_u(1,:)) = vhP.R;
 objective_quad(idx_u(vhP.Hp, :), idx_u(vhP.Hp, :)) = vhP.R;
 
-% Minimize slack var (parameter q in paper?)
+% Minimize slack var
 objective_lin(idx_slack) = vhP.S;
-%old: objective_quad(idx_slack, idx_slack) = 1e30;
+% alternatively add quadratic slack objective, too
+% `objective_quad(idx_slack, idx_slack)` = vhP.S;
 
 %% Blocking: minimize lateral delta to opponent if blocking is recommended
 if vhP.isBlockingEnabled

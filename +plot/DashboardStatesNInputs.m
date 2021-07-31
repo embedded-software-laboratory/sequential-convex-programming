@@ -89,7 +89,10 @@ classdef DashboardStatesNInputs < plot.Base
                     title('Controller: Yaw Angle \phi [rad]')
                     if bounds_available
                         ylim(modelParams_controller.bounds(:, 5)' .* 1.1)
-                        yline(modelParams_controller.bounds(:, 5)', '--r')
+                        % if bounds are real
+                        if ~any(isinf(modelParams_controller.bounds(:, 5)'))
+                            yline(modelParams_controller.bounds(:, 5)', '--r')
+                        end
                     end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])

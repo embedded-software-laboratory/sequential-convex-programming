@@ -65,7 +65,7 @@ classdef BaseOde < model.vehicle.Base
         
         function [Ad, Bd, Ed] = discretize_linearized_model(obj, x0, u0)
             % Adapt value of velocity in x-dircetion [ x0(3) = dx ] to avoid
-            % NaN-results because system-ode devides by dx
+            % NaN-results because system-ode devides by dX
             if x0(3) == 0
                 x0(3) = eps; % assign smallest possible value in Matlab
             end

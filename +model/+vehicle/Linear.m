@@ -39,8 +39,8 @@ classdef Linear < model.vehicle.Base
             obj@model.vehicle.Base(4, 2, Hp, dt, p) % call superclass constructor
         end
             
-        function dx = ode(obj, x, u)
-            dx = (obj.p.Ad - eye(size(obj.p.Ad))) * x + obj.p.Bd * u;
+        function dX = ode(obj, x, u)
+            dX = (obj.p.Ad - eye(size(obj.p.Ad))) * x + obj.p.Bd * u;
         end
         
         function [Ad, Bd, Ed] = calculatePredictionMatrices(obj, ~, ~)

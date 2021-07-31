@@ -125,13 +125,13 @@ classdef SingleTrack < model.vehicle.BaseOde
 
             %% Readability
             % States
-            v_long   = x(3);
-            v_lat   = x(4);
-            yaw   = x(5);
-            dyaw  = x(6);
+            v_long = x(3);
+            v_lat  = x(4);
+            yaw    = x(5);
+            dyaw   = x(6);
             % Inputs
-            delta = u(1);
-            t     = u(2);
+            delta  = u(1);
+            t      = u(2);
 
             %% Tire forces
             % front/rear tire side slip angle
