@@ -2,7 +2,7 @@
 %
 %% Initial Remarks
 % when running this software the first time, some simulation data needs to
-%   be prepared, don't be confused by the outputs and warnings
+%   be pr epared, don't be confused by the outputs and warnings
 clc
 clear
 % get scenario independent cfg

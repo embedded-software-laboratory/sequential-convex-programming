@@ -1,5 +1,6 @@
 function cfg = scenario_SL_reduce_checkpoints(cfg)
 % reduce number of checkpoints of track discretization
+cfg.scn.description = [cfg.scn.description '\nwith reduced number of checkpoints'];
 
 % will be scaled arroding to track scale
 %   equals 1m on 1:1 scale, ~0.023m on 1:43 scale

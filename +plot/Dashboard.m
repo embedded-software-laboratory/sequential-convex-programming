@@ -159,6 +159,7 @@ classdef Dashboard < plot.Base
                 %% assemble text
                 obj.add_table_line('\bfControl: press ESC to abort, SPACE to pause\rm', '');
                 obj.add_table_line('', '');
+                obj.add_table_line(['\it' sprintf(cfg.scn.description) '\rm'], sprintf(repmat('\n', 1, length(strfind(cfg.scn.description, '\n')))), false);
                 obj.add_table_line('\bfConfiguration\rm', '');
                 % get name of function handle
                 obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
@@ -223,9 +224,9 @@ classdef Dashboard < plot.Base
             set(obj.subplot_plot_handles{6}, 'YData', U(2,:));
         end
         
-        function add_table_line(obj, desc, val)
+        function add_table_line(obj, desc, val, show_colon)
             obj.table_desc{end + 1} = desc;
-            if ~isempty(val)
+            if ~isempty(val) && (nargin > 3 && show_colon)
                 obj.table_desc{end} = [obj.table_desc{end} ':'];
             end
             obj.table_val{end + 1} = val;

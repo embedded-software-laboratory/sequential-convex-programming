@@ -3,6 +3,7 @@ function cfg = scenario_models_comparison_linear(cfg)
 %   single-track (controller & simulation) vs.
 %   linear/single-track (controller/simulation) vs.
 %   linear(controller & simulation)
+cfg.scn.description = [cfg.scn.description '\nwith ST/ST vs lin/ST vs lin/lin controller/simulation'];
 
 
 %% Vehicles

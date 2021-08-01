@@ -1,5 +1,7 @@
 function cfg = scenario_main_vehicle_SL_vs_SCR(cfg)
 % Showcasing SL vs SCR track discretization
+cfg.scn.description = [cfg.scn.description '\nwith comparison of SL vs SCR track discretization controller'];
+
 cfg.scn.is_main_vehicle_only = true;
 
 %% Vehicles

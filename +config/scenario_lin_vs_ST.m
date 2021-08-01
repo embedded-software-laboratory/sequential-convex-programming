@@ -1,5 +1,6 @@
 function cfg = scenario_lin_vs_ST(cfg)
 % Showcasing linear vs. non-linear vehicle model controller
+cfg.scn.description = [cfg.scn.description '\nwith linear vs single-track vehicle model controller'];
 
 %% Vehicles
 vehicle_default = config.base_vehicle(cfg);
