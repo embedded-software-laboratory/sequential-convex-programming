@@ -1,6 +1,7 @@
 function cfg_vh = base_vehicle(cfg)
 % base configuration for any vehicle
 %   contains all possible options
+cfg_vh.description = 'base vehicle';
 
 % required for ST to lin Liniger conversion
 cfg_vh.tempFileSingleTrackAMax = [cfg.tempPath 'singleTrackAMax.mat'];

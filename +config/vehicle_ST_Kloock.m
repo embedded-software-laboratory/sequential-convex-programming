@@ -1,5 +1,6 @@
 function cfg_vh = vehicle_ST_Kloock(cfg_vh)
 % adapts vehicle to Single Track Model Kloock
+cfg_vh.description = [cfg_vh.description '\nwith single-track vehicle model & Kloock params'];
 
 %% Model
 % CAVE: model params should match across controller and simulation model

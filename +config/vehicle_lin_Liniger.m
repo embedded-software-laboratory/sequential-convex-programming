@@ -1,5 +1,6 @@
 function cfg_vh = vehicle_lin_Liniger(cfg_vh)
 % adapts vehicle to linear Liniger model
+cfg_vh.description = [cfg_vh.description '\nwith linear model & params from ST Liniger'];
 
 %% Model
 % CAVE: model params should match across controller and simulation model

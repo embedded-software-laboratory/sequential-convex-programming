@@ -4,6 +4,7 @@ function cfg_vh = vehicle_paper_SL(cfg_vh)
 %   Autonomous Vehicle Racing using Sequential Linearization,” in 2018 IEEE
 %   Intelligent Vehicles Symposium (IV), Changshu, Jun. 2018, pp. 476–483. 
 %   doi: 10.1109/IVS.2018.8500634.)
+cfg_vh.description = [cfg_vh.description '\nreplicating "SL paper" settings (linear models, specific weights & MPC params)'];
 
 %% Controller: General Optimization
 cfg_vh.p.SCP_iterations = 1;
@@ -18,7 +19,7 @@ cfg_vh.p.R = 0.01 * eye(2); % Penalty weight for control changes over time
 
 cfg_vh.approximation = cfg_vh.approximationSL;
 
-vehicle_.x_start = [0 0 .1 0 0 0]';
+cfg_vh.x_start = [0 0 .1 0 0 0]';
 
 %% Contoller: Miscellaneous Modelling
 % Linearization (SL): size of Trust Region for position

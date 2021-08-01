@@ -170,6 +170,7 @@ classdef Dashboard < plot.Base
                     vh = cfg.scn.vhs{i};                
                     obj.add_table_line('', '');
                     obj.add_table_line(['\bfVehicle ' num2str(i) '\rm with \bf\color[rgb]{' sprintf('%f,%f,%f', colors(i, :)) '}color\rm\color{black}'], '');
+                    obj.add_table_line(['\it' sprintf(vh.description) '\rm'], sprintf(repmat('\n', 1, length(strfind(vh.description, '\n')))), false);
                     obj.add_table_line('Vehicle Control Model', class(vh.model_controller));
                     obj.add_table_line('Vehicle Control Params', vh.model_controller.p.paramsName);
                     if ~cfg.scn.is_main_vehicle_only || i == 1 % only for vehicles !=1 when main vehicle simulation mode
