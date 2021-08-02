@@ -43,7 +43,7 @@ scenarios(41) = config.scenario_paper_SL(config.base_scenario(cfg));
 %                                   vv         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if true
-    output_file = sim.run(scenarios(10));
+    output_file = sim.run(scenarios(11));
 else % alternative: run all scenarios from above
     for i = 1:length(scenarios) %#ok<UNRCH>
         scenario = scenarios(i);

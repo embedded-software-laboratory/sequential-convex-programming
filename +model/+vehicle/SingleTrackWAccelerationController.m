@@ -9,8 +9,6 @@ classdef SingleTrackWAccelerationController < model.vehicle.SingleTrack
         phi_error_prev
         
         u_1_ST_prev
-%         
-%         dX_prev
     end
 
     methods
@@ -24,19 +22,9 @@ classdef SingleTrackWAccelerationController < model.vehicle.SingleTrack
             obj.phi_error_prev = 0;
             
             obj.u_1_ST_prev = zeros(1, obj.nu);
-%             
-%             obj.dX_prev = zeros(1, obj.nx);
             
             warning('Acceleration controller for linear model is experimental, use with caution')
         end
-%         
-%         
-%         function dX = ode(obj, x, u)
-%             % wrapper for superclass
-%             dX = ode@model.vehicle.SingleTrack(obj, x, u);
-%             
-%             obj.dX_prev = dX;
-%         end
             
 
         function u_1_ST = controller(obj, x_0, u_1_lin)
