@@ -15,8 +15,13 @@ classdef TrackPolygons < plot.Base
             set(obj.figure_handle, 'Name', sprintf('Track - SCR (scale %s)', utils.rat2str(track_creation_scale)), 'WindowState', 'maximized');
             
             t = tiledlayout(2,2);
-            t.Padding = 'tight';
-            t.TileSpacing = 'tight';
+            if verLessThan('matlab','9.10')
+                t.Padding = 'compact';
+                t.TileSpacing = 'compact';
+            else
+                t.Padding = 'tight';
+                t.TileSpacing = 'tight';
+            end
             
             % 0) original
             ax1 = nexttile;
