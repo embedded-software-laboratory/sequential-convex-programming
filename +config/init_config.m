@@ -82,7 +82,7 @@ cfg.scn.track = controller.track_SL.reduce_checkpoints(cfg.scn.track, cfg.scn.tr
 cfg.scn.track_center = [cfg.scn.track.center];
 
 % plot track, includes prerun of track SCR
-plot.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
+plots.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
 
 % Polygon Creation (for SCR)
 % if any vehicle uses SCR controller

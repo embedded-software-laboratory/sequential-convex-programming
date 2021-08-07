@@ -1,4 +1,4 @@
-classdef DashboardAcceleration < plot.Base
+classdef DashboardAcceleration < plots.Base
     methods
         function plot(obj, cfg, ws)
             i_vehicle = 1;

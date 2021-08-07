@@ -8,7 +8,7 @@ colors = utils.getRwthColors(100);
 %% Plot track
 f = figure(1020);
 clf(f)
-plot.Race(1020).plot_track(cfg.scn.track);
+plots.Race(1020).plot_track(cfg.scn.track);
 hold on
 set(f, 'Name', "Vehicle 1's Velocity on Track");
 

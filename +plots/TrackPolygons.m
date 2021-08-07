@@ -1,10 +1,10 @@
-classdef TrackPolygons < plot.Base
+classdef TrackPolygons < plots.Base
     % plot discretized track's polygon creation process
     %
     % usage example
     % ```
     % [checkpoints, track_creation_scale] = model.track.HockenheimShort()
-    % plot.TrackPolygons().plot(checkpoints, track_creation_scale, 0.5)
+    % plots.TrackPolygons().plot(checkpoints, track_creation_scale, 0.5)
     % ```
     
     methods
@@ -26,7 +26,7 @@ classdef TrackPolygons < plot.Base
             % 0) original
             ax1 = nexttile;
             title(sprintf('0) Original Track - Discretized with %i Checkpoints', length(checkpoints)))
-            plot.TrackCheckpoints(NaN).plot(checkpoints)
+            plots.TrackCheckpoints(NaN).plot(checkpoints)
 
             % 1) tesselation (based on discret track checkpoints)
             ax2 = nexttile;

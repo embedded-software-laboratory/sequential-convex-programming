@@ -1,4 +1,4 @@
-classdef Dashboard < plot.Base
+classdef Dashboard < plots.Base
     properties
         table_desc
         table_val
@@ -7,7 +7,7 @@ classdef Dashboard < plot.Base
     methods
         function obj = Dashboard(figure_handle_number)
             % call superclass constructor
-            obj@plot.Base(figure_handle_number)
+            obj@plots.Base(figure_handle_number)
             
             obj.table_desc = {};
             obj.table_val = {};

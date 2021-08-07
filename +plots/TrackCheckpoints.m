@@ -1,10 +1,10 @@
-classdef TrackCheckpoints < plot.Base
+classdef TrackCheckpoints < plots.Base
     % plot discretized track's checkpoints
     %
     % usage example
     % ```
     % [checkpoints, track_creation_scale] = model.track.HockenheimShort()
-    % plot.TrackCheckpoints().plot(checkpoints, track_creation_scale)
+    % plots.TrackCheckpoints().plot(checkpoints, track_creation_scale)
     % ```
     
     methods

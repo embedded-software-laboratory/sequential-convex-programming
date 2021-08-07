@@ -1,4 +1,4 @@
-classdef Race < plot.Base
+classdef Race < plots.Base
     methods
         function plot(obj, cfg, ws)
             scn = cfg.scn;

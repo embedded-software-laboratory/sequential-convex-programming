@@ -32,11 +32,11 @@ cfg.plot.has_focus_on_vehicle = false;
 
 % fixed plots drawn at initialization
 % CAVE: hard-coded in init, here only for proper figure order
-plot.TrackPolygons(1);
+plots.TrackPolygons(1);
 
 % init loop plots - make sure to give unique figure numbers
 cfg.plot.plots_to_draw = {
-    plot.Race(10)
-    plot.Dashboard(11)
-    plot.DashboardAcceleration(12)};
+    plots.Race(10)
+    plots.Dashboard(11)
+    plots.DashboardAcceleration(12)};
 end
