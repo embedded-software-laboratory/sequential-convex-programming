@@ -18,6 +18,10 @@ function output_file = run(cfg)
 %% Initialization
 timer_overall = tic;
 
+if verLessThan('matlab', '9.10')
+    warning('This is an old MATLAB version. Not all features of the software will work')
+end
+
 % initialization of objects etc.
 cfg = config.init_config(cfg);
 
