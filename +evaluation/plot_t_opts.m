@@ -26,7 +26,13 @@ for v = 1:length(t_opts)
     
     % calc staistics
     stat(v).median = median(t_opt_per_iteration);
-    stat(v).prctile_99 = prctile(t_opt_per_iteration, 99);
+    % if 'Statistics and Machine Learning Toolbox' available
+    if utils.isToolboxAvailable('Statistics and Machine Learning Toolbox')
+        stat(v).prctile_99 = prctile(t_opt_per_iteration, 99);
+    else
+        warning("'Statistics and Machine Learning Toolbox' is not installed, thus not calculating percentile");
+        stat(v).prctile_99 = 0;
+    end
     stat(v).max = max(t_opt_per_iteration);
 end
 
@@ -42,9 +48,17 @@ for v = 1:length(cats)
 end
 cats = categorical(cats);
 
-bar(cats, [[stat.median]' [stat.prctile_99]' [stat.max]']);
-ylabel('Solver Time [s]')
-legend('Median','99th Percentile','Maximum', 'location', 'northwest')
+if verLessThan('matlab', '9.7')
+    warning('MATLAB version too old, not plotting statistics. Instead printed:')
+    disp(cats);
+    disp(stat.median);
+    disp(stat.prctile_99);
+    disp(stat.max);
+else
+    bar(cats, [[stat.median]' [stat.prctile_99]' [stat.max]']);
+    ylabel('Solver Time [s]')
+    legend('Median','99th Percentile','Maximum', 'location', 'northwest')
+end
 
 %% Display vehicle config
 for v = 1:length(cfg.scn.vhs)
