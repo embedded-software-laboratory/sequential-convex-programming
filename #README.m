@@ -1,4 +1,6 @@
-% main file to run: 'run.m'
+% main file to run: 'code/run.m'
+%   add path 'code' to the path, while being in this current folder
+%   there you can choose scenarios or indicually build one
 
 %% Requirements
 % MATLAB 

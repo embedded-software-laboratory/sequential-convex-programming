@@ -10,8 +10,8 @@ warning off backtrace
 cfg.env.cplex.path = 'D:\#local Apps\CPLEX_MATLAB_x64';
 
 % paths
-cfg.outputPath = ['out\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
-cfg.tempPath = 'tmp\';
+cfg.outputPath = ['results\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
+cfg.tempPath = 'results\tmp\';
 % create output & temp dir if non-existing
 if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
 if ~isfolder(cfg.tempPath); mkdir(cfg.tempPath); end
