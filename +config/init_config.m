@@ -25,6 +25,11 @@ else
     cfg.env.cplex.is_available = false;
 end
 
+% if use MATLAB's quadprog, check if toolbox is available
+if ~cfg.env.cplex.is_available && ~utils.isToolboxAvailable('Optimization Toolbox')
+    error("neither CPLEX nor MATLAB's 'Optimization Toolbox' is available - install any of those");
+end
+
 %% Vehicle Models
 for i = 1:length(cfg.scn.vhs)
     % detect if model is linear
