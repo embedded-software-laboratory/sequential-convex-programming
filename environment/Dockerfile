@@ -1,0 +1,5 @@
+# hash:sha256:f622d7353e92f49ac2e11234b75ba3e52d96df0222aa7e2bf36ad6cd44b3be51
+FROM registry.codeocean.com/codeocean/matlab:2019a-ubuntu18.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG MLM_LICENSE_FILE
