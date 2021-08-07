@@ -162,6 +162,14 @@ classdef Dashboard < plots.Base
                 obj.add_table_line(['\it' sprintf(cfg.scn.description) '\rm'], sprintf(repmat('\n', 1, length(strfind(cfg.scn.description, '\n')))), false);
                 obj.add_table_line('\bfConfiguration\rm', '');
                 % get name of function handle
+                % MATLAB version handling doesn't work due to "syntax
+                % error"
+                %if verLessThan('matlab', '9.7')
+                    fcn_information = functions(cfg.scn.track_handle);
+                    obj.add_table_line('Track', fcn_information.function);
+                %else
+                %    obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
+                %end
                 obj.add_table_line('Track Creation Scale', utils.rat2str(cfg.scn.track_creation_scale));
                 
                 
