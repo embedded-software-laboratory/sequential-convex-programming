@@ -56,11 +56,6 @@ else % alternative: run all scenarios from above
     end
 end
 
-%% Evaluation
 % Loding saved file after finished scenario
-disp('Loaded output file of sim, so you can use evaluation scripts')
+disp('Loaded output file of sim, so you can use individual evaluation scripts or replay, if desired')
 load(output_file)
-
-% Run example evaluation scipts
-evaluation.plot_t_opts()
-evaluation.plot_track_with_speed()

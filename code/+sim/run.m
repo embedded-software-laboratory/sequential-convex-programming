@@ -192,6 +192,14 @@ if exist('ME', 'var')
     warning('Error in race loop ocurred, rethrowing:')
     rethrow(ME)
 end
+
+%% Evaluation
+% Run example evaluation scipts
+evaluation.plot_t_opts()
+evaluation.plot_track_with_speed()
+
+% export all currently open figures (especially for CodeOcean)
+utils.exportAllFigures(cfg);
 end
 
 
