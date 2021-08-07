@@ -14,35 +14,63 @@ classdef TrackPolygons < plots.Base
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             set(obj.figure_handle, 'Name', sprintf('Track - SCR (scale %s)', utils.rat2str(track_creation_scale)), 'WindowState', 'maximized');
             
-            t = tiledlayout(2,2);
-            if verLessThan('matlab','9.10')
-                t.Padding = 'compact';
-                t.TileSpacing = 'compact';
+            if verLessThan('matlab', '9.7')
+                warning('Unlinked figures for track generation plots due to old MATLAB version')
             else
-                t.Padding = 'tight';
-                t.TileSpacing = 'tight';
+                t = tiledlayout(2,2);
+                if verLessThan('matlab', '9.10')
+                    t.Padding = 'compact';
+                    t.TileSpacing = 'compact';
+                else
+                    t.Padding = 'tight';
+                    t.TileSpacing = 'tight';
+                end
             end
-            
+
             % 0) original
-            ax1 = nexttile;
+            if verLessThan('matlab', '9.7')
+                figure
+                xlabel('x [m]'); ylabel('y [m]')
+            else
+                ax1 = nexttile;
+            end
             title(sprintf('0) Original Track - Discretized with %i Checkpoints', length(checkpoints)))
             plots.TrackCheckpoints(NaN).plot(checkpoints)
 
             % 1) tesselation (based on discret track checkpoints)
-            ax2 = nexttile;
+            if verLessThan('matlab', '9.7')
+                figure
+                xlabel('x [m]'); ylabel('y [m]')
+            else
+                ax2 = nexttile;
+            end
             track = controller.track_SCR.t1_tesselate(checkpoints);
             plotTrackPolygons_(track, sprintf('1) Tesselation to %i Polygons', length(track.polygons)))
+
             % 2) merge polygons
-            ax3 = nexttile;
+            if verLessThan('matlab', '9.7')
+                figure
+                xlabel('x [m]'); ylabel('y [m]')
+            else
+                ax3 = nexttile;
+            end
             track = controller.track_SCR.t2_merge(track, track_creation_scale, epsilon_area_tolerance);
             plotTrackPolygons_(track, sprintf('2) Merged to %i Polygons', length(track.polygons)))
+
             % 3) add overlaps
-            ax4 = nexttile;
+            if verLessThan('matlab', '9.7')
+                figure
+                xlabel('x [m]'); ylabel('y [m]')
+            else
+                ax4 = nexttile;
+            end
             track = controller.track_SCR.t3_overlap(track, track_creation_scale);
             plotTrackPolygons_(track, sprintf('3) Overlapped %i Polygons', length(track.polygons)))
-            
-            linkaxes([ax1 ax2 ax3 ax4],'xy')
-            xlabel(t, 'x [m]'); ylabel(t, 'y [m]')
+
+            if ~verLessThan('matlab', '9.7')
+                linkaxes([ax1 ax2 ax3 ax4],'xy')
+                xlabel(t, 'x [m]'); ylabel(t, 'y [m]')
+            end
                 
             function plotTrackPolygons_(track, name)
                 title(name)
