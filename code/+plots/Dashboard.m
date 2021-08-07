@@ -26,6 +26,7 @@ classdef Dashboard < plots.Base
             color = colors(i_vh, :); % need to store color for later plot updates (else Matlab's gc will delete)
             
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
+            set(obj.figure_handle, 'WindowState', 'maximized');
             
             %% Prepare data
             X = vh.X_controller;
