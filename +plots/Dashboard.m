@@ -64,7 +64,7 @@ classdef Dashboard < plots.Base
                 end
                 if bounds_available
                     ylim(modelParams_controller.bounds(:, 3)' .* 1.1)
-                    yline(modelParams_controller.bounds(:, 3)', '--r')
+                    utils.yline_compatiblity(modelParams_controller.bounds(:, 3)', '--r')
                 end
                 xlim([Tx(1) Tx(end)])
                 grid on
@@ -78,7 +78,7 @@ classdef Dashboard < plots.Base
                 end
                 if bounds_available
                     ylim(modelParams_controller.bounds(:, 4)' .* 1.1)
-                    yline(modelParams_controller.bounds(:, 4)', '--r')
+                    utils.yline_compatiblity(modelParams_controller.bounds(:, 4)', '--r')
                 end
                 xlim([Tx(1) Tx(end)])
                 grid on
@@ -93,7 +93,7 @@ classdef Dashboard < plots.Base
                         % if bounds of model are real
                         if ~any(isinf(modelParams_controller.bounds(:, 5)'))
                             ylim(modelParams_controller.bounds(:, 5)' .* 1.1)
-                            yline(modelParams_controller.bounds(:, 5)', '--r')
+                            utils.yline_compatiblity(modelParams_controller.bounds(:, 5)', '--r')
                         else % use default bounds
                             bounds = [-pi, pi]; % use periodicity
                             ylim(bounds .* 1.1)
@@ -109,7 +109,7 @@ classdef Dashboard < plots.Base
                     title('Controller: Yaw Rate \omega [rad/sec]')
                     if bounds_available
                         ylim(modelParams_controller.bounds(:, 6)' .* 1.1)
-                        yline(modelParams_controller.bounds(:, 6)', '--r')
+                        utils.yline_compatiblity(modelParams_controller.bounds(:, 6)', '--r')
                     end
                     xlim([Tx(1) Tx(end)])
                     yticks([-3*pi -2*pi -pi 0 pi 2*pi 3*pi])
@@ -128,7 +128,7 @@ classdef Dashboard < plots.Base
                     ylim(modelParams_controller.bounds(:, length(X(:, 1)) + 1)' .* 1.1)
                     % if bounds are real
                     if ~any(isinf(modelParams_controller.bounds(:, length(X(:, 1)) + 1)'))
-                        yline(modelParams_controller.bounds(:, length(X(:, 1)) + 1)', '--r')
+                        utils.yline_compatiblity(modelParams_controller.bounds(:, length(X(:, 1)) + 1)', '--r')
                     end
                 end
                 xlim([Tu(1) Tu(end)])
@@ -146,7 +146,7 @@ classdef Dashboard < plots.Base
                     ylim(modelParams_controller.bounds(:, length(X(:, 1)) + 2)' .* 1.1)
                     % if bounds are real
                     if ~any(isinf(modelParams_controller.bounds(:, length(X(:, 1)) + 2)'))
-                        yline(modelParams_controller.bounds(:, length(X(:, 1)) + 2)', '--r')
+                        utils.yline_compatiblity(modelParams_controller.bounds(:, length(X(:, 1)) + 2)', '--r')
                     end
                 end
                 xlim([Tu(1) Tu(end)])
@@ -162,7 +162,6 @@ classdef Dashboard < plots.Base
                 obj.add_table_line(['\it' sprintf(cfg.scn.description) '\rm'], sprintf(repmat('\n', 1, length(strfind(cfg.scn.description, '\n')))), false);
                 obj.add_table_line('\bfConfiguration\rm', '');
                 % get name of function handle
-                obj.add_table_line('Track', functions(cfg.scn.track_handle).function);
                 obj.add_table_line('Track Creation Scale', utils.rat2str(cfg.scn.track_creation_scale));
                 
                 
@@ -238,7 +237,6 @@ classdef Dashboard < plots.Base
             % shift for matlab 1-indexing
             logical_str = logical_str{logical + 1};
         end
-            
     end
 end
 
