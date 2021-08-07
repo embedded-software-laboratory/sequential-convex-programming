@@ -1,5 +1,14 @@
 % main file to run: 'run.m'
 
+%% Requirements
+% MATLAB 
+%   - Version: recommended R2021a, minimum R2019a
+%   - Symbolic Math Toolbox
+%   - Statistics and Machine Learning Toolbox (required for evaluation only)
+%   - solver:
+%       - recommended IBM ILOG CPLEX Optimization Studio 12.10
+%       - alternatively MATLAB's 'quadprog' via 'Symbolic Math Toolbox'
+
 %% TODOs
 % - also search for 'FIXME' for issues to be fixed
 % - use 'sim scale' to norm all other scales
