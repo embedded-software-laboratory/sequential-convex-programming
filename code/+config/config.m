@@ -6,12 +6,12 @@ warning off backtrace
 
 %% Main Parameters
 % folder of CPLEX' MATLAB connector & all necessary run files
-% typical installation dir: 'C:\Program Files\IBM\ILOG\CPLEX_Studio1210\cplex\matlab\x64_win64';
-cfg.env.cplex.path = 'D:\#local Apps\CPLEX_MATLAB_x64';
+% typical installation dir: 'C:/Program Files/IBM/ILOG/CPLEX_Studio1210/cplex/matlab/x64_win64';
+cfg.env.cplex.path = 'D:/#local Apps/CPLEX_MATLAB_x64';
 
 % paths
-cfg.outputPath = ['results\', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '\'];
-cfg.tempPath = 'results\tmp\';
+cfg.outputPath = ['results/', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '/'];
+cfg.tempPath = 'results/tmp/';
 % create output & temp dir if non-existing
 if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
 if ~isfolder(cfg.tempPath); mkdir(cfg.tempPath); end
