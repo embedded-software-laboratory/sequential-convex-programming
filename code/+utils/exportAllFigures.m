@@ -6,5 +6,6 @@ for i = 1:length(all_figures)
     filename = utils.sanitizeFilename(filename);
     
     % save figure
+    set(all_figures(i).Number, 'PaperOrientation', 'landscape');
     print(['-f' num2str(all_figures(i).Number)], [cfg.outputPath filename], '-dpdf', '-bestfit');
 end
