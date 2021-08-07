@@ -10,6 +10,9 @@
 %   - solver:
 %       - recommended IBM ILOG CPLEX Optimization Studio 12.10
 %       - alternatively MATLAB's 'quadprog' via 'Symbolic Math Toolbox'
+%
+% tested on UNIX (Ubuntu 18.04 64-bit) and Windows 10 64-bit, MATLAB
+% R2021a, R2019b, R2019a
 
 %% TODOs
 % - also search for 'FIXME' for issues to be fixed
