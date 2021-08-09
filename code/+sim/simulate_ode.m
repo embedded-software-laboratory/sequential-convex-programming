@@ -27,8 +27,8 @@ if ~ismethod(veh_cfg.model_simulation, 'controller')
     function_sim = @(t, x_in_sim) veh_cfg.model_simulation.ode(x_in_sim, u_1_for_sim);
     
     % simulate
-    [~, x_sim] = ode45(function_sim, dt_sim, x_0,...
-        odeset('RelTol',1e-8,'AbsTol',1e-8));
+    [~, x_sim] = ode45(function_sim, dt_sim, x_0);%,...
+        %odeset('RelTol',1e-8,'AbsTol',1e-8));
 
     % extract new x_0
     x_0 = x_sim(end,:)';
@@ -43,8 +43,8 @@ else % if model has controller
         %   to debug:
         %       1. call `figure`
         %       2. expand `odeset` with `'Stats','on','OutputFcn',@odeplot`
-        [~, x_sim] = ode45(function_sim, [dt_sim(i - 1) dt_sim(i)], x_0,...
-            odeset('RelTol',1e-4,'AbsTol',1e-4));
+        [~, x_sim] = ode45(function_sim, [dt_sim(i - 1) dt_sim(i)], x_0);%,...
+            %odeset('RelTol',1e-4,'AbsTol',1e-4));
         
         % extract new x_0
         x_0 = x_sim(end,:)';
