@@ -50,7 +50,10 @@ for i = 1:length(parameter_variation)
 end
 
 %% Plot Results
-figure_number = 1001; clf(figure_number); figure(figure_number); hold on
+figure_number = 1001;
+figure(figure_number)
+clf(figure_number)
+hold on
 set(gcf, 'Name', ['Parameter Study: Parameter ' parameter_name ' vs. Lap Time'])
 if isscalar(results(1).parameter) % if scalar
     scatter([results.parameter], [results.lap_time], 'filled')
