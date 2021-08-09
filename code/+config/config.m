@@ -9,9 +9,11 @@ warning off backtrace
 % typical installation dir: 'C:/Program Files/IBM/ILOG/CPLEX_Studio1210/cplex/matlab/x64_win64';
 cfg.env.cplex.path = 'D:/#local Apps/CPLEX_MATLAB_x64';
 
+cfg.startTimeStr = datestr(now, 'yyyy.mm.dd_HH_MM_SS');
+
 % paths (must have trailing slash)
 if usejava('desktop') % if run graphically
-    cfg.outputPath = ['../results/', datestr(now, 'yyyy.mm.dd_HH_MM_SS'), '/'];
+    cfg.outputPath = ['../results/', cfg.startTimeStr, '/'];
     cfg.tempPath = '../results/tmp/';
 else % if on CodeOcean (or headless, in general)
     cfg.outputPath = '../results/';

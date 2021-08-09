@@ -82,7 +82,7 @@ classdef SingleTrack < model.vehicle.BaseOde
             % Bounds (first row upper, second lower bounds)
             %    states                          inputs
             %    p_x  p_y  v_x  v_y  yaw  dyaw   delta d
-            %    m    m    m/s  m/s       1/s    rad   [CAVE] Nm
+            %    m    m    m/s  m/s       1/s    rad   [CAVE] Nm (different model)
             % CAVE position bounds are not considered in QP creation
             p.bounds = ...
                 [-Inf -Inf  .05 -2   -Inf -2*pi  -.4   -.08 ;
