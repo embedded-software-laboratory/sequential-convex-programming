@@ -2,6 +2,11 @@ function cfg_vh = vehicle_lin_Liniger(cfg_vh)
 % adapts vehicle to linear Liniger model
 cfg_vh.description = [cfg_vh.description '\nwith linear model & params from ST Liniger'];
 
+%% from Parameter Study (HockenheimShort, SL)
+cfg_vh.p.Q = 21; % weight for maximization of position on track
+cfg_vh.p.R = diag([5 0.7]); % weight for control changes over time
+cfg_vh.p.trust_region_size = 1.8;
+
 %% Model
 % CAVE: model params should match across controller and simulation model
 cfg_vh.model_controller_handle = @model.vehicle.Linear;

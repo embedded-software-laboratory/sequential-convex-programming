@@ -2,15 +2,15 @@ clc
 clear
 
 %% [CONFIG] Parameter to Change, Vehicle & Scenario
-cfg_default = config.scenario_1_vehicle(config.base_scenario(config.config()), @config.vehicle_ST_Liniger);
-% e.g. Q, trust_region_size
-parameter_name = 'R'; % field in `scenario_default.scn.vhs{1}.p`
+cfg_default = config.scenario_1_vehicle(config.base_scenario(config.config()), @config.vehicle_lin_Liniger);
+% e.g. Q, E, trust_region_size
+parameter_name = 'trust_region_size'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variotion_factors = 21:.5:23;
+parameter_variotion_factors = .6:0.2:2;
 for i = 1:length(parameter_variotion_factors)
-    if true % for arrays
-        parameter_variation(i).parameter = diag([55 parameter_variotion_factors(i)]); %#ok<SAGROW>
+    if false % for arrays
+        parameter_variation(i).parameter = diag([parameter_variotion_factors(i) 0.7]); %#ok<SAGROW>
     else % for scalar
         parameter_variation(i).parameter = parameter_variotion_factors(i); %#ok<UNRCH>
     end
