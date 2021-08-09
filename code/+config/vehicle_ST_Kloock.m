@@ -6,6 +6,6 @@ cfg_vh.description = [cfg_vh.description '\nwith single-track vehicle model & Kl
 % CAVE: model params should match across controller and simulation model
 cfg_vh.model_controller_handle = @model.vehicle.SingleTrack;
 cfg_vh.modelParams_controller = model.vehicle.SingleTrack.getParamsKloockRC_1_43_WithLinigerBounds();
-cfg_vh.model_simulation_handle = cfg_vh.model_controller;
+cfg_vh.model_simulation_handle = cfg_vh.model_controller_handle;
 cfg_vh.modelParams_simulation = model.vehicle.SingleTrack.getParamsKloockRC_1_43_WithLinigerBounds();
 end

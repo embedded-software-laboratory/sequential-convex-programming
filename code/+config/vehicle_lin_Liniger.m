@@ -6,7 +6,7 @@ cfg_vh.description = [cfg_vh.description '\nwith linear model & params from ST L
 % CAVE: model params should match across controller and simulation model
 cfg_vh.model_controller_handle = @model.vehicle.Linear;
 cfg_vh.modelParams_controller = model.vehicle.Linear.getParamsSingleTrackLiniger(cfg_vh.p.dt_controller, cfg_vh.tempFileSingleTrackAMax);
-cfg_vh.model_simulation_handle = cfg_vh.model_controller;
+cfg_vh.model_simulation_handle = cfg_vh.model_controller_handle;
 % CAVE FIXME linear models get simulated differently --> using
 % `dt_controller` instead of `dt_simulation` for now
 cfg_vh.modelParams_simulation = model.vehicle.Linear.getParamsSingleTrackLiniger(cfg_vh.p.dt_controller, cfg_vh.tempFileSingleTrackAMax);
