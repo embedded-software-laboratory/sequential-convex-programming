@@ -27,8 +27,8 @@ cfg_vh.p.trust_region_size = 50; % from Janis, 1:1 scale
 
 %% Model
 % CAVE: model params should match across controller and simulation model
-cfg_vh.model_controller = @model.vehicle.Linear;
+cfg_vh.model_controller_handle = @model.vehicle.Linear;
 cfg_vh.modelParams_controller = model.vehicle.Linear.getParamsF1CarMaker(cfg_vh.p.dt_controller);
-cfg_vh.model_simulation = cfg_vh.model_controller;
+cfg_vh.model_simulation_handle = cfg_vh.model_controller;
 cfg_vh.modelParams_simulation = cfg_vh.modelParams_controller;
 end

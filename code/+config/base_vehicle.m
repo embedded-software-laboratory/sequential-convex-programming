@@ -48,9 +48,9 @@ cfg_vh.approximation = cfg_vh.approximationSL; % 'approximationSL' or 'approxima
  
 %% Model
 % CAVE: model params should match across controller and simulation model
-cfg_vh.model_controller = @model.vehicle.Linear;
+cfg_vh.model_controller_handle = @model.vehicle.Linear;
 cfg_vh.modelParams_controller = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
-cfg_vh.model_simulation = cfg_vh.model_controller;
+cfg_vh.model_simulation_handle = cfg_vh.model_controller;
 cfg_vh.modelParams_simulation = model.vehicle.SingleTrack.getParamsLinigerRC_1_43_WithLinigerBounds();
 
 %% Geometric

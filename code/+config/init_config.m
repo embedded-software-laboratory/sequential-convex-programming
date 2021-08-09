@@ -33,12 +33,12 @@ end
 %% Vehicle Models
 for i = 1:length(cfg.scn.vhs)
     % detect if model is linear
-    cfg.scn.vhs{i}.isControlModelLinear = isequal(cfg.scn.vhs{i}.model_controller, @model.vehicle.Linear);
-    cfg.scn.vhs{i}.isSimulationModelLinear = isequal(cfg.scn.vhs{i}.model_simulation, @model.vehicle.Linear);
+    cfg.scn.vhs{i}.isControlModelLinear = isequal(cfg.scn.vhs{i}.model_controller_handle, @model.vehicle.Linear);
+    cfg.scn.vhs{i}.isSimulationModelLinear = isequal(cfg.scn.vhs{i}.model_simulation_handle, @model.vehicle.Linear);
     
     % Instantiate vehicle models
     cfg.scn.vhs{i}.model_controller = ...
-        cfg.scn.vhs{i}.model_controller(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_controller, cfg.scn.vhs{i}.modelParams_controller);
+        cfg.scn.vhs{i}.model_controller_handle(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_controller, cfg.scn.vhs{i}.modelParams_controller);
     % initialization of the jacobians for linearization is crucial for
     %   gaining computational speed in case of controllers
     if ~cfg.scn.vhs{i}.isControlModelLinear
@@ -46,7 +46,7 @@ for i = 1:length(cfg.scn.vhs)
     end
     
     cfg.scn.vhs{i}.model_simulation = ...
-        cfg.scn.vhs{i}.model_simulation(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_simulation, cfg.scn.vhs{i}.modelParams_simulation);
+        cfg.scn.vhs{i}.model_simulation_handle(cfg.scn.vhs{i}.p.Hp, cfg.scn.vhs{i}.p.dt_simulation, cfg.scn.vhs{i}.modelParams_simulation);
     
     if ~isfield(cfg.scn.vhs{i}.modelParams_controller, 'bounds')
         warning("Vehicle's %i controller model has no bounds (for linear models it doesn't matter)", i);
