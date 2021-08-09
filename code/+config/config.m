@@ -14,14 +14,14 @@ cfg.startTimeStr = datestr(now, 'yyyy.mm.dd_HH_MM_SS');
 % paths (must have trailing slash)
 if usejava('desktop') % if run graphically
     cfg.outputPath = ['../results/', cfg.startTimeStr, '/'];
-    cfg.tempPath = '../results/tmp/';
+    cfg.dataPath = '../data/';
 else % if on CodeOcean (or headless, in general)
     cfg.outputPath = '../results/';
-    cfg.tempPath = '../results/';
+    cfg.dataPath = '../data/';
 end
 % create output & temp dir if non-existing
 if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
-if ~isfolder(cfg.tempPath); mkdir(cfg.tempPath); end
+if ~isfolder(cfg.dataPath); mkdir(cfg.dataPath); end
 
 %% Logging
 cfg.log.DEBUG   = 4;

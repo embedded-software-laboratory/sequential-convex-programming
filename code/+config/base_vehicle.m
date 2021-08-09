@@ -4,7 +4,7 @@ function cfg_vh = base_vehicle(cfg)
 cfg_vh.description = 'base vehicle';
 
 % required for ST to lin Liniger conversion
-cfg_vh.tempFileSingleTrackAMax = [cfg.tempPath 'singleTrackAMax.mat'];
+cfg_vh.dataFileSingleTrackAMax = [cfg.dataPath 'singleTrackAMax.mat'];
 
 %% Controller: General Optimization
 cfg_vh.p.SCP_iterations = 1;
