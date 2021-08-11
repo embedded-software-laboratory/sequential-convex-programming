@@ -6,13 +6,13 @@ cfg_default = config.scenario_1_vehicle(...
     config.base_scenario(config.config()),...
     @config.vehicle_ST_Liniger);
 % choose SCR
-% cfg_default.scn.vhs{1}.approximation = 20;
+cfg_default.scn.vhs{1}.approximation = 20;
 
 % e.g. Q R, trust_region_size
 parameter_name = 'Q'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variation_factors = 1.9;
+parameter_variation_factors = 1;
 for i = 1:length(parameter_variation_factors)
     if strcmp(parameter_name, 'R') % for arrays
         % first tune whole R

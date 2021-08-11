@@ -21,8 +21,8 @@ for i = 1:length(cfg.scn.vhs)
         (ws.vhs{i}.cp_curr < 0.1 * length(cfg.scn.track)) % now is in first 10% of lap
         % advance lap counter
         ws.vhs{i}.lap_count = ws.vhs{i}.lap_count + 1;
-        % using warning just to stand out
-        warning('########## Vehicle %i has finished lap %i ##########', i, ws.vhs{i}.lap_count)
+        % printing in red
+        fprintf(2, '########## Vehicle %i has finished lap %i ##########\n', i, ws.vhs{i}.lap_count)
     end
 end
 
