@@ -26,9 +26,9 @@ for i = 1:vh.p.SCP_iterations
     if vh.approximationIsSCR
         % For each point of the projected trajectory, find the index
         % of the track polygon index
-        track_polygons = cfg.scn.track_polygons;
-        track_polygon_indices = controller.track_SCR.find_closest_polygon_indices(...
-            X_opt(vh.model_controller.idx_pos, :), cfg.scn.track_polygons, vh.p.Hp);
+        track_polygons = cfg.scn.track_SCR.polygons;
+        track_polygon_indices = controller.track_SCR.find_closest_and_most_forward_polygon_indices(...
+            X_opt(vh.model_controller.idx_pos, :), cfg.scn.track_SCR.polygons, vh.p.Hp);
     else
         track_polygons = NaN;
         track_polygon_indices = NaN;
