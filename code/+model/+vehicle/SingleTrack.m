@@ -38,7 +38,7 @@ classdef SingleTrack < model.vehicle.BaseOde
             %   sense with these bounds -> removed
             p.bounds = ...
                 [-Inf -Inf -.1  -2   -Inf -7    -.35  -.1 ;
-                  Inf  Inf  1    2    Inf  7     .35   1 ];
+                  Inf  Inf  4    2    Inf  7     .35   1 ];
             % CAVE delta not considered in QP creation
             %p.bounds_delta = ...
             %    [-Inf -Inf -Inf -Inf -Inf -Inf   -1   -1  ;
