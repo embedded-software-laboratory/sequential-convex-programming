@@ -93,7 +93,7 @@ plots.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vhs)
     if cfg.scn.vhs{i}.approximationIsSCR
-        cfg.scn.track_polygons = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance).polygons;
+        cfg.scn.track_SCR = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
         break
     end
 end

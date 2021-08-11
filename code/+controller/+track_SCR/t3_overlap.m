@@ -79,4 +79,3 @@ for i1 = 1:length(track.polygons)
     track_new.polygons(i1).vertex_indices = indices;
     [track_new.polygons(i1).A, track_new.polygons(i1).b] = utils.vert2con(vertices_union);        
 end
-end
