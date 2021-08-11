@@ -56,8 +56,8 @@ if verLessThan('matlab', '9.7')
     disp(stat.prctile_99);
     disp(stat.max);
 else
-    bar(cats, [[stat.median]' [stat.prctile_99]' [stat.max]']);
-    ylabel('Solver Time [s]')
+    bar(cats, 1000 .* [[stat.median]' [stat.prctile_99]' [stat.max]']);
+    ylabel('Solver Time [ms]')
     legend('Median','99th Percentile','Maximum', 'location', 'northwest')
 end
 

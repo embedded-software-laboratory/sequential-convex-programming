@@ -20,7 +20,7 @@ cfg.scn.is_main_vehicle_only = false;
 % e.g. HockenheimShort, testCircuitA testOvalB testOvalD, testCircuitLiniger
 cfg.scn.track_handle = @model.track.HockenheimShort; 
 % TODO SCR only works with hockenheim_simple?
-cfg.scn.track_SCR_epsilon_area_tolerance = .05;
+cfg.scn.track_SCR_epsilon_area_tolerance = .05; % [m^2], on a 1:1 scale. will be scaled according to track creation scale
 
 % minimum distance between checkpoints
 %   zero won't change anything at given track

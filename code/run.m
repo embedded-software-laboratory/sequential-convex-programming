@@ -30,7 +30,13 @@ scenarios(18) = config.scenario_SL_reduce_checkpoints(scenarios(15));
 
 % different controller per vehicle
 scenarios(20) = config.scenario_models_comparison_linear(scenarios(1));
-scenarios(21) = config.scenario_endless_race(config.scenario_lin_vs_ST(scenarios(1)));
+scenarios(21) = config.scenario_lin_vs_ST(scenarios(1));
+scenarios(22) = config.scenario_SL_vs_SCR(scenarios(1));
+
+% as endless race
+scenarios(25) = config.scenario_endless_race(scenarios(20));
+scenarios(26) = config.scenario_endless_race(scenarios(21));
+scenarios(27) = config.scenario_endless_race(scenarios(22));
 
 % only one main vehicle, of which state various controllers are calculated
 %   and displayed overlayed
@@ -38,7 +44,7 @@ scenarios(30) = config.scenario_main_vehicle_lin_vs_ST(scenarios(1));
 scenarios(31) = config.scenario_main_vehicle_SL_vs_SCR(scenarios(1));
 
 % previous paper comparion
-scenarios(41) = config.scenario_paper_SL(scenarios(1));
+scenarios(41) = config.scenario_paper_SL(scenarios(10));
 
 %% Run Selected Scenario
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

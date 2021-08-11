@@ -3,6 +3,8 @@
 %   1. load a "log.mat" from the output directory into workspace
 %   2. run script
 
+% recreate figure handles
+cfg.plot.plots_to_draw = config.config().plot.plots_to_draw;
 % re-init config (so that objects & figure handles are present again)
 cfg = config.init_config(cfg);
 

@@ -1,6 +1,6 @@
 function cfg = scenario_main_vehicle_lin_vs_ST(cfg)
 % Showcasing linear vs. non-linear vehicle model controller overlayed
-cfg.scn.description = [cfg.scn.description '\nwith comparison of lin vs ST model controller'];
+cfg.scn.description = [cfg.scn.description '\nwith comparison of lin vs ST model controller (executed on one vehicle)'];
 
 cfg.scn.is_main_vehicle_only = true;
 

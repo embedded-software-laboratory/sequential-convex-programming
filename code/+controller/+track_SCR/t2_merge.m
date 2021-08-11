@@ -1,4 +1,4 @@
-function track = t2_merge(track, track_scale, epsilon_area_tolerance)
+function [track, epsilon_area_tolerance_scaled] = t2_merge(track, track_scale, epsilon_area_tolerance)
 % merge polygons to convex regions
 %
 % Inputs
@@ -21,7 +21,8 @@ for i = length(track.polygons):-1:2
     [indices_hull, area_merged] = convhull(track.vertices(:, idx_union)', 'simplify', true);
 
     % merge polygons if their union is (almost) convex (almost same area)
-    if area_merged - (area_1 + area_2) <= epsilon_area_tolerance * (track_scale^2)
+    epsilon_area_tolerance_scaled = epsilon_area_tolerance * (track_scale^2);
+    if area_merged - (area_1 + area_2) <= epsilon_area_tolerance_scaled
         % delete polygon 1
         track.polygons(i) = [];
         % replace polygon 2 with union (first and last entry of hull is duplicated)
