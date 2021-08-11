@@ -5,7 +5,10 @@ cfg_vh.description = [cfg_vh.description '\nwith single-track vehicle model & Li
 %% from Parameter Study (HockenheimShort, SL)
 cfg_vh.p.Q = 17; % weight for maximization of position on track
 cfg_vh.p.R = diag([55 9]); % weight for control changes over time
-cfg_vh.p.trust_region_size = 0.11;
+cfg_vh.p.trust_region_size = 0.11; % SL only
+% %% from Parameter Study (HockenheimShort, SCR)
+% cfg_vh.p.Q = 1; %0.9; % weight for maximization of position on track
+% cfg_vh.p.R = diag([90 90]); % weight for control changes over time
 
 %% Model
 % CAVE: model params should match across controller and simulation model

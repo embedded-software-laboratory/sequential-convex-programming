@@ -2,17 +2,21 @@ clc
 clear
 
 %% [CONFIG] Parameter to Change, Vehicle & Scenario
-cfg_default = config.scenario_1_vehicle(config.base_scenario(config.config()), @config.vehicle_lin_Liniger);
+cfg_default = config.scenario_1_vehicle(...
+    config.base_scenario(config.config()),...
+    @config.vehicle_ST_Liniger);
+cfg_default.scn.vhs{1}.approximation = 20; % choose SCR
 % e.g. Q, E, trust_region_size
-parameter_name = 'trust_region_size'; % field in `scenario_default.scn.vhs{1}.p`
+parameter_name = 'Q'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variotion_factors = .6:0.2:2;
+parameter_variotion_factors = 0.7:0.05:1.2;
 for i = 1:length(parameter_variotion_factors)
-    if false % for arrays
-        parameter_variation(i).parameter = diag([parameter_variotion_factors(i) 0.7]); %#ok<SAGROW>
+    if strcmp(parameter_name, 'R') % for arrays
+        parameter_variation(i).parameter = diag([90 parameter_variotion_factors(i)]); %#ok<SAGROW>
+%         parameter_variation(i).parameter = parameter_variotion_factors(i) .* diag([1 1]); %#ok<SAGROW>
     else % for scalar
-        parameter_variation(i).parameter = parameter_variotion_factors(i); %#ok<UNRCH>
+        parameter_variation(i).parameter = parameter_variotion_factors(i); %#ok<SAGROW>
     end
 end
 
