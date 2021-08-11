@@ -5,7 +5,7 @@ cfg_vh.description = [cfg_vh.description '\nwith linear model & params from ST L
 %% from Parameter Study (HockenheimShort, SL)
 cfg_vh.p.Q = 21; % weight for maximization of position on track
 cfg_vh.p.R = diag([5 0.7]); % weight for control changes over time
-cfg_vh.p.trust_region_size = 1.8;
+cfg_vh.p.trust_region_size = 1.8; % [m] adds/subtracts to position (SL only)
 %% from Parameter Study (HockenheimShort, SCR)
 cfg_vh.p.Q = 1; % weight for maximization of position on track
 cfg_vh.p.R = diag([0.1 0.1]); % weight for control changes over time

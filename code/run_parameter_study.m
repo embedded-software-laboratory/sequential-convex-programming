@@ -5,18 +5,22 @@ clear
 cfg_default = config.scenario_1_vehicle(...
     config.base_scenario(config.config()),...
     @config.vehicle_ST_Liniger);
-cfg_default.scn.vhs{1}.approximation = 20; % choose SCR
-% e.g. Q, E, trust_region_size
+% choose SCR
+% cfg_default.scn.vhs{1}.approximation = 20;
+
+% e.g. Q R, trust_region_size
 parameter_name = 'Q'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variotion_factors = 0.7:0.05:1.2;
-for i = 1:length(parameter_variotion_factors)
+parameter_variation_factors = 1.9;
+for i = 1:length(parameter_variation_factors)
     if strcmp(parameter_name, 'R') % for arrays
-        parameter_variation(i).parameter = diag([90 parameter_variotion_factors(i)]); %#ok<SAGROW>
+        % first tune whole R
 %         parameter_variation(i).parameter = parameter_variotion_factors(i) .* diag([1 1]); %#ok<SAGROW>
+        % then tune individual entries
+        parameter_variation(i).parameter = diag([30 parameter_variation_factors(i)]); %#ok<SAGROW>
     else % for scalar
-        parameter_variation(i).parameter = parameter_variotion_factors(i); %#ok<SAGROW>
+        parameter_variation(i).parameter = parameter_variation_factors(i); %#ok<SAGROW>
     end
 end
 
@@ -40,6 +44,7 @@ for i = 1:length(parameter_variation)
         %% store current lap time for parameter
         % load results of current simulation
         sim_result = load(output_file) %#ok<NOPTS>
+        fprintf('Current parameter iteration %i with parameter %.2f\n', i, parameter_variation(i).parameter)
 
         % calculate lap_time (depending on x_start and track's finish line):
         %   actually 1 lap + a fraction of a lap

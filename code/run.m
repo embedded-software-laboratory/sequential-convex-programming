@@ -15,7 +15,12 @@ cfg = config.config();
 % Default scenario (not runable)
 scenarios(1) = config.base_scenario(cfg);
 
-% one vehicle only (and endless race)
+% one vehicle only (SCR)
+scenarios(5) = config.scenario_1_vehicle(scenarios(1), @(cfg_veh) config.vehicle_SCR(config.vehicle_ST_Liniger(cfg_veh)));
+scenarios(6) = config.scenario_1_vehicle(scenarios(1), @(cfg_veh) config.vehicle_SCR(config.vehicle_lin_Liniger_ST_Liniger(cfg_veh)));
+scenarios(7) = config.scenario_1_vehicle(scenarios(1), @(cfg_veh) config.vehicle_SCR(config.vehicle_lin_Liniger(cfg_veh)));
+
+% one vehicle only
 scenarios(10) = config.scenario_1_vehicle(scenarios(1), @config.vehicle_ST_Liniger);
 scenarios(11) = config.scenario_1_vehicle(scenarios(1), @config.vehicle_lin_Liniger_ST_Liniger);
 scenarios(12) = config.scenario_1_vehicle(scenarios(1), @config.vehicle_lin_Liniger);
@@ -54,7 +59,7 @@ scenarios(41) = config.scenario_paper_SL(scenarios(10));
 %                                   vv         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if true
-    output_file = sim.run(scenarios(10));
+    output_file = sim.run(scenarios(5));
 else % alternative: run all scenarios from above
     for i = 1:length(scenarios) %#ok<UNRCH>
         scenario = scenarios(i);

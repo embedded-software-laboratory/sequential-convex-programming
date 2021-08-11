@@ -36,7 +36,8 @@ cfg_vh.p.n_acceleration_limits = 16;
 
 % Linearization (SL): size of Trust Region for position
 % FIXME scale trust region size with track
-cfg_vh.p.trust_region_size = 0.1; % large trust region sizes yields more numerical issues or errors
+cfg_vh.p.trust_region_size = 0.1;  % [m] adds/subtracts to position (SL only)
+% large trust region sizes yields more numerical issues or errors
 % SL 50, SCR not required, Botz 0.06
 
 %% Controller: Approximation Method
