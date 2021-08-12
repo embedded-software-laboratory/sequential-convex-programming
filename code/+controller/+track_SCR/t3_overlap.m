@@ -1,6 +1,9 @@
-function track_new = t3_overlap(track, track_scale)
+function track_new = t3_overlap(track, track_scale, direction_is_forward, track_overlapped)
 % Inputs
 % track
+% track_overlapped: in case one direction was run already, contains
+%           overlapped track for merging of forward and backward overlaps.
+%           if first run, should equal arg `track`
 % track_scale [m]
 
 % convert to constraints
@@ -12,7 +15,7 @@ track_new = struct;
 track_new.vertices = nan(2,0);
 
 
-debug_ = true;
+debug_ = false;
 if debug_
     figure(997)
     clf
@@ -36,11 +39,17 @@ for i_p = 1:length(track.polygons)
     
     %% initial: get enlarged current polygon
     p = vert2poly(get_track_polygon_vertices(i_p, track));
-    p_enlarged = vert2poly(enlarge_polygon_into_forward_direction(i_p, track, track_scale));
-    if debug_; plot(p); plot(p_enlarged); end
+    if debug_; plot(p); end
+    p_enlarged = vert2poly(enlarge_polygon_into_forward_direction(i_p, track, track_scale, direction_is_forward, debug_));
+    if debug_; plot(p_enlarged); end
     
     %% repeat as long as forward neighbours lay in current polygon's enlarged region
-    i_f = utils.mod1(i_p + 1, length(track.polygons));
+    
+    if direction_is_forward
+        i_f = utils.mod1(i_p + 1, length(track.polygons));
+    else
+        i_f = utils.mod1(i_p - 1, length(track.polygons));
+    end
     while true
         if debug_
             figure(997)
@@ -58,7 +67,7 @@ for i_p = 1:length(track.polygons)
         %% if next forward neighbour overlaps enlarged current polygon
         if p_enlarged.overlaps(p_next_neighbour)
             %% enlarge next forward neighbour
-            p_next_neighbour_enlarged = vert2poly(enlarge_polygon_into_forward_direction(i_f, track, track_scale));
+            p_next_neighbour_enlarged = vert2poly(enlarge_polygon_into_forward_direction(i_f, track, track_scale, direction_is_forward, debug_));
             if debug_; plot(p_next_neighbour_enlarged); end
             
             %% get overlap between current enlarged polygon and enlarged
@@ -98,19 +107,32 @@ for i_p = 1:length(track.polygons)
                     % laying inside
                     p_enlarged_retain = p_enlarged_divided_by_neighbour_overlap;
                 else
-                    assert(p_enlarged_divided_by_neighbour_overlap.NumRegions == 2, 'Numerical issues? Please investigate!')
+                    % case 3 regions can happen soldomly, if neighbour
+                    % restricts track like a triangle but has same normal
+                    % as the current polygon
+                    %   --> especially at joint point (when track circle is
+                    %   close) when running in backward direction
+                    %
+                    % integrated special exclusion (so that we assert as
+                    % tight as possible, detecting possible errors as early
+                    % as possible)
+                    if p_enlarged_divided_by_neighbour_overlap.NumRegions == 3 && i_p == 1 && i_f == length(track.polygons)
+                        warning('Ignoring set division issue at track joint (where circle is closed). Caused by slight misalignments from track creation')
+                    else
+                        assert(p_enlarged_divided_by_neighbour_overlap.NumRegions == 2, 'Numerical issues? Please investigate!')
+                    end
     %             end
 
 
-                %% check which polygon is part of original polygon (= overlaps)
-                %   should be the first polygon due to track definition
-                tf_p_part_of_original = overlaps([p; p_enlarged_divided_by_neighbour_overlap.regions]);
+                    %% check which polygon is part of original polygon (= overlaps)
+                    %   should be the first polygon due to track definition
+                    tf_p_part_of_original = overlaps([p; p_enlarged_divided_by_neighbour_overlap.regions]);
 
-                %% choose original overlapping polygon
-                %   we want: polygon 2 and 3 (columns) relation to first polygon (row)
-                p_divided_selection_index = tf_p_part_of_original(1, 2:3);
-                temp = p_enlarged_divided_by_neighbour_overlap.regions;
-                p_enlarged_retain = temp(p_divided_selection_index);
+                    %% choose original overlapping polygon
+                    %   we want: polygon 2 and 3 (columns) relation to first polygon (row)
+                    p_divided_selection_index = tf_p_part_of_original(1, 2:3);
+                    temp = p_enlarged_divided_by_neighbour_overlap.regions;
+                    p_enlarged_retain = temp(p_divided_selection_index);
                 end
             if debug_; plot(p_enlarged_retain); end
             
@@ -142,19 +164,57 @@ for i_p = 1:length(track.polygons)
         end
         
         % for-loop: forward index
-        i_f = utils.mod1(i_f + 1, length(track.polygons));
+        
+        if direction_is_forward
+            i_f = utils.mod1(i_f + 1, length(track.polygons));
+        else
+            i_f = utils.mod1(i_f - 1, length(track.polygons));
+        end
     end
     if debug_; plot(p_enlarged, 'EdgeColor', 'r'); end
     %if debug_; drawnow; pause(0.2); end
     
     %% save output
+    track_new.polygons(i_p).vertex_indices = length(track_new.vertices) + (1:length(poly2vert(p_enlarged)));
     track_new.vertices = [track_new.vertices  poly2vert(p_enlarged)];
-    %track_new.polygons(i1).vertex_indices = indices;
     [track_new.polygons(i_p).A, track_new.polygons(i_p).b] = utils.vert2con(poly2vert(p_enlarged)');   
+end
+
+%% merge forward and backward overlap, if previous overlaps given
+if exist('track_overlapped', 'var')
+    track_merged_overlaps = struct;
+    track_merged_overlaps.vertices = nan(2,0);
+    
+    for i_p = 1:length(track.polygons)
+        if debug_
+            figure(997)
+            clf
+            hold on
+            axis equal
+            xlim([-5 10])
+            ylim([-10 5])
+        end
+        
+        % get overlaps in both directions
+        p_overlap_prev = vert2poly(get_track_polygon_vertices(i_p, track_overlapped));
+        p_overlap_curr = vert2poly(get_track_polygon_vertices(i_p, track_new));
+        if debug_; plot(p_overlap_prev); plot(p_overlap_curr); end
+        
+        % merge overlaps
+        p_overlap = p_overlap_prev.union(p_overlap_curr);
+        if debug_; plot(p_overlap, 'EdgeColor', 'r'); end
+        
+        %% save output
+        track_merged_overlaps.polygons(i_p).vertex_indices = length(track_merged_overlaps.vertices) + (1:length(poly2vert(p_overlap)));
+        track_merged_overlaps.vertices = [track_merged_overlaps.vertices  poly2vert(p_overlap)];
+        [track_merged_overlaps.polygons(i_p).A, track_merged_overlaps.polygons(i_p).b] = utils.vert2con(poly2vert(p_overlap)');   
+    end
+    
+    track_new = track_merged_overlaps;
 end
 end
 
-function p_enlarged = enlarge_polygon_into_forward_direction(i_p, track, track_scale)
+function p_enlarged = enlarge_polygon_into_forward_direction(i_p, track, track_scale, direction_is_forward, debug_)
     % enlarge polygon into direction of shared edge with forward neighbour
     %
     % Inputs
@@ -162,13 +222,18 @@ function p_enlarged = enlarge_polygon_into_forward_direction(i_p, track, track_s
     n_vertices_p = length(track.polygons(i_p).vertex_indices);
     
     % shared vertices with forward neighbour
-    i_f = utils.mod1(i_p + 1, length(track.polygons)); % next forward polygon
+    if direction_is_forward
+        i_f = utils.mod1(i_p + 1, length(track.polygons)); % next forward polygon
+    else
+        i_f = utils.mod1(i_p - 1, length(track.polygons)); % next forward polygon
+    end
     n_vertices_f = length(track.polygons(i_f).vertex_indices);
     [i_shared_vertices_f_index, ~] = find(repmat(track.polygons(i_p).vertex_indices, n_vertices_f, 1) == repmat(track.polygons(i_f).vertex_indices', 1, n_vertices_p));
     i_shared_vertices_f = track.polygons(i_f).vertex_indices(i_shared_vertices_f_index);
     assert(numel(i_shared_vertices_f) == 2, "number of shared vertices don't match, check your track creation!")
     shared_point_f_1 = track.vertices(:, i_shared_vertices_f(1));
     shared_point_f_2 = track.vertices(:, i_shared_vertices_f(2));
+    if debug_; plot_vertices(get_track_polygon_vertices(i_p, track)'); plot_vertices(get_track_polygon_vertices(i_f, track)'); end
     
     %% find shared (opposite) constraints
     % forward
@@ -186,9 +251,9 @@ function p_enlarged = enlarge_polygon_into_forward_direction(i_p, track, track_s
     %   we can use the same index as polygon was converted to
     %   constraint representation with same function --> must be
     %   determinstically the same index order
-    factor_enlarging = 10000; % FIXME constant
+%     factor_enlarging = 10000; % FIXME constant
     b_enlarged_p = track.polygons(i_p).b;
-    % forward
+    % FIXME make max track limits dependent
     if b_enlarged_p(i_shared_constraints_p_f) > 0
         b_enlarged_p(i_shared_constraints_p_f) = 1e2;
         %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) * factor_enlarging;
