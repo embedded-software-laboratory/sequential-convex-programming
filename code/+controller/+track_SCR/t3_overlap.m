@@ -193,7 +193,7 @@ function p_enlarged = enlarge_polygon_into_forward_direction(i_p, track, track_s
         b_enlarged_p(i_shared_constraints_p_f) = 1e2;
         %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) * factor_enlarging;
     else
-        b_enlarged_p(i_shared_constraints_p_f) = 1e-2;
+        b_enlarged_p(i_shared_constraints_p_f) = 10;
         %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) / factor_enlarging;
     end
     
