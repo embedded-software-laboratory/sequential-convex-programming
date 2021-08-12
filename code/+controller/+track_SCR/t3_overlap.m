@@ -5,77 +5,241 @@ function track_new = t3_overlap(track, track_scale)
 
 % convert to constraints
 for i = 1:length(track.polygons)
-    [track.polygons(i).A,track.polygons(i).b] = utils.vert2con(track.vertices(:,track.polygons(i).vertex_indices)');
-end
-
-% find neighbor intersections
-for i1 = 1:length(track.polygons)
-    % find shared vertices
-    i2 = utils.mod1(i1+1, length(track.polygons));
-    nv1 = length(track.polygons(i1).vertex_indices);
-    nv2 = length(track.polygons(i2).vertex_indices);
-    [I,~] = find(repmat(track.polygons(i1).vertex_indices, nv2, 1) == repmat(track.polygons(i2).vertex_indices', 1, nv1));
-    shared_vertices = track.polygons(i2).vertex_indices(I);
-    assert(numel(shared_vertices) == 2);
-
-    % find shared (opposite) constraints
-    p1 = track.vertices(:, shared_vertices(1));
-    p2 = track.vertices(:, shared_vertices(2));
-
-    n = [0 -1;1 0]* (p1-p2);
-    n = n ./ norm(n);
-    b = n'*p1;
-    I1 = find(abs(abs(track.polygons(i1).b) - abs(b)) < 1e-10 * track_scale);
-    I2 = find(abs(abs(track.polygons(i2).b) - abs(b)) < 1e-10 * track_scale);
-    assert(numel(I1) == 1);
-    assert(numel(I2) == 1);
-
-    % remove shared constraints
-    A1 = track.polygons(i1).A;
-    b1 = track.polygons(i1).b;
-    A2 = track.polygons(i2).A;
-    b2 = track.polygons(i2).b;
-
-    A1(I1,:) = [];
-    b1(I1,:) = [];
-    A2(I2,:) = [];
-    b2(I2,:) = [];
-
-    track.polygons(i1).A_intersection = [A1;A2];
-    track.polygons(i1).b_intersection = [b1;b2];
+    [track.polygons(i).A, track.polygons(i).b] = utils.vert2con(track.vertices(:,track.polygons(i).vertex_indices)');
 end
 
 track_new = struct;
 track_new.vertices = nan(2,0);
 
-% add overlaps
-for i1 = 1:length(track.polygons)
 
-    i0 = utils.mod1(i1-1, length(track.polygons));
-    i2 = utils.mod1(i1+1, length(track.polygons));
+debug_ = true;
+if debug_
+    figure(997)
+    clf
+    hold on
+    axis equal
+    xlim([-5 10])
+    ylim([-10 5])
+end
 
-    vertices_0 = utils.con2vert([track.polygons(i0).A_intersection; track.polygons(i0).A], [track.polygons(i0).b_intersection; track.polygons(i0).b]);
-    vertices_1 = track.vertices(:, track.polygons(i1).vertex_indices)';
-    vertices_2 = utils.con2vert([track.polygons(i1).A_intersection; track.polygons(i2).A], [track.polygons(i1).b_intersection; track.polygons(i2).b]);
+% find neighbor intersections
+for i_p = 1:length(track.polygons)
+    %% find shared vertices of directly neighboured polygons
+    % leveraging track definition: each polygon has exactly two neighbours
+    % with exactly on full shared edge each (equaling exactly two vertices
+    % each)
+    %
+    % Subscripts
+    %   p: current polygon to check
+    %   f: next forward polygon neighbour
+    %   b: next backward polygon neighbour
+    
+    %% initial: get enlarged current polygon
+    p = vert2poly(get_track_polygon_vertices(i_p, track));
+    p_enlarged = vert2poly(enlarge_polygon_into_forward_direction(i_p, track, track_scale));
+    if debug_; plot(p); plot(p_enlarged); end
+    
+    %% repeat as long as forward neighbours lay in current polygon's enlarged region
+    i_f = utils.mod1(i_p + 1, length(track.polygons));
+    while true
+        if debug_
+            figure(997)
+            clf
+            hold on
+            axis equal
+            xlim([-5 10])
+            ylim([-10 5])
+            plot(p_enlarged)
+        end
 
-    vertices_union = [vertices_0; vertices_1; vertices_2];
+        p_next_neighbour = vert2poly(get_track_polygon_vertices(i_f, track));
+        if debug_; plot(p_next_neighbour); end
+        
+        %% if next forward neighbour overlaps enlarged current polygon
+        if p_enlarged.overlaps(p_next_neighbour)
+            %% enlarge next forward neighbour
+            p_next_neighbour_enlarged = vert2poly(enlarge_polygon_into_forward_direction(i_f, track, track_scale));
+            if debug_; plot(p_next_neighbour_enlarged); end
+            
+            %% get overlap between current enlarged polygon and enlarged
+            % neighbour
+            p_overlap_enlarged_n_next_neighbour = p_enlarged.intersect(p_next_neighbour_enlarged);
+            if debug_; plot(p_overlap_enlarged_n_next_neighbour); end
+            
+            %% divide current enlarged polygon by overlap with next
+            % neighbour
+            %   yields a polygon with two separated regions:
+            %   on before overlap (backwards), one after (forwards)
+%             p_enlarged_divided_by_neighbour_overlap = p_enlarged.subtract(p_overlap_enlarged_n_next_neighbour);
+%             if debug_; plot(p_enlarged_divided_by_neighbour_overlap); end
+%             %if debug_; scatter(p_enlarged_divided_by_neighbour_overlap.Vertices(:, 1), p_enlarged_divided_by_neighbour_overlap.Vertices(:, 2)); end
+%             
+%             % if subtract didn't work: probably numerical issues -->
+%             % downscale p_enlarged a little bit to get proper separated
+%             % polygons
+%             if p_enlarged_divided_by_neighbour_overlap.NumRegions ~= 2
+                % get p_enlarged's center point
+                [p_overlap_enlarged_n_next_neighbour_center(1), p_overlap_enlarged_n_next_neighbour_center(2)] = p_overlap_enlarged_n_next_neighbour.centroid;
+                % scale down w.r.t. center
+                %   scaling down enlarged so that only track width is
+                %   reduced minimallistically (as enlarged and next
+                %   neighbour overlap --> scaling has no effect here)
+                p_overlap_enlarged_n_next_neighbour_upscaled = p_overlap_enlarged_n_next_neighbour.scale(1 + 1e-3, p_overlap_enlarged_n_next_neighbour_center);
+                if debug_; plot(p_overlap_enlarged_n_next_neighbour_upscaled); end
+                
+                % re-try to divide enlarged area as before
+            	p_enlarged_divided_by_neighbour_overlap = p_enlarged.subtract(p_overlap_enlarged_n_next_neighbour_upscaled);
+                if debug_; plot(p_enlarged_divided_by_neighbour_overlap); end
+                %if debug_; scatter(p_enlarged_divided_by_neighbour_overlap.Vertices(:, 1), p_enlarged_divided_by_neighbour_overlap.Vertices(:, 2)); end
+                
+                if p_enlarged_divided_by_neighbour_overlap.NumRegions == 1
+                    % edge case: neighbour doesn't divide p_enlarged,
+                    % because it's only sticking into p_enlarged but not
+                    % laying inside
+                    p_enlarged_retain = p_enlarged_divided_by_neighbour_overlap;
+                else
+                    assert(p_enlarged_divided_by_neighbour_overlap.NumRegions == 2, 'Numerical issues? Please investigate!')
+    %             end
 
-    [~, area_0] = convhull(vertices_0);
-    [~, area_1] = convhull(vertices_1);
-    [~, area_2] = convhull(vertices_2);
-    [K, area_union] = convhull(vertices_union, 'simplify', true);
 
-    % polygons need to be convex: close to same area
-    assert(abs(area_0 + area_1 + area_2 - area_union) < 1e-9 * (track_scale^2), 'overlapped polygons area mismatch');
-    % NOTE only track hockenheim requires slighlty larger deviation
-    % margin of 1e-8 - maybe was caused by missing scaling? then remove
-    % comment
+                %% check which polygon is part of original polygon (= overlaps)
+                %   should be the first polygon due to track definition
+                tf_p_part_of_original = overlaps([p; p_enlarged_divided_by_neighbour_overlap.regions]);
 
-    vertices_union = vertices_union(K(2:end),:);
+                %% choose original overlapping polygon
+                %   we want: polygon 2 and 3 (columns) relation to first polygon (row)
+                p_divided_selection_index = tf_p_part_of_original(1, 2:3);
+                temp = p_enlarged_divided_by_neighbour_overlap.regions;
+                p_enlarged_retain = temp(p_divided_selection_index);
+                end
+            if debug_; plot(p_enlarged_retain); end
+            
+            %% union: reatining old p_enlarged parts, add overlap with next neighbour
+            [p_enlarged_retain_center(1), p_enlarged_retain_center(2)] = p_enlarged_retain.centroid;
+            % scale down w.r.t. center
+            %   scaling down enlarged so that only track width is
+            %   reduced minimallistically (as enlarged and next
+            %   neighbour overlap --> scaling has no effect here)
+            p_enlarged_retain_upscaled = p_enlarged_retain.scale(1 + 1e-3, p_enlarged_retain_center);
+                
+            p_enlarged = union(p_enlarged_retain_upscaled, p_overlap_enlarged_n_next_neighbour_upscaled);
+            
+            % downscale again (else we exponentially increase polygon size
+            % over loop iterations)
+            
+            [p_enlarged_center(1), p_enlarged_center(2)] = p_enlarged.centroid;
+            % scale down w.r.t. center
+            %   scaling down enlarged so that only track width is
+            %   reduced minimallistically (as enlarged and next
+            %   neighbour overlap --> scaling has no effect here)
+            p_enlarged = p_enlarged.scale(1 - 1e-3, p_enlarged_center);
+            
+            if debug_; plot(p_enlarged, 'EdgeColor', 'r'); end
+            %if debug_; drawnow; end
+        else
+            % no overlapping --> maximum convex enlargement reached
+            break
+        end
+        
+        % for-loop: forward index
+        i_f = utils.mod1(i_f + 1, length(track.polygons));
+    end
+    if debug_; plot(p_enlarged, 'EdgeColor', 'r'); end
+    %if debug_; drawnow; pause(0.2); end
+    
+    %% save output
+    track_new.vertices = [track_new.vertices  poly2vert(p_enlarged)];
+    %track_new.polygons(i1).vertex_indices = indices;
+    [track_new.polygons(i_p).A, track_new.polygons(i_p).b] = utils.vert2con(poly2vert(p_enlarged)');   
+end
+end
 
-    indices = size(track_new.vertices,2) + (1 : size(vertices_union, 1));
+function p_enlarged = enlarge_polygon_into_forward_direction(i_p, track, track_scale)
+    % enlarge polygon into direction of shared edge with forward neighbour
+    %
+    % Inputs
+    %   i_p: index of polygon to be expanded
+    n_vertices_p = length(track.polygons(i_p).vertex_indices);
+    
+    % shared vertices with forward neighbour
+    i_f = utils.mod1(i_p + 1, length(track.polygons)); % next forward polygon
+    n_vertices_f = length(track.polygons(i_f).vertex_indices);
+    [i_shared_vertices_f_index, ~] = find(repmat(track.polygons(i_p).vertex_indices, n_vertices_f, 1) == repmat(track.polygons(i_f).vertex_indices', 1, n_vertices_p));
+    i_shared_vertices_f = track.polygons(i_f).vertex_indices(i_shared_vertices_f_index);
+    assert(numel(i_shared_vertices_f) == 2, "number of shared vertices don't match, check your track creation!")
+    shared_point_f_1 = track.vertices(:, i_shared_vertices_f(1));
+    shared_point_f_2 = track.vertices(:, i_shared_vertices_f(2));
+    
+    %% find shared (opposite) constraints
+    % forward
+    b_p_f = create_b_of_edge(shared_point_f_1, shared_point_f_2);
+    i_shared_constraints_p_f = find(abs(abs(track.polygons(i_p).b) - abs(b_p_f)) < 1e-10 * track_scale);
+    assert(numel(i_shared_constraints_p_f) == 1, "number of vertices in constraint representation don't match! Please investigate");
+   
+    % just double check that neighbour has same amount of shared constraints
+    i_shared_constraints_f_p = find(abs(abs(track.polygons(i_f).b) - abs(b_p_f)) < 1e-10 * track_scale);
+    assert(numel(i_shared_constraints_f_p) == 1, "number of vertices in constraint representation don't match! Please investigate")
+    
+    %% expand current polygon into direction of shared edge
+    % creating pseudo polygon with effectively shared edges expanded
+    % that far that they become ineffective
+    %   we can use the same index as polygon was converted to
+    %   constraint representation with same function --> must be
+    %   determinstically the same index order
+    factor_enlarging = 10000; % FIXME constant
+    b_enlarged_p = track.polygons(i_p).b;
+    % forward
+    if b_enlarged_p(i_shared_constraints_p_f) > 0
+        b_enlarged_p(i_shared_constraints_p_f) = 1e2;
+        %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) * factor_enlarging;
+    else
+        b_enlarged_p(i_shared_constraints_p_f) = 1e-2;
+        %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) / factor_enlarging;
+    end
+    
+    %% convert back to vertices representation
+    p_enlarged = utils.con2vert(track.polygons(i_p).A, b_enlarged_p);
+    %if debug_; plot_polygon(p_enlarged, ':'); end
+    assert(~isempty(p_enlarged), 'Some error in polygon enlarging happened! Please investigate')
+end
 
-    track_new.vertices = [track_new.vertices  vertices_union'];
-    track_new.polygons(i1).vertex_indices = indices;
-    [track_new.polygons(i1).A, track_new.polygons(i1).b] = utils.vert2con(vertices_union);        
+function b = create_b_of_edge(shared_point_1, shared_point_2)
+    % create b of given line segment
+    n = [0 -1; 1 0] * (shared_point_1 - shared_point_2);
+    n = n ./ norm(n);
+    b = n' * shared_point_1;
+end
+
+function p_poly = vert2poly(p_vert)
+    % convert from vertice representation to MATLAB's polyshape
+    
+    % convert to correctly ordered polygon (current vertices are unordered)
+    p_vert = cleanse_convex_polygon(p_vert);
+    %if debug_; plot_polygon(p_vert); end
+    % ... so that we can convert to MATLAB's poly
+    p_poly = polyshape(p_vert(:, 1), p_vert(:, 2));
+    %if debug_; plot(p_poly); end
+end
+
+
+function p_vert = poly2vert(p_poly)
+    p_vert = p_poly.Vertices';
+end
+
+function p_vert = get_track_polygon_vertices(i, track)
+    p_vert = track.vertices(:,track.polygons(i).vertex_indices)';
+end
+
+function polygon = cleanse_convex_polygon(polygon)
+    % order vertices, remove unneccesary vertices
+    select_and_reorder_indices = convhull(polygon);
+    select_and_reorder_indices = select_and_reorder_indices(1:end-1);
+    polygon = polygon(select_and_reorder_indices, :);
+end
+
+
+function plot_vertices(vertices, LineSpec)
+    if nargin < 2; LineSpec = '-'; end
+    %plot([vertices(1, :) vertices(1, 1)], [vertices(2, :) vertices(2, 1)], LineSpec)
+    plot(vertices(1, :), vertices(2, :), LineSpec)
 end
