@@ -17,16 +17,16 @@ cfg_vh.p.R = diag([90 90]); % 41 for maximum aggrasion: 14.6s. 90: 15.1 % weight
 cfg_vh.p.trust_region_size = 1.6; % [m] adds/subtracts to position (SL only)
 
 % e.g. Q R, trust_region_size
-parameter_name = 'Q'; % field in `scenario_default.scn.vhs{1}.p`
+parameter_name = 'R'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variation_factors = 1.5:0.1:2;
+parameter_variation_factors = 1:0.1:1.5;
 for i = 1:length(parameter_variation_factors)
     if strcmp(parameter_name, 'R') % for arrays
         % first tune whole R
-%         parameter_variation(i).parameter = parameter_variotion_factors(i) .* diag([1 1]); %#ok<SAGROW>
+        parameter_variation(i).parameter = parameter_variation_factors(i) .* diag([1 1]); %#ok<SAGROW>
         % then tune individual entries
-        parameter_variation(i).parameter = diag([30 parameter_variation_factors(i)]); %#ok<SAGROW>
+%         parameter_variation(i).parameter = diag([30 parameter_variation_factors(i)]); %#ok<SAGROW>
     else % for scalar
         parameter_variation(i).parameter = parameter_variation_factors(i); %#ok<SAGROW>
     end
@@ -35,7 +35,7 @@ end
 %% Parameter Iteration Loop
 
 % make sure only running one lap
-cfg_default.race.n_laps = 2;
+cfg_default.race.n_laps = 1;
 
 % preallocate
 results(length(parameter_variation)).lap_time = [];
@@ -64,23 +64,26 @@ for i = 1:length(parameter_variation)
         disp(me)
         warning('Error in simulation, setting lap time to 0')
     end
+    
+    %% Plot Results
+    figure_number = 1001;
+    figure(figure_number)
+    clf(figure_number)
+    hold on
+    set(gcf, 'Name', ['Parameter Study: Parameter ' parameter_name ' vs. Lap Time'])
+    if isscalar(results(1).parameter) % if scalar
+        scatter([results(1:i).parameter], [results(1:i).lap_time], 'filled')
+        plot([results(1:i).parameter], [results(1:i).lap_time])
+        xlabel(['Parameter ' parameter_name], 'Interpreter', 'none'); ylabel('Lap Time [s]');
+    else % if arrays etc.: show index
+        scatter(1:i, [results(1:i).lap_time], 'filled')
+        plot(1:i, [results(1:i).lap_time])
+        xlabel(['Index of Parameter ' parameter_name], 'Interpreter', 'none'); ylabel('Lap Time [s]');
+    end
+    
+    drawnow
 end
 
-%% Plot Results
-figure_number = 1001;
-figure(figure_number)
-clf(figure_number)
-hold on
-set(gcf, 'Name', ['Parameter Study: Parameter ' parameter_name ' vs. Lap Time'])
-if isscalar(results(1).parameter) % if scalar
-    scatter([results.parameter], [results.lap_time], 'filled')
-    plot([results.parameter], [results.lap_time])
-    xlabel(['Parameter ' parameter_name], 'Interpreter', 'none'); ylabel('Lap Time [s]');
-else % if arrays etc.: show index
-    scatter(1:length(parameter_variation), [results.lap_time], 'filled')
-    plot(1:length(parameter_variation), [results.lap_time])
-    xlabel(['Index of Parameter ' parameter_name], 'Interpreter', 'none'); ylabel('Lap Time [s]');
-end
 
 % export figure (in parameter study folder)
 outputPathStudy = [cfg_default.outputPath '../Parameter Study/'];
