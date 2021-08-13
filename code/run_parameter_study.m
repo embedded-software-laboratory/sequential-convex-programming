@@ -5,14 +5,22 @@ clear
 cfg_default = config.scenario_1_vehicle(...
     config.base_scenario(config.config()),...
     @config.vehicle_ST_Liniger);
+% SCR lap time: 10.7, 2 laps 20.5 -> delta = 9.8
+%   mit korrigierter polygon findung: lap time: 10.5
+% SL lap time: 11.8, 2 laps 21.5 -> delta = 9.7
+
 % choose SCR
-%cfg_default.scn.vhs{1}.approximation = 20;
+cfg_default.scn.vhs{1}.approximation = 20;
+% current time-lap-optimal params
+cfg_vh.p.Q = 1.5; % or even more?2.6 for maximum aggressive but close to instable; % weight for maximization of position on track
+cfg_vh.p.R = diag([90 90]); % 41 for maximum aggrasion: 14.6s. 90: 15.1 % weight for control changes over time
+cfg_vh.p.trust_region_size = 1.6; % [m] adds/subtracts to position (SL only)
 
 % e.g. Q R, trust_region_size
 parameter_name = 'Q'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variation_factors = 0.5:0.1:1.5;
+parameter_variation_factors = 1.5:0.1:2;
 for i = 1:length(parameter_variation_factors)
     if strcmp(parameter_name, 'R') % for arrays
         % first tune whole R
@@ -27,7 +35,7 @@ end
 %% Parameter Iteration Loop
 
 % make sure only running one lap
-cfg.scn.race.n_laps = 1;
+cfg_default.race.n_laps = 2;
 
 % preallocate
 results(length(parameter_variation)).lap_time = [];
