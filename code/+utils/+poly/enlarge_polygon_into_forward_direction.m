@@ -35,16 +35,9 @@ assert(numel(i_shared_constraints_f_p) == 1, "number of vertices in constraint r
 %   we can use the same index as polygon was converted to
 %   constraint representation with same function --> must be
 %   determinstically the same index order
-%     factor_enlarging = 10000; % FIXME constant
 b_enlarged_p = track.polygons(i_p).b;
-% FIXME make max track limits dependent
-if b_enlarged_p(i_shared_constraints_p_f) > 0
-    b_enlarged_p(i_shared_constraints_p_f) = 1e2;
-    %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) * factor_enlarging;
-else
-    b_enlarged_p(i_shared_constraints_p_f) = 10;
-    %b_enlarged_p(i_shared_constraints_p_f) = b_enlarged_p(i_shared_constraints_p_f) / factor_enlarging;
-end
+% FIXME change to max track diagonal dimension
+b_enlarged_p(i_shared_constraints_p_f) = 5000*track_scale;
 
 %% convert back to vertices representation
 p_enlarged = utils.poly.con2vert(track.polygons(i_p).A, b_enlarged_p);

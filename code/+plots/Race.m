@@ -85,7 +85,7 @@ classdef Race < plots.Base
                     obj.add_tmp_handle(plot(tangent_left(1,:), tangent_left(2,:), '--', 'color', c(k, :), 'LineWidth', 1));
                     obj.add_tmp_handle(plot(tangent_right(1,:), tangent_right(2,:), '--', 'color', c(k, :), 'LineWidth', 1));
                 else % SCR
-                    last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(X_controller(1:2, p.Hp), scn.track_SCR.constraints_upscaled);
+                    last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(X_controller(1:2, p.Hp), scn.track_SCR);
                     last_poly_vertices = utils.poly.cleanse_convex_polygon(...
                         utils.poly.get_track_polygon_vertices(last_poly_idx, scn.track_SCR));
                     % back-and-forth conversion to close polygon
