@@ -11,7 +11,7 @@ classdef TrackPolygons < plots.Base
     % the
     
     methods
-        function plot(obj, checkpoints, track_tesselated, track_merged, track_overlapped, track_creation_scale)
+        function plot(obj, checkpoints, track_tesselated, track_merged, track_overlapped, track_creation_scale, track_SCR_epsilon_area_tolerance)
             % epsilon_area_tolerance [m^2]: maximal poylgon differnce for
             % merging
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
@@ -56,7 +56,7 @@ classdef TrackPolygons < plots.Base
             else
                 ax3 = nexttile;
             end
-            plotTrackPolygons_(track_merged, sprintf('2) Merged to %i Polygons', length(track_merged.polygons)))
+            plotTrackPolygons_(track_merged, sprintf('2) Merged to %i Polygons - Relaxation Tolerance \\epsilon_A = %.4f m^2', length(track_merged.polygons), track_creation_scale*track_SCR_epsilon_area_tolerance))
 
             % 3) add overlaps
             if verLessThan('matlab', '9.7')

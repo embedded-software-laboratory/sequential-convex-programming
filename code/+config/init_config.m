@@ -96,5 +96,5 @@ for i = 1:length(cfg.scn.vhs)
 end
 
 % plot track
-plots.TrackPolygons(1).plot(cfg.scn.track, track_tesselated, track_merged, cfg.scn.track_SCR, cfg.scn.track_creation_scale);
+plots.TrackPolygons(1).plot(cfg.scn.track, track_tesselated, track_merged, cfg.scn.track_SCR, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
 end
