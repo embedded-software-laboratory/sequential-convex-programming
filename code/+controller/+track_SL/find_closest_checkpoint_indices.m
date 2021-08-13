@@ -1,4 +1,4 @@
-function cp_indices = find_closest_checkpoint_indices(position, cp_center, Hp)
+function cp_indices = find_closest_checkpoint_indices(positions, cp_center, Hp)
 % find closest checkpoints of track to given states (position) x
 % Inputs:
 %   cp:     track or subset of track
@@ -11,5 +11,5 @@ cp_indices = nan(1, Hp);
 
 for k = 1:Hp
     % save index of closest checkpoint
-    [cp_indices(k), ~] = controller.track_SL.find_closest_checkpoint_index(position(:, k), cp_center);
+    [cp_indices(k), ~] = controller.track_SL.find_closest_checkpoint_index(positions(:, k), cp_center);
 end

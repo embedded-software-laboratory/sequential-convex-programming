@@ -1,6 +1,6 @@
-function polygon = cleanse_convex_polygon(polygon)
+function vertices = cleanse_convex_polygon(vertices)
 % order vertices, remove unneccesary vertices
-select_and_reorder_indices = convhull(polygon);
+select_and_reorder_indices = convhull(vertices);
 select_and_reorder_indices = select_and_reorder_indices(1:end-1);
-polygon = polygon(select_and_reorder_indices, :);
+vertices = vertices(select_and_reorder_indices, :);
 end

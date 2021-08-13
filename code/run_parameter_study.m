@@ -20,7 +20,7 @@ cfg_vh.p.trust_region_size = 1.6; % [m] adds/subtracts to position (SL only)
 parameter_name = 'R'; % field in `scenario_default.scn.vhs{1}.p`
 % adapt below in code in case of arrays to process arbitrary values like arrays
 % create parameter variation
-parameter_variation_factors = 1:0.1:1.5;
+parameter_variation_factors = 1:10:90;
 for i = 1:length(parameter_variation_factors)
     if strcmp(parameter_name, 'R') % for arrays
         % first tune whole R
