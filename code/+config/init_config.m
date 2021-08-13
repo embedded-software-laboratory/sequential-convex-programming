@@ -86,15 +86,15 @@ cfg.scn.track = controller.track_SL.reduce_checkpoints(cfg.scn.track, cfg.scn.tr
 % Preallocate for speed
 cfg.scn.track_center = [cfg.scn.track.center];
 
-% plot track, includes prerun of track SCR
-%plots.TrackPolygons(1).plot(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
-
 % Polygon Creation (for SCR)
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vhs)
     if cfg.scn.vhs{i}.approximationIsSCR
-        cfg.scn.track_SCR = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
+        [cfg.scn.track_SCR, track_tesselated, track_merged] = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
         break
     end
 end
+
+% plot track
+plots.TrackPolygons(1).plot(cfg.scn.track, track_tesselated, track_merged, cfg.scn.track_SCR, cfg.scn.track_creation_scale);
 end

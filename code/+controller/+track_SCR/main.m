@@ -1,4 +1,4 @@
-function track = main(checkpoints, track_scale, epsilon_area_tolerance)
+function [track_fullSCR, track_tesselated, track_merged] = main(checkpoints, track_scale, epsilon_area_tolerance)
     % generate restricted track subset
     
     %% Actual SCR
