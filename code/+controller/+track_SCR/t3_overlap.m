@@ -119,6 +119,8 @@ for i_p = 1:length(track.polygons)
                     if p_enlarged_divided_by_neighbour_overlap.NumRegions == 3 && i_p == 1 && i_f == length(track.polygons)
                         warning('Ignoring set division issue at track joint (where circle is closed). Caused by slight misalignments from track creation')
                     else
+                        % NumRegions == 1 should be an edge-case to (for coarse tesselation), but
+                        % never happened - enable if it happens sometime
                         assert(p_enlarged_divided_by_neighbour_overlap.NumRegions == 2, 'Numerical issues? Please investigate!')
                     end
     %             end

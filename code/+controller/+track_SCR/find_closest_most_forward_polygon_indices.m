@@ -1,4 +1,4 @@
-function polygon_indices = find_closest_most_forward_polygon_indices(positions, polygons, Hp)
+function polygon_indices = find_closest_most_forward_polygon_indices(positions, track_upscaled_polygons, Hp)
 % For each trajectory point, find the most forward track polygon. As a
 %   fallback, the closest polygon is given out (e.g., in case of slackened
 %   track limits or numerical issues
@@ -11,14 +11,13 @@ for k = 1:Hp
     distance_to_polygon_min = Inf;
     % polygons containing position
     containing_polygons_indices = [];
-
-    for j = 1:length(polygons)
+    for j = 1:length(track_upscaled_polygons)
         % distance to edge of polygon
         %   max because polygon is in halfspace-represenation ->
         %   negative: inside polygon; positive: outside
         %       case negative: edge which is closest
         %       case positive: edge which is furthest away
-        distance_to_polygon = max(polygons(j).A * positions(:, k) - polygons(j).b);
+        distance_to_polygon = max(track_upscaled_polygons(j).A * positions(:, k) - track_upscaled_polygons(j).b);
         
         % save closest polygon
         if distance_to_polygon_min > distance_to_polygon
@@ -50,7 +49,7 @@ for k = 1:Hp
         % distance between each polygon in [#polygons]
         distance_between_polygon_indices = diff(...
             [containing_polygons_indices...
-             containing_polygons_indices(1) + length(polygons)]);
+             containing_polygons_indices(1) + length(track_upscaled_polygons)]);
         
         % we define last polygon cointaing position as the one having the
         %   largest distance to the next polygon in [#polygons]
