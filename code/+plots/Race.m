@@ -122,10 +122,10 @@ classdef Race < plots.Base
                 %         plot(tangent_obst(1,:), tangent_obst(2,:),'k--','LineWidth',1)
                 %         
                 %     elseif strcmp(p.name, 'SCR')
-                %         import utils.con2vert
+                %         import utils.poly.con2vert
                 %         poly_idx = controller_output.track_polygon_indices(end);
                 %         poly = p.track_polygons(poly_idx);
-                %         vertices = con2vert(poly.A, poly.b);
+                %         vertices = poly.con2vert(poly.A, poly.b);
                 %         K = convhull(vertices(:,1), vertices(:,2));
                 %         vertices = vertices(K,:);
                 %         plot(vertices(:,1), vertices(:,2),'k','LineWidth',1.5);

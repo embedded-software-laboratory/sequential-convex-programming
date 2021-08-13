@@ -1,6 +1,8 @@
 function [V] = con2vert(A,b)
 % Convert 2D convex polygon from half-space representation to vertex
 % representation.
+%
+% inspired by 'poly.con2vert' from Matlab File Exchange by Michael Kleder
 
 assert(size(A,1) == size(b,1));
 assert(size(A,2) == 2);

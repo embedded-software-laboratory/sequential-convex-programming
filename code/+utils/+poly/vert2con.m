@@ -1,6 +1,8 @@
 function [A,b] = vert2con(V)
 % Convert 2D convex polygon from vertex representation to half-space
 % representation.
+%
+% inspired by 'poly.vert2con' from Matlab File Exchange by Michael Kleder
 
 assert(size(V,2) == 2);
 
