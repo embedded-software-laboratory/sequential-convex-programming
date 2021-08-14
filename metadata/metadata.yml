@@ -1,2 +1,24 @@
 metadata_version: 1
 name: Sequential Convex Programming Methods for Real-time Trajectory Optimization in Autonomous Vehicle Racing
+description: We present a real-time-capable \textit{Model Predictive Controller} (MPC) based on a single-track vehicle model and Pacejka’s magic tire formula for autonomous racing applications. After constructing a non-convex trajectory optimization problem, it is convexified using the Sequential Convex Programming (SCP) method. For track discretization we use two different methods, namely Sequential Linearization (SL) and Sequential Convex Restriction (SCR). SL was already introduced in our previous paper. SCR is a new addition, introduced in detail and its recursive feasibility proven. We show that a controller with SCR yields faster lap times, for race starts as well as flying laps, while being real-time capable. A video showing the results is available at youtube/XXXXXXXXXXXX.
+tags:
+- autonomous-vehicle
+- autonomous-vehicle-racing
+- discretization
+- scp
+- sequential-convex-programming
+- sqp
+- sequential-quadratic-programming
+authors:
+- name: Bassam Alrifaee
+  affiliations:
+  - name: Chair of Embedded Software, RWTH Aachen University, Germany
+- name: Patrick Scheffe
+  affiliations:
+  - name: Chair of Embedded Software, RWTH Aachen University, Germany
+- name: Theodor Mario Henneken
+  affiliations:
+  - name: Chair of Embedded Software, RWTH Aachen University, Germany
+corresponding_contributor:
+  name: Theodor Mario Henneken
+  email: theodor.henneken@rwth-aachen.de

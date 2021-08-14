@@ -15,6 +15,10 @@
 % tested on UNIX (Ubuntu 18.04 64-bit) and Windows 10 64-bit, MATLAB
 % R2021a, R2019b, R2019a
 
+%% Misc
+% - export large figures:
+print('-painters', gcf, "filename.svg", '-dsvg')
+
 %% TODOs
 % - also search for 'FIXME' for issues to be fixed
 % - use 'sim scale' to norm all other scales
