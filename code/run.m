@@ -67,7 +67,7 @@ scenarios(50) = config.scenario_race_various_vehicles(scenarios(1));
 %                                   vv         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if true
-    output_file = sim.run(config.scenario_n_laps_race(scenarios(22), 2));
+    output_file = sim.run(config.scenario_n_laps_race(scenarios(4), 2));
 else % alternative: run all scenarios from above
     for i = 1:length(scenarios) %#ok<UNRCH>
         scenario = scenarios(i);

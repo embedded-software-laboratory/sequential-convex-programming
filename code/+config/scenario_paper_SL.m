@@ -8,7 +8,7 @@ cfg.scn.description = [cfg.scn.description '\nreplicationg "SL paper" settings']
 
 %% Track
 cfg.scn.track_handle = @model.track.HockenheimShortCarMaker;
-cfg.scn.track_SCR_epsilon_area_tolerance = .5;
+cfg.scn.track_SCR_epsilon_area_tolerance = .5; % [m^2]
 
 %% Vehicles
 vehicle_ = config.vehicle_paper_SL(config.base_vehicle(cfg));

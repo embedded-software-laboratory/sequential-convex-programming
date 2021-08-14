@@ -70,8 +70,6 @@ cfg_vh.x_starts = [...
     [2.8 -0.05 0 0 0 0]'];
 cfg_vh.x_start = cfg_vh.x_starts(:, 1);
 
-
-
 % FIXME adapt to scale. Define in vehicle model
 cfg_vh.lengthVal = 0.075; % obstacle's size measured along its direction of movement [m]
 cfg_vh.widthVal = 0.045; % obstacle's size measured at right angels to its direction of movement[m]
