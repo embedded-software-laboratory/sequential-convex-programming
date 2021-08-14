@@ -10,7 +10,6 @@ cfg = config.init_config(cfg);
 
 %% Visualization
 disp('run plotting')
-
 warning('replaying at real-time speed of vehicle 1 (other vehicles may have other discretization time dt and thus a woring speed)')
 
 for j = 1:length(log.lap)
@@ -25,13 +24,18 @@ for j = 1:length(log.lap)
         cfg.plot.plots_to_draw{i}.plot(cfg, ws);
     end
     drawnow
-
+    
+    if j == 1
+        fprintf(2, 'start replay with press of button\n')
+        pause
+    end
+    
     % pause to simulate real time
     % CAVE replaying at real-time of vehicle 1
     delta = cfg.scn.vhs{1}.p.dt_controller - toc;
     if delta > 0
         pause(delta);
-    else
+    elseif j > 1
         warning('Replay is currently not real-time')
     end 
 end
