@@ -3,4 +3,7 @@ function exportFigure(figure_number, filename)
 % PDF and MATLAB fig
 set(figure_number, 'PaperOrientation', 'landscape');
 print(['-f' num2str(figure_number)], [filename '.pdf'], '-dpdf', '-bestfit');
-saveas(figure_number, [filename '.fig'], 'fig');
+
+warning off % gives redundant warning about using savefig
+savefig(figure_number, [filename '.fig'], 'compact');
+warning on
