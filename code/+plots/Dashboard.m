@@ -1,4 +1,5 @@
 classdef Dashboard < plots.Base
+    % TODO add number of laps display (last lap time + average + cumulative, too)
     properties
         table_desc
         table_val

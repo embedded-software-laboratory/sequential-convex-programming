@@ -51,6 +51,9 @@ scenarios(31) = config.scenario_main_vehicle_SL_vs_SCR(scenarios(1));
 % previous paper comparion
 scenarios(41) = config.scenario_paper_SL(scenarios(10));
 
+% actual race situatiions
+scenarios(50) = config.scenario_race_various_vehicles(scenarios(1));
+
 %% Run Selected Scenario
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select scneario  by changing the indexnumber %

@@ -7,7 +7,6 @@ cfg.scn.obstacles = {};
 cfg.scn.vhs = {};
 
 %% General
-cfg.scn.Dsafe = 'CircleImpr'; % Chose either 'Circle' or 'Ellipse' or 'CircleImpr' or 'EllipseImpr' 
 cfg.race.n_laps = 1;            % Number of laps to be driven
 
 % only simulation for main vehicle (vehicle number 1)

@@ -114,9 +114,11 @@ classdef Race < plots.Base
                     for j = 1:length(scn.vhs)
                         % Respect only constraints for opponents marked as obstacles
                         if ws.obstacleTable(k,j) == 1
+                            % FIXME match plotting with shapes represented,
+                            % see createCP
                             dist = pdist([x_0_controller(1:2)';ws.vhs{1,j}.x_0(1:2)'],'euclidean'); % calculate distance
                             normal_vector = - (x_0_controller(1:2)-ws.vhs{1,j}.x_0(1:2))/dist; % normal vector in direction from trajectory point to obstacle center
-                            closest_obst_point = ws.vhs{1,j}.x_0(1:2) - normal_vector * scn.vhs{1,j}.distSafe2CenterVal; % intersection of safe radius and connection between trajectory point and obstacle center 
+                            closest_obst_point = ws.vhs{1,j}.x_0(1:2) - normal_vector * scn.vhs{1,j}.distSafe2CenterVal_1; % intersection of safe radius and connection between trajectory point and obstacle center 
                             tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
                             obj.add_tmp_handle(plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k, :),'LineWidth',1));
                             

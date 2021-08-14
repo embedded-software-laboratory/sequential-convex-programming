@@ -9,6 +9,8 @@ cfg_vh.dataFileSingleTrackAMax = [cfg.dataPath 'singleTrackAMax.mat'];
 %% Controller: General Optimization
 cfg_vh.p.SCP_iterations = 1;
 % SL 1, SCR 2, Botz 1
+
+% CAVE: needs at least 2 p.SCP_iterations
 cfg_vh.p.isBlockingEnabled = false;
 cfg_vh.p.areObstaclesConsidered = false;
 
@@ -56,7 +58,19 @@ cfg_vh.modelParams_simulation = model.vehicle.SingleTrack.getParamsLinigerRC_1_4
 
 %% Geometric
 % xStart [pos_x pox_y v_x v_y yaw dyaw/dt] will be initialized to match model states
-cfg_vh.x_start = [0 0 0 0 0 0]';
+% grid start positions for 1 to 8 vehicles
+cfg_vh.x_starts = [...
+    [0.1  0.05 0 0 0 0]'...
+    [0.5 -0.05 0 0 0 0]'...
+    [0.9  0.05 0 0 0 0]'...
+    [1.3 -0.05 0 0 0 0]'...
+    [1.7  0.05 0 0 0 0]'...
+    [2.1 -0.05 0 0 0 0]'...
+    [2.5  0.05 0 0 0 0]'...
+    [2.8 -0.05 0 0 0 0]'];
+cfg_vh.x_start = cfg_vh.x_starts(:, 1);
+
+
 
 % FIXME adapt to scale. Define in vehicle model
 cfg_vh.lengthVal = 0.075; % obstacle's size measured along its direction of movement [m]
@@ -64,8 +78,7 @@ cfg_vh.widthVal = 0.045; % obstacle's size measured at right angels to its direc
 
 % obstacles are modeled as rotated rectangles that can move with
 % constant speed and direction.
+cfg_vh.distSafe = 'Circle'; % Chose either 'Circle' or 'Ellipse' or 'CircleImpr' or 'EllipseImpr' 
 cfg_vh.distSafe2CenterVal_1 = round(sqrt((cfg_vh.lengthVal/2)^2 + (cfg_vh.widthVal/2)^2),2,'significant');
 cfg_vh.distSafe2CenterVal_2 = [0.09;0.06]; % Definition of ellipsis (two semi-axis)
-% TODO why there are two defined above?
-cfg_vh.distSafe2CenterVal = cfg_vh.distSafe2CenterVal_1;
 end

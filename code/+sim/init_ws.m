@@ -22,7 +22,7 @@ for i = 1:length(cfg.scn.vhs)
         ws.vhs{i}.x_0(cfg.scn.vhs{i}.model_controller.idx_pos), cfg.scn.track_center);
     ws.vhs{i}.cp_prev = cp_x_0;
     ws.vhs{i}.cp_curr = cp_x_0;
-    ws.vhs{i}.lap_count = -1; % start with 0 finished laps (but -1 because vehicles start just short of finish line)
+    ws.vhs{i}.lap_count = 0; % start with 0 finished laps (-1 in case of vehicles start just short of finish line)
     ws.vhs{i}.pos = 0; % ego vehicle position relative to all other vehicles
 end
 

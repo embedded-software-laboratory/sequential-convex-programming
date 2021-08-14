@@ -1,11 +1,11 @@
 function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
     A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper] = ...
         create_QP(...
-            vh, x_0, X_opt_prev, U_opt_prev,...
+            vhs_cfg, x_0, X_opt_prev, U_opt_prev,...
             checkpoints, checkpoint_indices,...
             track_polygons, track_polygon_indices,...
             iter, i_vehicle,...
-            obstacleTable, blockingTable, vhs)
+            obstacleTable, blockingTable, vhs_ws)
 % QP formulation: create and solve convexified problem
 % track can be represented as SCR or SL
 % SL: Sequential Linearization controller: QP approximated (linearised, thus relaxed) variant
@@ -18,15 +18,16 @@ function [n_vars, idx_x, idx_u, idx_slack, objective_quad, objective_lin,...
 %       requires fields x_0, X_opt, cp_curr
 
 % Assign for better readability/access
-vhP = vh.p;
-vhModel = vh.model_controller;
-isControlModelLinear = vh.isControlModelLinear;
+vh_cfg = vhs_cfg{i_vehicle};
+vhP = vh_cfg.p;
+vhModel = vh_cfg.model_controller;
+isControlModelLinear = vh_cfg.isControlModelLinear;
 
-if vh.approximationIsSL
+if vh_cfg.approximationIsSL
     % Verification if indices-matrix has only one row and Hp columns
     assert(size(checkpoint_indices, 1) == 1);
     assert(size(checkpoint_indices, 2) == vhP.Hp);
-elseif vh.approximationIsSCR
+elseif vh_cfg.approximationIsSCR
     % Verification if indices-matrix has only one column and Hp rows
     assert(size(track_polygon_indices, 1) == vhP.Hp);
     assert(size(track_polygon_indices, 2) == 1);
@@ -52,10 +53,10 @@ end
 n_ineq = 0;
 
 
-if vh.approximationIsSL
+if vh_cfg.approximationIsSL
     % 2 track constraints at every time step 
     n_ineq = n_ineq + 2 * vhP.Hp;
-elseif vh.approximationIsSCR
+elseif vh_cfg.approximationIsSCR
     % n-polygon-dependent track constraints at every time step
     for k = 1:vhP.Hp
         n_ineq = n_ineq + length(track_polygons(track_polygon_indices(k)).b);
@@ -147,7 +148,7 @@ for k = 1:vhP.Hp
     % assign current checkpoint for better readability
     checkpoint_c = checkpoints(checkpoint_indices(k));
     
-    if vh.approximationIsSL
+    if vh_cfg.approximationIsSL
         % left side (27)
         n_rows = n_rows(end) + 1;
         A_ineq(n_rows, idx_slack) = -1;
@@ -158,7 +159,7 @@ for k = 1:vhP.Hp
         A_ineq(n_rows, idx_slack) = -1;
         A_ineq(n_rows, idx_pos(k,:)) = -checkpoint_c.normal_vector';
         b_ineq(n_rows) = -checkpoint_c.normal_vector' * checkpoint_c.right;
-    elseif vh.approximationIsSCR
+    elseif vh_cfg.approximationIsSCR
         track_polygon = track_polygons(track_polygon_indices(k));
         n_rows = n_rows(end) + (1:length(track_polygon.b));
         A_ineq(n_rows, idx_slack) = -1;
@@ -174,7 +175,7 @@ for k = 1:vhP.Hp
         % not modelling the actual technical inputs but the resulting
         % accelerations
         [Au_acc, b_acc] = controller.get_acceleration_ellipses(...
-            vh.modelParams_controller, vhP, (1:vhP.n_acceleration_limits)', X_opt_prev(:, k));
+            vh_cfg.modelParams_controller, vhP, (1:vhP.n_acceleration_limits)', X_opt_prev(:, k));
         n_rows = n_rows(end) + vhP.n_acceleration_limits;
         
         A_ineq(n_rows - vhP.n_acceleration_limits + 1:n_rows, idx_u(k,:)) = Au_acc;
@@ -206,13 +207,13 @@ for k = 1:vhP.Hp
         if (iter >= 2) && (sum(obstacleTable(i_vehicle,:)) >= 1)
 
             % iterate over all opponents
-            for j = 1:length(cfg.scn.vhs)
+            for j = 1:length(vhs_ws)
                 % Extend predicted trajectory of opponent if the opponent's prediction horizon is shorter than the own horizon
                 % TODO: very simplistic approach
-                if k <= size(vhs{1, j}.X_opt,2) % Choose correponding trajectory point if prediciton step is within scope
-                    X_opt_opp = vhs{1, j}.X_opt(:, k);
+                if k <= size(vhs_ws{j}.X_opt,2) % Choose correponding trajectory point if prediciton step is within scope
+                    X_opt_opp = vhs_ws{j}.X_opt(:, k);
                 else % If prediction step is not within scope, choose last trajectory point
-                    X_opt_opp = vhs{1, j}.X_opt(:, end);
+                    X_opt_opp = vhs_ws{j}.X_opt(:, end);
                 end    
 
                 % Respect only constraints for opponents marked as obstacles
@@ -221,32 +222,32 @@ for k = 1:vhP.Hp
                     normal_vector = - (X_opt_prev(1:2,k)-X_opt_opp(1:2))/d; % normal vector in direction from trajectory point to obstacle center
                     V_diff = X_opt_prev(3:4,k) - X_opt_opp(3:4);    % velocity difference between ego and opponent
 
-                    if strcmp(cfg.scn.Dsafe,'Circle')
+                    if strcmp(vhs_cfg{j}.distSafe, 'Circle')
                         D_vel_1 = sqrt((V_diff(1) * vhP.dt_controller)^2 + (V_diff(2) * vhP.dt_controller)^2);  % safety distance due to velocity of objects
-                        D_size_1 = 2*cfg.scn.vhs{1,j}.distSafe2CenterVal_1;       % safety distance due to object size
+                        D_size_1 = 2*vhs_cfg{j}.distSafe2CenterVal_1;       % safety distance due to object size
                         Dsafe_1 = D_vel_1 + D_size_1;
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_1; % intersection of safe radius and connection between trajectory point and obstacle center
-                    elseif strcmp(cfg.scn.Dsafe,'Ellipse')
+                    elseif strcmp(vhs_cfg{j}.distSafe, 'Ellipse')
                         D_vel_2 = ( normal_vector' * V_diff ) * vhP.dt_controller;
                         yaw_ang = X_opt_prev(5,k);
                         Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
-                        D_size_2 = normal_vector' * (Rot_yaw * cfg.scn.vhs{1,j}.distSafe2CenterVal_2);
+                        D_size_2 = normal_vector' * (Rot_yaw * vhs_cfg{j}.distSafe2CenterVal_2);
                         Dsafe_2 = norm( D_vel_2 + D_size_2 );
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_2; % intersection of safe radius and connection between trajectory point and obstacle center
-                    elseif strcmp(cfg.scn.Dsafe,'CircleImpr')
+                    elseif strcmp(vhs_cfg{j}.distSafe, 'CircleImpr')
                         D_vel_1 = ( normal_vector' * V_diff ) * vhP.dt_controller; % Improved
     %                         D_vel_1 = 0;
-                        D_size_1 = 2*cfg.scn.vhs{1,j}.distSafe2CenterVal_1;
+                        D_size_1 = 2*vhs_cfg{j}.distSafe2CenterVal_1;
                         Dsafe_1 = D_vel_1 + D_size_1;
                         closest_obst_point = X_opt_opp(1:2) - normal_vector * Dsafe_1;
-                    elseif strcmp(cfg.scn.Dsafe,'EllipseImpr')
+                    elseif strcmp(vhs_cfg{j}.distSafe, 'EllipseImpr')
                         D_vel_2 = ( normal_vector' * V_diff ) * vhP.dt_controller;
                         yaw_ang = X_opt_opp(5); % FIXME add support for linear model: calculate yaw angle
                         Rot_yaw = [ cos(yaw_ang) -sin(yaw_ang) ; sin(yaw_ang) cos(yaw_ang) ];
-    %                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * cfg.scn.vhs{1,j}.distSafe2CenterVal_2) );
+    %                         D_size_2 = norm( (-normal_vector) .* (Rot_yaw * vhs{1,j}.distSafe2CenterVal_2) );
     %                         Dsafe_2 = D_vel_2 + D_size_2;
     %                         closest_obst_point = xOpp(1:2) - normal_vector * Dsafe_2;
-                        safety_ellipseA = Rot_yaw * cfg.scn.vhs{1,j}.distSafe2CenterVal_2;
+                        safety_ellipseA = Rot_yaw * vhs_cfg{j}.distSafe2CenterVal_2;
                         closest_obst_point = X_opt_opp(1:2) + [ safety_ellipseA(1)*(-normal_vector(1)) ; safety_ellipseA(2)*(-normal_vector(2)) ]  - normal_vector * D_vel_2;
                     end
 
@@ -298,9 +299,9 @@ assert(n_rows == n_ineq);
 
 %% Objective
 % Maximize position along track
-if vh.approximationIsSL
+if vh_cfg.approximationIsSL
     objective_lin(idx_pos(vhP.Hp, :)) = -vhP.Q * checkpoints(checkpoint_indices(vhP.Hp)).forward_vector;
-elseif vh.approximationIsSCR
+elseif vh_cfg.approximationIsSCR
     objective_lin(idx_pos(vhP.Hp, :)) = -vhP.Q * track_polygons(track_polygon_indices(vhP.Hp)).forward_direction;
 end
 
@@ -333,11 +334,11 @@ if vhP.isBlockingEnabled
             T_ego = checkpoint_c.center;
             
             % nearest checkpoint of opp
-            n0_opp = checkpoints(vhs{1,1}.cp_curr).normal_vector;
-            T0_opp = checkpoints(vhs{1,1}.cp_curr).center;
+            n0_opp = checkpoints(vhs_ws{1,1}.cp_curr).normal_vector;
+            T0_opp = checkpoints(vhs_ws{1,1}.cp_curr).center;
             
             % current position of attacking opponent
-            p0_opp = vhs{1,1}.x_0(1:2);
+            p0_opp = vhs_ws{1,1}.x_0(1:2);
             
             n1 = n_ego(1); n2 = n_ego(2);
             T1 = T_ego(1); T2 = T_ego(2);
@@ -363,7 +364,7 @@ bound_lower(idx_slack) = 0;
 % required due to linearization at working point - if too far away,
 % linearization error could increase too much
 % (could use delta bounds instead, but not supported by solvers)
-if vh.approximationIsSL
+if vh_cfg.approximationIsSL
     bound_lower(idx_pos) = (X_opt_prev(vhModel.idx_pos, :) - vhP.trust_region_size)';
     bound_upper(idx_pos) = (X_opt_prev(vhModel.idx_pos, :) + vhP.trust_region_size)';
 end
