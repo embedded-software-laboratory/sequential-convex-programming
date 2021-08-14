@@ -202,6 +202,7 @@ evaluation.plot_track_with_speed()
 
 % export all currently open figures (especially for CodeOcean)
 utils.exportAllFigures(cfg);
+fprintf(2, 'Result files (graphics, figures, logs) were saved in "%s"\n', cfg.outputPath)
 end
 
 

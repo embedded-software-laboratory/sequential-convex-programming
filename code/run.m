@@ -81,5 +81,5 @@ else % alternative: run all scenarios from above
 end
 
 % Loding saved file after finished scenario
-disp('Loaded output file of sim, so you can use individual evaluation scripts or replay, if desired')
+fprintf(2, 'Loaded output file of sim, so you can use individual evaluation scripts or replay, if desired\n')
 load(output_file)
