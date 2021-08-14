@@ -56,7 +56,9 @@ for i = 1:length(cfg.scn.vhs)
     end
     
     % reduce start states to match simulation model states
-    assert(isequal(size(cfg.scn.vhs{i}.x_start), [6 1]))
+    if ~isequal(size(cfg.scn.vhs{i}.x_start), [6 1])
+        warning("size of start states doesn't match - it's ok in case of replay of linear model - else: investigate");
+    end
     cfg.scn.vhs{i}.x_start = cfg.scn.vhs{i}.x_start(1:cfg.scn.vhs{i}.model_simulation.nx);
     
     %% Inputs
