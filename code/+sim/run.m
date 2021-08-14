@@ -147,10 +147,12 @@ try
         ws = sim.update_administrative_data(cfg, ws);
 
         %% Execution control
-        % Check if race finished
+        % Check if race finished (every vehicle reached n_laps finish line
+        ctl_race_ongoing = false;
         for i = 1:length(cfg.scn.vhs)
-            if ws.vhs{i}.lap_count >= cfg.race.n_laps
-                ctl_race_ongoing = false;
+            if ws.vhs{i}.lap_count < cfg.race.n_laps
+                ctl_race_ongoing = true;
+                break;
             end
         end
 
