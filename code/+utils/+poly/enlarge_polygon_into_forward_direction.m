@@ -17,7 +17,7 @@ i_shared_vertices_f = track.polygons(i_f).vertex_indices(i_shared_vertices_f_ind
 assert(numel(i_shared_vertices_f) == 2, "number of shared vertices don't match, check your track creation!")
 shared_point_f_1 = track.vertices(:, i_shared_vertices_f(1));
 shared_point_f_2 = track.vertices(:, i_shared_vertices_f(2));
-if debug_; plot_vertices(get_track_polygon_vertices(i_p, track)'); plot_vertices(get_track_polygon_vertices(i_f, track)'); end
+if debug_; utils.poly.plot_vertices(utils.poly.get_track_polygon_vertices(i_p, track)'); utils.poly.plot_vertices(utils.poly.get_track_polygon_vertices(i_f, track)'); end
 
 %% find shared (opposite) constraints
 % forward

@@ -7,8 +7,8 @@ function [track_fullSCR, track_tesselated, track_merged] = main(checkpoints, tra
     % 2) merge polygons
     track_merged = controller.track_SCR.t2_merge(track_tesselated, track_scale, epsilon_area_tolerance);
     % 3) add overlaps (first forwards, than backwards [herbey unioning forward an backward overlap])
-    track_overlapped_forward = controller.track_SCR.t3_overlap(track_merged, track_scale, true);
-    track_overlapped = controller.track_SCR.t3_overlap(track_merged, track_scale, false, track_overlapped_forward);
+    track_overlapped_forward = controller.track_SCR.t3_overlap(checkpoints, track_merged, track_scale, true);
+    track_overlapped = controller.track_SCR.t3_overlap(checkpoints, track_merged, track_scale, false, track_overlapped_forward);
     
     % calculate forward directions of polygons
     track_fullSCR = controller.track_SCR.t9_add_forward_direction(track_overlapped, checkpoints);

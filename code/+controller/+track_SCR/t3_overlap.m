@@ -1,5 +1,6 @@
-function track_new = t3_overlap(track, track_scale, direction_is_forward, track_overlapped)
+function track_new = t3_overlap(checkpoints, track, track_scale, direction_is_forward, track_overlapped)
 % Inputs
+% checkpoints: just for plotting
 % track
 % track_overlapped: in case one direction was run already, contains
 %           overlapped track for merging of forward and backward overlaps.
@@ -20,9 +21,7 @@ if debug_
     figure(997) %#ok<*UNRCH> % for whole file ok
     clf
     hold on
-    axis equal
-    xlim([-5 10])
-    ylim([-10 5])
+    plots.Race.plot_track(checkpoints);
 end
 
 % find neighbor intersections
@@ -59,9 +58,7 @@ for i_p = 1:length(track.polygons)
             figure(997)
             clf
             hold on
-            axis equal
-            xlim([-5 10])
-            ylim([-10 5])
+            plots.Race.plot_track(checkpoints);
             plot(p_enlarged)
         end
 
@@ -187,9 +184,7 @@ if exist('track_overlapped', 'var')
             figure(997)
             clf
             hold on
-            axis equal
-            xlim([-5 10])
-            ylim([-10 5])
+            plots.Race.plot_track(checkpoints);
         end
         
         % get overlaps in both directions
