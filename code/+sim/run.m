@@ -107,15 +107,18 @@ try
         %% Simulation
         % compute input response / advance to next state/x_0
         for i = 1:length(cfg.scn.vhs)
+            % if only simulation for main vehicle ("equipped" with
+            % multiple controllers), copy it's x_0 to other vehicles
+            % (which are only to compare controllers at each step)
             if cfg.scn.is_main_vehicle_only && i > 1
-                % only simulation for main vehicle required, copy it's x_0
-                % to other vehicles (which are only to compare controllers
-                % at each step)
+                % copy trajectory of main vehicle to other controllers
                 if ~cfg.scn.vhs{i}.isSimulationModelLinear
                     ws.vhs{i}.x_0 = ws.vhs{1}.x_0;
                 else
                     ws.vhs{i}.x_0 = model.vehicle.state_st2lin(ws.vhs{1}.x_0);
                 end
+                
+                % don't simulate
                 continue
             end
             
