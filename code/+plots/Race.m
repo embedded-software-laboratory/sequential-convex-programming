@@ -112,33 +112,40 @@ classdef Race < plots.Base
                 if sum(ws.obstacleTable(k,:)) >= 1
                     % iterate over all opponents
                     for j = 1:length(scn.vhs)
-                        % Respect only constraints for opponents marked as obstacles
-                        if ws.obstacleTable(k,j) == 1
-                            % FIXME match plotting with shapes represented,
-                            % see createCP
-                            dist = pdist([x_0_controller(1:2)';ws.vhs{1,j}.x_0(1:2)'],'euclidean'); % calculate distance
-                            normal_vector = - (x_0_controller(1:2)-ws.vhs{1,j}.x_0(1:2))/dist; % normal vector in direction from trajectory point to obstacle center
-                            closest_obst_point = ws.vhs{1,j}.x_0(1:2) - normal_vector * scn.vhs{1,j}.distSafe2CenterVal_1; % intersection of safe radius and connection between trajectory point and obstacle center 
-                            tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
-                            obj.add_tmp_handle(plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k, :),'LineWidth',1));
-                            
-%                         lastTrajectoryPoint = controller_output.x(p.idx_pos,p.Hp); % Select last trajectory point
-%                         
-%                         dist = pdist([lastTrajectoryPoint'; [p.obstacle_1.xVal p.obstacle_1.yVal]],'euclidean');            % See SL_QP
-%                         normal_vector = - (lastTrajectoryPoint-[p.obstacle_1.xVal; p.obstacle_1.yVal])/dist;                % See SL_QP
-%                         closest_obst_point = [p.obstacle_1.xVal; p.obstacle_1.yVal] - normal_vector * p.obstacle_1.distSafe2CenterVal;    % See SL_QP
-%                         
-%                         % Adjust obstacle constraint in case of deadlock
-%                         left_unit_vector = [0 -1;1 0] * last_checkpoint.forward_vector;        % See SL_QP
-%                         
-%                         if strcmp(controller_output.constrAdpt,'left')                                              % See SL_QP
-%                             normal_vector = [last_checkpoint.forward_vector'; -left_unit_vector'] * normal_vector;
-%                         elseif strcmp(controller_output.constrAdpt,'right')
-%                             normal_vector = [last_checkpoint.forward_vector'; -left_unit_vector'] * normal_vector;
-%                         end
-%                         tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
-%                         
-%                         plot(tangent_obst(1,:), tangent_obst(2,:),'k--','LineWidth',1)
+                        % only if obstacles enabled
+                        if scn.vhs{k}.p.areObstaclesConsidered
+                            % Respect only constraints for opponents marked as obstacles
+                            if scn.vhs{k}.approximationIsSL
+                                if ws.obstacleTable(k,j) == 1
+                                    % FIXME match plotting with shapes represented,
+                                    % see createCP
+                                    dist = pdist([x_0_controller(1:2)';ws.vhs{1,j}.x_0(1:2)'],'euclidean'); % calculate distance
+                                    normal_vector = - (x_0_controller(1:2)-ws.vhs{1,j}.x_0(1:2))/dist; % normal vector in direction from trajectory point to obstacle center
+                                    closest_obst_point = ws.vhs{1,j}.x_0(1:2) - normal_vector * scn.vhs{1,j}.distSafe2CenterVal_1; % intersection of safe radius and connection between trajectory point and obstacle center 
+                                    tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
+                                    obj.add_tmp_handle(plot(tangent_obst(1,:), tangent_obst(2,:),'--','color',c(k, :),'LineWidth',1));
+
+        %                         lastTrajectoryPoint = controller_output.x(p.idx_pos,p.Hp); % Select last trajectory point
+        %                         
+        %                         dist = pdist([lastTrajectoryPoint'; [p.obstacle_1.xVal p.obstacle_1.yVal]],'euclidean');            % See SL_QP
+        %                         normal_vector = - (lastTrajectoryPoint-[p.obstacle_1.xVal; p.obstacle_1.yVal])/dist;                % See SL_QP
+        %                         closest_obst_point = [p.obstacle_1.xVal; p.obstacle_1.yVal] - normal_vector * p.obstacle_1.distSafe2CenterVal;    % See SL_QP
+        %                         
+        %                         % Adjust obstacle constraint in case of deadlock
+        %                         left_unit_vector = [0 -1;1 0] * last_checkpoint.forward_vector;        % See SL_QP
+        %                         
+        %                         if strcmp(controller_output.constrAdpt,'left')                                              % See SL_QP
+        %                             normal_vector = [last_checkpoint.forward_vector'; -left_unit_vector'] * normal_vector;
+        %                         elseif strcmp(controller_output.constrAdpt,'right')
+        %                             normal_vector = [last_checkpoint.forward_vector'; -left_unit_vector'] * normal_vector;
+        %                         end
+        %                         tangent_obst = [(closest_obst_point + L * [0 -1; 1 0] * normal_vector) (closest_obst_point - L * [0 -1; 1 0] * normal_vector)];
+        %                         
+        %                         plot(tangent_obst(1,:), tangent_obst(2,:),'k--','LineWidth',1)
+                                end
+                            else
+                                warning('plotting of obstacles not implemented for SCR')
+                            end
                         end
                     end
                 end
