@@ -15,17 +15,28 @@ function [track_fullSCR, track_tesselated, track_merged] = main(checkpoints, tra
     
     
     %% enlarge track_merged's constraints for polygon search (/ extract centroids)
+    % if you want to find  actual (non-overlapped) polygon:
+    % use `track_merged` instead of `track_overlapped`
+    if false
+        track_find_polygons = track_merged; %#ok<*UNRCH>
+    % if you want to find most forward polygon (fastest lap times)
+    else
+        track_find_polygons = track_overlapped;
+    end
+
     constraints_upscaled = struct;
     %centroids = nan(2, length(track_fullSCR.polygons));
-    for j = 1:length(track_fullSCR.polygons)
+    for j = 1:length(track_find_polygons.polygons)
+        poly_current = utils.poly.vert2poly(utils.poly.get_track_polygon_vertices(j, track_find_polygons));
+        
         % enlarge polygon slighlty for numerical reasons
-        poly_current = utils.poly.vert2poly(utils.poly.get_track_polygon_vertices(j, track_fullSCR));
         [poly_current_center(1), poly_current_center(2)] = poly_current.centroid;
         % scale down w.r.t. center
         %   scaling down enlarged so that only track width is
         %   reduced minimallistically (as enlarged and next
         %   neighbour overlap --> scaling has no effect here)
         poly_current = poly_current.scale(1 + 1e-3, poly_current_center);
+        
         [constraints_upscaled(j).A, constraints_upscaled(j).b] = utils.poly.vert2con(utils.poly.poly2vert(poly_current)');
         
         %[centroids(1, j), centroids(2, j)] = poly_current.centroid();
