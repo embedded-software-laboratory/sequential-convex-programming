@@ -69,4 +69,8 @@ end
 X_opt = qp_vars(idx_x)';
 U_opt = qp_vars(idx_u)';
 log.slack = qp_vars(idx_slack);
+
+if log.slack > 1e-10
+    warning('Slackened track constraints with slack = %.2e!', log.slack)
+end
 end
