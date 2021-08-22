@@ -60,7 +60,6 @@ scenarios(40) = config.scenario_paper_SL(scenarios(1));
 if true % run only selected scenario
     output_file = sim.run(scenarios(22));
 else % alternative: run all scenarios from above
-    for i = 41:length(scenarios) %#ok<UNRCH>
         fprintf('Executing scenario %i', i);
         
         % recreate figure handles
