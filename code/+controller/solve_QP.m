@@ -2,7 +2,8 @@ function [X_opt, U_opt, log] =...
     solve_QP(...
         isCplexAvailable, n_vars, idx_x, idx_u, idx_slack,...
         quad_objective, lin_objective,...
-        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper)
+        A_ineq, b_ineq, A_eq, b_eq, bound_lower, bound_upper,...
+        track_creation_scale)
 %% Solve QP
 log = struct;
 
@@ -74,7 +75,7 @@ X_opt = qp_vars(idx_x)';
 U_opt = qp_vars(idx_u)';
 log.slack = qp_vars(idx_slack);
 
-if log.slack > 1e-10
+if log.slack > 4.e-9 * track_creation_scale
     warning('Slackened track constraints with slack = %.2e!', log.slack)
 end
 end
