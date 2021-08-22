@@ -1,25 +1,53 @@
-main file to run: 'run.m' in folder 'code'
-  there you can choose scenarios or indicually build one
+Sequential Convex Programming Methods for Real-time Trajectory Optimization in Autonomous Racing
+---
 
-  make sure 'code' is your matlab working folder
+![GIF showing SCR and SL](hhttps://raw.githubusercontent.com/embedded-software-laboratory/sequential-convex-programming/master/animation_SCR_vs_SL.gif)
 
-% Requirements
-MATLAB 
-  - Version: recommended R2021a, minimum R2019a
-  - Symbolic Math Toolbox
-  - Statistics and Machine Learning Toolbox (required for evaluation only)
-  - solver:
-      - recommended IBM ILOG CPLEX Optimization Studio 12.10
-      - alternatively MATLAB's 'quadprog' via 'Symbolic Math Toolbox'
+[Paper (not published yet)]()
 
+[![Open in Code Ocean](https://codeocean.com/codeocean-assets/badge/open-in-code-ocean.svg)](https://codeocean.com/capsule/2367434/tree)
+ 
+[Watch Video on YouTube](https://youtu.be/21iETsolCNQ)
+ 
+[Explore on GitHub](https://github.com/embedded-software-laboratory/sequential-convex-programming)
+ 
+# Abstract
+We present a real-time-capable Model Predictive Controller based on a
+single-track vehicle model and Pacejka’s magic tire formula for autonomous
+racing applications. After constructing a non-convex trajectory
+optimization problem, it is convexified using the Sequential Convex
+Programming method. We use two different methods for track discretization,
+namely Sequential Linearization (SL) and Sequential Convex Restriction
+(SCR). SL was already introduced in our previous paper. SCR is a new
+addition, introduced in detail and its recursive feasibility proven.
+We show that a controller with SCR yields faster lap times - for race
+starts as well as flying laps - while being real-time capable.
+ 
+# Instructions
+1. open folder 'code' in MATLAB
+2. run the file 'run.m'
+    there you can choose a number from pre-configured scenarios.
+    Alternatively, create a scenario from the existing configuration
+    building blocks (scenarios and vehicles), or create a completly new
+    configuration
+ 
+## Requirements
+- MATLAB 
+    - Version: recommended R2021a, minimum R2019a
+    - Symbolic Math Toolbox
+    - Statistics and Machine Learning Toolbox (required for evaluation only)
+- Solver
+    - recommended IBM ILOG CPLEX Optimization Studio 12.10
+    - alternatively, MATLAB's 'quadprog' via 'Symbolic Math Toolbox'
+ 
 tested on UNIX (Ubuntu 18.04 64-bit) and Windows 10 64-bit, MATLAB
 R2021a, R2019b, R2019a
-
-% Misc
+ 
+## Miscellaneous
 - export large figures:
 print('-painters', gcf, "filename.svg", '-dsvg')
-
-% TODOs
+ 
+## TODOs
 - also search for 'FIXME' for issues to be fixed
 - use 'sim scale' to norm all other scales
     - regularize states and inputs and their respective weights, scale models and track --> allows easy adaption to miniature and full-sized vehicle
