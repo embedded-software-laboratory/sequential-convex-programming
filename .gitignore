@@ -4,6 +4,6 @@
 
 # custom files
 /data/*
-!/data/.gitkeep
+!/data/LICENSE
 /results/*
 !/results/.gitkeep
