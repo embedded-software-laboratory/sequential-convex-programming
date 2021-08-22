@@ -1,5 +1,6 @@
+function scenarios = run(~)
 % main run file & examples how to use this software
-%
+
 %% Initial Remarks
 % when running this software the first time, some simulation data needs to
 %   be prepared -> don't be confused by the outputs and warnings
@@ -57,25 +58,10 @@ scenarios(40) = config.scenario_paper_SL(scenarios(1));
 %                             here  ||         %
 %                                   vv         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if true % run only selected scenario
+if nargin == 0 % default: run only selected scenario
     output_file = sim.run(scenarios(22));
-else % alternative: run all scenarios from above
-    for i = 2:length(scenarios) %#ok<UNRCH>
-        fprintf('Executing scenario %i', i);
-        
-        % recreate figure handles
-        cfg.plot.plots_to_draw = config.config().plot.plots_to_draw;
-        
-        scenario = scenarios(i);
-        if ~isempty(scenario.scn)
-            if scenario.race.n_laps > 10 % limit race length
-                scenario.race.n_laps = 2;
-            end
-            output_file = sim.run(scenario);
-        end
-    end
+    
+    % Loding saved file after finished scenario
+    fprintf(2, 'Loaded output file of sim, so you can use individual evaluation scripts or replay, if desired\n')
+    evalin('base', sprintf('load(''%s'')', output_file));
 end
-
-% Loding saved file after finished scenario
-fprintf(2, 'Loaded output file of sim, so you can use individual evaluation scripts or replay, if desired\n')
-load(output_file)
