@@ -4,7 +4,6 @@ cfg.scn.description = [cfg.scn.description '\nwith linear vs single-track vehicl
 
 %% Vehicles
 vehicle_default = config.base_vehicle(cfg);
-warning('Chosen large H_p for large track coverage. Please pause at step  ~126 to see differences of prediction over whole track')
 
 % vehicle 1: single-track liniger
 vh = config.vehicle_ST_Liniger(vehicle_default);
