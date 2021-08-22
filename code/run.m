@@ -20,7 +20,7 @@ scenarios(4) = config.scenario_1_vehicle(scenarios(1), @(cfg_veh) config.vehicle
 scenarios(5) = config.scenario_1_vehicle(scenarios(1), @(cfg_veh) config.vehicle_SCR(config.vehicle_lin_Liniger_ST_Liniger(cfg_veh)));
 scenarios(6) = config.scenario_1_vehicle(scenarios(1), @(cfg_veh) config.vehicle_SCR(config.vehicle_lin_Liniger(cfg_veh)));
 
-% ...with some laps
+% ...with some (2) laps
 scenarios(7) = config.scenario_n_laps_race(scenarios(4), 2);
 scenarios(8) = config.scenario_n_laps_race(scenarios(5), 2);
 scenarios(9) = config.scenario_n_laps_race(scenarios(6), 2);
@@ -67,7 +67,7 @@ scenarios(50) = config.scenario_race_various_vehicles(scenarios(1));
 %                                   vv         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if true
-    output_file = sim.run(config.scenario_n_laps_race(scenarios(4), 2));
+    output_file = sim.run(scenarios(22));
 else % alternative: run all scenarios from above
     for i = 1:length(scenarios) %#ok<UNRCH>
         scenario = scenarios(i);
