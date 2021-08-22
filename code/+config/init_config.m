@@ -92,6 +92,9 @@ cfg.scn.track_center = [cfg.scn.track.center];
 % if any vehicle uses SCR controller
 for i = 1:length(cfg.scn.vhs)
     if cfg.scn.vhs{i}.approximationIsSCR
+        warning("Disabling 'MATLAB:polyshape:repairedBySimplify' warnings")
+        warning off MATLAB:polyshape:repairedBySimplify
+        
         [cfg.scn.track_SCR, track_tesselated, track_merged] = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
         
         % plot track

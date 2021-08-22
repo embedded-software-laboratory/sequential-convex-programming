@@ -2,6 +2,7 @@ function cfg = config()
 cfg = struct;
 
 % disable trace in case of warnings
+warning("Disabling warning's backtracing")
 warning off backtrace
 
 %% Main Parameters
