@@ -95,7 +95,8 @@ for i = 1:length(cfg.scn.vhs)
         warning("Disabling 'MATLAB:polyshape:repairedBySimplify' warnings")
         warning off MATLAB:polyshape:repairedBySimplify
         
-        [cfg.scn.track_SCR, track_tesselated, track_merged] = controller.track_SCR.main(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
+        disp('Generating SCR track model - this can take a few seconds')
+        [cfg.scn.track_SCR, track_tesselated, track_merged] = controller.track_SCR.generate(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
         
         % plot track
         plots.TrackPolygons(1).plot(cfg.scn.track, track_tesselated, track_merged, cfg.scn.track_SCR, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
