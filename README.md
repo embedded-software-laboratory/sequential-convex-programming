@@ -6,8 +6,8 @@ Sequential Convex Programming Methods for Real-time Trajectory Optimization in A
 [Paper (not published yet)]()
 
 [![Open in Code Ocean](https://codeocean.com/codeocean-assets/badge/open-in-code-ocean.svg)](https://codeocean.com/capsule/2367434/tree)
- 
-[Watch Video on YouTube](https://youtu.be/21iETsolCNQ)
+
+[Watch Full Video on YouTube](https://youtu.be/21iETsolCNQ)
  
 [Explore on GitHub](https://github.com/embedded-software-laboratory/sequential-convex-programming)
  
@@ -24,12 +24,17 @@ We show that a controller with SCR yields faster lap times - for race
 starts as well as flying laps - while being real-time capable.
  
 # Instructions
-1. open folder 'code' in MATLAB
-2. run the file 'run.m'
-    there you can choose a number from pre-configured scenarios.
-    Alternatively, create a scenario from the existing configuration
-    building blocks (scenarios and vehicles), or create a completly new
-    configuration
+0. clone or download this repo and open MATLAB in this folder
+1. open folder 'code' via ```cd code``` in MATLAB
+2. optional: choose a pre-configured scenario in file 'run.m'
+    Alternatively, configure an individual configuration as described in
+    the next paragraph
+2. run the scenario via ```run()```
+
+## Configuration
+In the folder 'code/+config', all configruations of scenarios and vehicles
+are stored. You can combine the building blocks to your likes or even
+create a completly new configuration
  
 ## Requirements
 - MATLAB 
@@ -45,7 +50,7 @@ R2021a, R2019b, R2019a
  
 ## Miscellaneous
 - export large figures:
-print('-painters', gcf, "filename.svg", '-dsvg')
+```print('-painters', gcf, "filename.svg", '-dsvg')```
  
 ## TODOs
 - also search for 'FIXME' for issues to be fixed

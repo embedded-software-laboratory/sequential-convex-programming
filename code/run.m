@@ -1,4 +1,4 @@
-% examples how to use this software
+% main run file & examples how to use this software
 %
 %% Initial Remarks
 % when running this software the first time, some simulation data needs to
