@@ -1,7 +1,7 @@
 Sequential Convex Programming Methods for Real-time Trajectory Optimization in Autonomous Racing
 ---
 
-![GIF showing SCR and SL](hhttps://raw.githubusercontent.com/embedded-software-laboratory/sequential-convex-programming/master/animation_SCR_vs_SL.gif)
+![GIF showing SCR and SL](https://raw.githubusercontent.com/embedded-software-laboratory/sequential-convex-programming/master/animation_SCR_vs_SL.gif)
 
 [Paper (not published yet)]()
 
