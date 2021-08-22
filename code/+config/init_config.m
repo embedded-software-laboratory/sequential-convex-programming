@@ -17,11 +17,11 @@ if exist(cfg.env.cplex.path, 'dir')
         disp('Using CPLEX for solving QP')
         cfg.env.cplex.is_available = true;
     else
-        fprintf('Using MATLAB for solving QP as CPLEX files in path "%s" not existing\n', cfg.env.cplex.path)
+        fprintf("Using MATLAB for solving QP as CPLEX files in path '%s' not existing\nMATLAB's quadprog could fail when compared to CPLEX\n", cfg.env.cplex.path)
         cfg.env.cplex.is_available = false;
     end
 else
-    fprintf('Using MATLAB for solving QP as CPLEX path "%s" is not existing\n', cfg.env.cplex.path)
+    fprintf("Using MATLAB for solving QP as CPLEX path '%s' is not existing\nMATLAB's quadprog could fail when compared to CPLEX\n", cfg.env.cplex.path)
     cfg.env.cplex.is_available = false;
 end
 
