@@ -3,5 +3,7 @@
 
 
 # custom files
-/data
-/results
+/data/*
+!/data/.gitkeep
+/results/*
+!/results/.gitkeep
