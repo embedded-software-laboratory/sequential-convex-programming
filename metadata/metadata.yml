@@ -31,13 +31,16 @@ tags:
 - sqp
 - sequential-quadratic-programming
 authors:
-- name: Bassam Alrifaee
-  affiliations:
-  - name: Chair of Embedded Software, RWTH Aachen University, Germany
 - name: Patrick Scheffe
   affiliations:
   - name: Chair of Embedded Software, RWTH Aachen University, Germany
 - name: Theodor Mario Henneken
+  affiliations:
+  - name: Chair of Embedded Software, RWTH Aachen University, Germany
+- name: Maximilian Kloock
+  affiliations:
+  - name: Chair of Embedded Software, RWTH Aachen University, Germany
+- name: Bassam Alrifaee
   affiliations:
   - name: Chair of Embedded Software, RWTH Aachen University, Germany
 corresponding_contributor:
