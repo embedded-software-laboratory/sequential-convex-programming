@@ -1,6 +1,27 @@
-metadata_version: 1
-name: Sequential Convex Programming Methods for Real-time Trajectory Optimization in Autonomous Vehicle Racing
-description: We present a real-time-capable Model Predictive Controller (MPC) based on a single-track vehicle model and Pacejka’s magic tire formula for autonomous racing applications. After constructing a non-convex trajectory optimization problem, it is convexified using the Sequential Convex Programming (SCP) method. We use two different methods for track discretization, namely Sequential Linearization (SL) and Sequential Convex Restriction (SCR). SL was already introduced in our previous paper. SCR is a new addition, introduced in detail and its recursive feasibility proven. We show that a controller with SCR yields faster lap times - for race starts as well as flying laps - while being real-time capable. A video showing the results is available at \url{https://youtu.be/21iETsolCNQ}.
+metadata_version: 2
+name: Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning in Autonomous Vehicle Racing
+description: We present a real-time-capable Model Predictive Controller (MPC)
+based on a non-linear single-track vehicle model and Pacejka’s
+magic tire formula for autonomous racing applications. After 
+formulating the general non-convex trajectory optimization 
+problem, the model is linearized around estimated operating 
+points and the constraints are convexified using the Sequential
+Convex Programming (SCP) method. We use two different methods
+to convexify the non-convex track constraints, namely Sequential
+Linearization (SL) and Sequential Convex Restriction (SCR).
+SL, a method of relaxing the constraints, was introduced in our
+previous paper. SCR, a method of restricting the constraints,
+is introduced in this paper. We show the application of SCR to
+autonomous racing and prove that it does not interfere with
+recursive feasibility. We compare the predicted trajectory
+quality of the non-linear single-track model with the linear
+double integrator model from our previous paper. The MPC
+performance is evaluated on a scaled version of the Hockenheimring
+racing track. We show that an MPC with SCR yields faster lap times
+than an MPC with SL - for race starts as well as flying laps -
+while still being real-time capable. A video showing the results
+is available at \url{https://youtu.be/21iETsolCNQ}.
+
 tags:
 - autonomous-vehicle
 - autonomous-vehicle-racing
