@@ -7,8 +7,9 @@ warning off backtrace
 
 %% Main Parameters
 % folder of CPLEX' MATLAB connector & all necessary run files
-% typical installation dir: 'C:/Program Files/IBM/ILOG/CPLEX_Studio1210/cplex/matlab/x64_win64';
 cfg.env.cplex.path = 'D:/#local Apps/CPLEX_MATLAB_x64';
+% typical installation dir:
+cfg.env.cplex.path = 'C:/Program Files/IBM/ILOG/CPLEX_Studio1210/cplex/matlab/x64_win64';
 
 cfg.startTimeStr = datestr(now, 'yyyy.mm.dd_HH_MM_SS');
 
@@ -37,6 +38,7 @@ cfg.log.level   = cfg.log.DEBUG; % log level: choose from above
 cfg.plot.is_enabled = true;
 cfg.plot.has_accelerations = true;
 cfg.plot.has_focus_on_vehicle = false;
+cfg.plot.grayscale = false;
 
 % fixed plots drawn at initialization
 % CAVE: hard-coded in init, here only for proper figure order

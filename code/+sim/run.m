@@ -117,6 +117,8 @@ try
                 else
                     ws.vhs{i}.x_0 = model.vehicle.state_st2lin(ws.vhs{1}.x_0);
                 end
+                % Copy full trajectory for track convexification
+                ws.vhs{i}.X_controller = ws.vhs{1}.X_controller;
                 
                 % don't simulate
                 continue

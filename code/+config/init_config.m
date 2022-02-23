@@ -104,4 +104,8 @@ for i = 1:length(cfg.scn.vhs)
         break
     end
 end
+
+% Plotting
+cfg.plot.grayscale = false;
+
 end

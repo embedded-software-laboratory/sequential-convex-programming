@@ -37,7 +37,7 @@ for j = 1:length(log.lap)
         pause(delta);
     elseif j > 1
         warning('Replay is currently not real-time')
-    end 
+    end
 end
 
 disp('replay finished')

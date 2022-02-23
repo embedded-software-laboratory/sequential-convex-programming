@@ -5,6 +5,11 @@ classdef Race < plots.Base
 
             set(groot, 'CurrentFigure', obj.figure_handle); % same as 'figure(f)' but without focusing
             
+            if ~cfg.plot.grayscale
+                c = utils.getRwthColors(100);
+            else
+                c = [0.3; 0.6] .* [1 1 1];
+            end
             % plot base track initially
             if ~obj.is_background_plotted
                 % clear old plot
@@ -15,7 +20,6 @@ classdef Race < plots.Base
                 hold on
                 
                 % create legend accordingly to cars drawn below
-                c = utils.getRwthColors(100);
                 handles = zeros(length(scn.vhs), 1);
                 names = cell(length(scn.vhs), 1);
                 for k = 1:length(scn.vhs)
@@ -37,7 +41,7 @@ classdef Race < plots.Base
 
             %% Plot vehicle specific elements
             %c = ['r','b','g','y','m','c','w','k',];
-            c = utils.getRwthColors(100);
+            
             for k = 1:length(scn.vhs)
                 % Value asignments for better readability
                 x_0_controller = ws.vhs{k}.x_0_controller;
@@ -47,7 +51,15 @@ classdef Race < plots.Base
                 vehWidth = scn.vhs{k}.widthVal;
 
                 %% Planned trajectory
-                obj.add_tmp_handle(plot(X_controller(1,:),X_controller(2,:),'.-','color',c(k, :),'MarkerSize',7));    
+                obj.add_tmp_handle(plot(X_controller(1,:),X_controller(2,:),'.-','color',c(k, :),'MarkerSize',7));
+                %% Previous trajectory
+                obj.add_tmp_handle(plot(...
+                    ws.vhs{k}.X_controller_prev(1,:),ws.vhs{k}.X_controller_prev(2,:),...
+                    'LineStyle',':',...
+                    'Marker','none',...
+                    'color','black',...
+                    'MarkerSize',5)...
+                );
 
                 %% Vehicle Box
                 if length(x_0_controller) <= 4 % if vehicle control model is linear
@@ -73,7 +85,7 @@ classdef Race < plots.Base
                 % would adher to in next controller execution)
                 if scn.vhs{k}.approximationIsSL
                     % Select checkpoint of last trajectory point
-                    last_checkpoint_index = controller.track_SL.find_closest_checkpoint_index(X_controller(1:2, p.Hp), [scn.track.center]);
+                    last_checkpoint_index = controller.track_SL.find_closest_checkpoint_index(ws.vhs{k}.X_controller_prev(1:2, p.Hp), [scn.track.center]);
                     % Select checkpoint of last trajectory point
                     last_checkpoint = scn.track(last_checkpoint_index);
                     % Length of plotted linear constraints
@@ -85,7 +97,7 @@ classdef Race < plots.Base
                     obj.add_tmp_handle(plot(tangent_left(1,:), tangent_left(2,:), '--', 'color', c(k, :), 'LineWidth', 1));
                     obj.add_tmp_handle(plot(tangent_right(1,:), tangent_right(2,:), '--', 'color', c(k, :), 'LineWidth', 1));
                 else % SCR
-                    last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(X_controller(1:2, p.Hp), scn.track_SCR);
+                    last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(ws.vhs{k}.X_controller_prev(1:2, p.Hp), scn.track_SCR);
                     last_poly_vertices = utils.poly.cleanse_convex_polygon(...
                         utils.poly.get_track_polygon_vertices(last_poly_idx, scn.track_SCR));
                     % back-and-forth conversion to close polygon
@@ -168,7 +180,7 @@ classdef Race < plots.Base
             %right_points = right_points - normals;
             % Draw track area
             pts=[fliplr(right_points) right_points(:,end) left_points left_points(:,1)];
-            fill(pts(1,:), pts(2,:),[1 1 1]*.8,'EdgeAlpha',0)
+            fill(pts(1,:), pts(2,:),[1 1 1]*.9,'EdgeAlpha',0)
 
             if true
                 plot([left_points(1,:) left_points(1,1)],[left_points(2,:) left_points(2,1)],'k','LineWidth',1);
