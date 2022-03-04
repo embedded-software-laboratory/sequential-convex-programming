@@ -54,10 +54,9 @@ if ~isempty(containing_polygons_indices)
         [containing_polygons_indices...
          containing_polygons_indices(1) + length(constraints_upscaled)]);
 
-    % we define last polygon cointaing position as the one having the
+    % we define the last polygon cointaing position as the one having the
     %   largest distance to the next polygon in [#polygons]
-    most_forward_polygon_index_index = find(distance_between_polygon_indices == max(distance_between_polygon_indices), 1, 'last');
-
+    [~,most_forward_polygon_index_index] = max(distance_between_polygon_indices);
     
     % extract 
     polygon_index = containing_polygons_indices(most_forward_polygon_index_index);

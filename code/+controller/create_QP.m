@@ -392,10 +392,10 @@ if ~isControlModelLinear
     % 	Choosing small numerical values for last prediction step
 	% 	(instead of terminal equality)
     %
-    %   Overwriting bounds form above
-    bound_upper(idx_x(end,3)) = 0.01;
-    bound_upper(idx_x(end,4)) = 0.01;
-    bound_upper(idx_x(end,6)) = 0.02;
+    %   Overwriting bounds from above
+    bound_upper(idx_x(end,3)) = 0.01; % v_long
+    bound_upper(idx_x(end,4)) = 0.01; % v_lat
+    bound_upper(idx_x(end,6)) = 0.02; % dyaw
     bound_lower(idx_x(end,3)) = 0.005;
     bound_lower(idx_x(end,4)) = -0.01;
     bound_lower(idx_x(end,6)) = -0.02;

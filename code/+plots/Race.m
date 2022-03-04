@@ -8,7 +8,7 @@ classdef Race < plots.Base
             if ~cfg.plot.grayscale
                 c = utils.getRwthColors(100);
             else
-                c = [0.3; 0.6] .* [1 1 1];
+                c = [0.1; 0.4] .* [1 1 1];
             end
             % plot base track initially
             if ~obj.is_background_plotted
@@ -53,13 +53,16 @@ classdef Race < plots.Base
                 %% Planned trajectory
                 obj.add_tmp_handle(plot(X_controller(1,:),X_controller(2,:),'.-','color',c(k, :),'MarkerSize',7));
                 %% Previous trajectory
-                obj.add_tmp_handle(plot(...
-                    ws.vhs{k}.X_controller_prev(1,:),ws.vhs{k}.X_controller_prev(2,:),...
-                    'LineStyle',':',...
-                    'Marker','none',...
-                    'color','black',...
-                    'MarkerSize',5)...
-                );
+                try
+                    obj.add_tmp_handle(plot(...
+                        ws.vhs{k}.X_controller_prev(1,:),ws.vhs{k}.X_controller_prev(2,:),...
+                        'LineStyle',':',...
+                        'Marker','none',...
+                        'color','black',...
+                        'MarkerSize',5)...
+                    );
+                catch
+                end
 
                 %% Vehicle Box
                 if length(x_0_controller) <= 4 % if vehicle control model is linear
@@ -84,8 +87,12 @@ classdef Race < plots.Base
                 % last checkpoint/polygon (next means the one, which we
                 % would adher to in next controller execution)
                 if scn.vhs{k}.approximationIsSL
-                    % Select checkpoint of last trajectory point
-                    last_checkpoint_index = controller.track_SL.find_closest_checkpoint_index(ws.vhs{k}.X_controller_prev(1:2, p.Hp), [scn.track.center]);
+                    try
+                        % Select checkpoint of last trajectory point
+                        last_checkpoint_index = controller.track_SL.find_closest_checkpoint_index(ws.vhs{k}.X_controller_prev(1:2, p.Hp), [scn.track.center]);
+                    catch
+                        last_checkpoint_index = controller.track_SL.find_closest_checkpoint_index(ws.vhs{k}.X_controller(1:2, p.Hp), [scn.track.center]);
+                    end
                     % Select checkpoint of last trajectory point
                     last_checkpoint = scn.track(last_checkpoint_index);
                     % Length of plotted linear constraints
@@ -97,7 +104,11 @@ classdef Race < plots.Base
                     obj.add_tmp_handle(plot(tangent_left(1,:), tangent_left(2,:), '--', 'color', c(k, :), 'LineWidth', 1));
                     obj.add_tmp_handle(plot(tangent_right(1,:), tangent_right(2,:), '--', 'color', c(k, :), 'LineWidth', 1));
                 else % SCR
-                    last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(ws.vhs{k}.X_controller_prev(1:2, p.Hp), scn.track_SCR);
+                    try
+                        last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(ws.vhs{k}.X_controller_prev(1:2, p.Hp), scn.track_SCR);
+                    catch
+                        last_poly_idx = controller.track_SCR.find_closest_most_forward_polygon_index(ws.vhs{k}.X_controller(1:2, p.Hp), scn.track_SCR);
+                    end
                     last_poly_vertices = utils.poly.cleanse_convex_polygon(...
                         utils.poly.get_track_polygon_vertices(last_poly_idx, scn.track_SCR));
                     % back-and-forth conversion to close polygon

@@ -13,7 +13,13 @@ for i = 1:length(cfg.scn.vhs)
     else
         ws.vhs{i}.x_0_controller = ws.vhs{i}.x_0;
     end
-    ws.vhs{i}.X_controller = repmat(ws.vhs{i}.x_0_controller, 1, cfg.scn.vhs{i}.p.Hp);
+    
+    try
+        ws.vhs{i}.X_controller = cfg.scn.vhs{i}.X_controller_start;
+    catch
+        ws.vhs{i}.X_controller = repmat(ws.vhs{i}.x_0_controller, 1, cfg.scn.vhs{i}.p.Hp);
+    end
+    
     ws.vhs{i}.X_controller_prev = ws.vhs{i}.X_controller;
     ws.vhs{i}.U_controller = repmat([0;0], 1, cfg.scn.vhs{i}.p.Hp);
     ws.vhs{i}.u_1 = ws.vhs{i}.U_controller(:, 1);

@@ -21,9 +21,6 @@ else % if on CodeOcean (or headless, in general)
     cfg.outputPath = '../results/';
     cfg.dataPath = '../data/';
 end
-% create output & temp dir if non-existing
-if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
-if ~isfolder(cfg.dataPath); mkdir(cfg.dataPath); end
 
 %% Logging
 cfg.log.DEBUG   = 4;

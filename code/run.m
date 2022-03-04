@@ -39,6 +39,7 @@ scenarios(19) = config.scenario_race_various_vehicles(scenarios(1));
 % different controller per vehicle
 scenarios(21) = config.scenario_lin_vs_ST(scenarios(1));
 scenarios(22) = config.scenario_SL_vs_SCR(scenarios(1));
+scenarios(23) = config.scenario_SCR_vs_SL(scenarios(1));
 % ... as endless race
 scenarios(26) = config.scenario_endless_race(scenarios(21));
 scenarios(27) = config.scenario_endless_race(scenarios(22));

@@ -76,8 +76,9 @@ try
                 vhs, ws.obstacleTable, ws.blockingTable, i);
 
             % save payload (predicted trajectories) for easier access
-            ws.vhs{i}.X_controller = ws.vhs{i}.controller_output(end).X_opt;
-            ws.vhs{i}.U_controller = ws.vhs{i}.controller_output(end).U_opt;
+            i_scp = find([ws.vhs{i}.controller_output.t_opt], 1, 'last');
+            ws.vhs{i}.X_controller = ws.vhs{i}.controller_output(i_scp).X_opt;
+            ws.vhs{i}.U_controller = ws.vhs{i}.controller_output(i_scp).U_opt;
             ws.vhs{i}.u_1 = ws.vhs{i}.U_controller(:, 1);
         end
         
@@ -114,11 +115,11 @@ try
                 % copy trajectory of main vehicle to other controllers
                 if ~cfg.scn.vhs{i}.isSimulationModelLinear
                     ws.vhs{i}.x_0 = ws.vhs{1}.x_0;
+                    ws.vhs{i}.X_controller = ws.vhs{1}.X_controller;
                 else
                     ws.vhs{i}.x_0 = model.vehicle.state_st2lin(ws.vhs{1}.x_0);
+                    ws.vhs{i}.X_controller = model.vehicle.state_st2lin(ws.vhs{1}.X_controller);
                 end
-                % Copy full trajectory for track convexification
-                ws.vhs{i}.X_controller = ws.vhs{1}.X_controller;
                 
                 % don't simulate
                 continue

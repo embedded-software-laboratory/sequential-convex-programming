@@ -14,10 +14,14 @@ X_opt = vhs{i_vehicle}.X_opt; % Hp stages: last cycle's       x(2), x(3), ..., x
 U_opt = vhs{i_vehicle}.U_opt; % Hp stages: last cycle's u(1), u(2), u(3), ..., u(Hp-1), u(Hp)
 
 % Preallocate for speed
-controller_output = struct('X_opt', 'U_opt', 'log_opt',...
-    'checkpoint_indices', 'track_polygon_indices', 't_opt');
-controller_output.X_opt(vh.p.SCP_iterations) = NaN;
-
+controller_output = struct( ...
+    'X_opt', [], ...
+    'U_opt', [], ...
+    'log_opt', [], ...
+    'checkpoint_indices', [], ...
+    'track_polygon_indices', [], ...
+    't_opt', num2cell(zeros(1,vh.p.SCP_iterations)) ...
+);
 
 %% Optimization Iterations
 for i = 1:vh.p.SCP_iterations
@@ -67,6 +71,18 @@ for i = 1:vh.p.SCP_iterations
     controller_output(i).checkpoint_indices = checkpoint_indices;
     controller_output(i).track_polygon_indices = track_polygon_indices;
     controller_output(i).t_opt = toc(timer);
+
+    try
+        x_prev = controller_output(i-1).X_opt;
+        x_now = controller_output(i).X_opt;
+        min_change = 1e-2;
+        if norm(x_prev-x_now)<min_change
+            % converged
+            break
+        end
+    catch
+    end
+
 end
 
 %% Status
@@ -76,6 +92,6 @@ end
 
 fprintf('vehicle %i t_opt %6.0fms flag %i iter %3i slack %6.2f fval %6.1f\n',...
     i_vehicle, sum([controller_output.t_opt]) * 1000,...
-    log_solver.exitflag, vh.p.SCP_iterations, log_solver.slack,...
+    log_solver.exitflag, i, log_solver.slack,...
     log_solver.fval);
 end

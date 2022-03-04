@@ -9,6 +9,10 @@ if isempty(cfg.scn.vhs)
     error('scenario without vehicles!')
 end
 
+% create output & temp dir if non-existing
+if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
+if ~isfolder(cfg.dataPath); mkdir(cfg.dataPath); end
+
 %% CPLEX Detection
 % if CPLEX is in path: use it
 if exist(cfg.env.cplex.path, 'dir')
@@ -90,18 +94,25 @@ cfg.scn.track_center = [cfg.scn.track.center];
 
 % Polygon Creation (for SCR)
 % if any vehicle uses SCR controller
-for i = 1:length(cfg.scn.vhs)
-    if cfg.scn.vhs{i}.approximationIsSCR
-        warning("Disabling 'MATLAB:polyshape:repairedBySimplify' warnings")
-        warning off MATLAB:polyshape:repairedBySimplify
-        
+cfg_array = [cfg.scn.vhs{:}];
+if any([cfg_array.approximationIsSCR])
+    warning("Disabling 'MATLAB:polyshape:repairedBySimplify' warnings")
+    warning off MATLAB:polyshape:repairedBySimplify
+    
+    try
+        f=load(cfg.scn.track_polygons_filepath);
+        cfg.scn.track_SCR = f.track_SCR;
+    catch
         disp('Generating SCR track model - this can take a few seconds')
         [cfg.scn.track_SCR, track_tesselated, track_merged] = controller.track_SCR.generate(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
-        
+        track_SCR = cfg.scn.track_SCR;
+        save(cfg.scn.track_polygons_filepath, ...
+            'track_SCR', 'track_tesselated', 'track_merged' ...
+        );
+    
         % plot track
         plots.TrackPolygons(1).plot(cfg.scn.track, track_tesselated, track_merged, cfg.scn.track_SCR, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
         
-        break
     end
 end
 
