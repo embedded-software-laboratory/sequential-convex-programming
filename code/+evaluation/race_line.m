@@ -14,10 +14,14 @@ function sim_result = race_line(has_changed)
         scenario = config.scenario_flying_start(scenario);
         
         % iterations for SL
-        assert(scenario.scn.vhs{2}.approximation == scenario.scn.vhs{1}.approximationSL);
+        assert(scenario.scn.vhs{2}.approximation == scenario.scn.vhs{2}.approximationSL);
         scenario.scn.vhs{2}.p.SCP_iterations = 1;
         % trust region
-        scenario.scn.vhs{2}.p.trust_region_size = 1.6;
+        if (scenario.env.cplex.is_available)
+            scenario.scn.vhs{2}.p.trust_region_size = 1.6;
+        else
+            scenario.scn.vhs{2}.p.trust_region_size = 0.6;
+        end
         
         output_file = sim.run(scenario);
     end

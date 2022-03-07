@@ -8,6 +8,11 @@ function sim_result = lin_vs_st(has_changed)
     scenario.outputPath = '../results/lin_vs_st/';
     output_file = [scenario.outputPath, 'log.mat'];
     if (has_changed) || (~isfile(output_file))
+        if (scenario.env.cplex.is_available)
+            scenario.scn.vhs{1}.p.trust_region_size = 1.6;
+        else
+            scenario.scn.vhs{1}.p.trust_region_size = 0.8;
+        end
         output_file = sim.run(scenario);
     end
 
