@@ -2,7 +2,7 @@ function sim_result = lap_time(output_file)
     if nargin == 0
         scenarios = run(true);
         scenario = scenarios(22); % race
-        scenario.outputPath = '../results/tmp/t_lap/';
+        scenario.outputPath = '../results/t_lap/';
         output_file = [scenario.outputPath, 'log.mat'];
         if ~isfile(output_file)
             % scenario = scenarios(4); % scr

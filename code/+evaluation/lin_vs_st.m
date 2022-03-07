@@ -5,7 +5,7 @@ function sim_result = lin_vs_st(has_changed)
     end
     scenarios = run(true);
     scenario = scenarios(30);
-    scenario.outputPath = '../results/tmp/lin_vs_st/';
+    scenario.outputPath = '../results/lin_vs_st/';
     output_file = [scenario.outputPath, 'log.mat'];
     if (has_changed) || (~isfile(output_file))
         output_file = sim.run(scenario);
@@ -65,15 +65,8 @@ end
 % sim_result.cfg.plot.plots_to_draw{i_race}.plot(sim_result.cfg, ws);
 % fig = sim_result.cfg.plot.plots_to_draw{i_race}.figure_handle;
 
-% legend('','','','','','','Single-Track Model','','','','','Linear Model','','','','','Location','southeast')
 legend('','','','','Single-Track Model','','Linear Model','','Location','southeast')
 xlim([-1.3 2.2]);
 ylim([-3.5 -0.8]);
 utils.set_figure_properties(fig,'paper',6);
 exportgraphics(fig, [sim_result.cfg.outputPath 'lin_vs_st.pdf'], 'ContentType','vector');
-
-
-% legend: v1,v2,track,track bound l/r,track bound l/r,track
-% start/stop,trajectory 1,previous trajectory 1,vehicle 1, convex
-% approximation 1, trajctory 2, previous trajectory 2, vehicle 2, SL l/r,
-% SL l/r

@@ -6,8 +6,8 @@ cfg.scn.description = [cfg.scn.description '\nwith comparison of SL vs SCR track
 vehicle_default = config.vehicle_ST_Liniger(config.base_vehicle(cfg));
 
 
-% vehicle 2: SCR
+% vehicle 1: SCR
 cfg.scn.vhs{end + 1} = config.vehicle_SCR(vehicle_default);
 
-% vehicle 1: SL
+% vehicle 2: SL
 cfg.scn.vhs{end + 1} = vehicle_default;

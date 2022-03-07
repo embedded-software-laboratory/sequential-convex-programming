@@ -39,7 +39,7 @@ init_control_keys(cfg.plot.plots_to_draw);
 disp('########################')
 disp('#- Starting race loop -#')
 
-try
+% try
     while ctl_race_ongoing
         fprintf('------------------------- Step %i -------------------------\n', step_sim);
         step_sim = step_sim + 1;
@@ -177,9 +177,9 @@ try
         end
         fprintf('Loop time %4.0fms\n', toc(timer_loop) * 1000)
     end
-catch ME
-    warning('#- Error in race loop -#')
-end
+% catch ME
+%     warning('#- Error in race loop -#')
+% end
 disp('#-  Ending race loop  -#')
 disp('########################')
 fprintf('Overall loop time %.2fs\n', toc(timer_overall))

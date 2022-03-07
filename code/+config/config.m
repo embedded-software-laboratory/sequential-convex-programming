@@ -16,11 +16,11 @@ cfg.startTimeStr = datestr(now, 'yyyy.mm.dd_HH_MM_SS');
 % paths (must have trailing slash)
 if usejava('desktop') % if run graphically
     cfg.outputPath = ['../results/', cfg.startTimeStr, '/'];
-    cfg.dataPath = '../data/';
 else % if on CodeOcean (or headless, in general)
     cfg.outputPath = '../results/';
-    cfg.dataPath = '../data/';
 end
+cfg.dataPath = '../data/';
+cfg.tmpPath = '../results/tmp/';
 
 %% Logging
 cfg.log.DEBUG   = 4;

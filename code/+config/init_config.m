@@ -12,6 +12,7 @@ end
 % create output & temp dir if non-existing
 if ~isfolder(cfg.outputPath); mkdir(cfg.outputPath); end
 if ~isfolder(cfg.dataPath); mkdir(cfg.dataPath); end
+if ~isfolder(cfg.tmpPath); mkdir(cfg.tmpPath); end
 
 %% CPLEX Detection
 % if CPLEX is in path: use it
@@ -100,13 +101,13 @@ if any([cfg_array.approximationIsSCR])
     warning off MATLAB:polyshape:repairedBySimplify
     
     try
-        f=load(cfg.scn.track_polygons_filepath);
+        f=load([cfg.tmpPath, cfg.scn.track_polygons_filename]);
         cfg.scn.track_SCR = f.track_SCR;
     catch
         disp('Generating SCR track model - this can take a few seconds')
         [cfg.scn.track_SCR, track_tesselated, track_merged] = controller.track_SCR.generate(cfg.scn.track, cfg.scn.track_creation_scale, cfg.scn.track_SCR_epsilon_area_tolerance);
         track_SCR = cfg.scn.track_SCR;
-        save(cfg.scn.track_polygons_filepath, ...
+        save([cfg.tmpPath, cfg.scn.track_polygons_filename], ...
             'track_SCR', 'track_tesselated', 'track_merged' ...
         );
     

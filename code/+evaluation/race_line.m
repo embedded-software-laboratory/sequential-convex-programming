@@ -1,5 +1,7 @@
 function sim_result = race_line(has_changed)
-    if (nargin==0) has_changed=false; end
+    if (nargin==0) 
+        has_changed=false;
+    end
     scenarios = run(true);
     scenario = scenarios(23); % race
     scenario.outputPath = '../results/race_line/';
@@ -16,7 +18,7 @@ function sim_result = race_line(has_changed)
         scenario.scn.vhs{2}.p.SCP_iterations = 1;
         % trust region
         scenario.scn.vhs{2}.p.trust_region_size = 1.6;
-
+        
         output_file = sim.run(scenario);
     end
     sim_result = load(output_file);

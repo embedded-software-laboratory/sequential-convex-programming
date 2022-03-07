@@ -1,5 +1,5 @@
 function [x_0, X_controller_start] = compute_ST_flying_initialization()
-        filepath = "../results/tmp/x_init_flying.mat"; 
+        filepath = "../results/tmp/x_init_flying.mat";
         try
             f = load(filepath); % loads x_0 and X_controller_start
             x_0 = f.x_0;
@@ -7,6 +7,7 @@ function [x_0, X_controller_start] = compute_ST_flying_initialization()
         catch
             scenarios = run(true);
             scenario = scenarios(4); % scr
+            scenario.outputPath = '../results/tmp/';
             n_laps = 2;
             scenario = config.scenario_n_laps_race(scenario, n_laps);
             output_file = sim.run(scenario);

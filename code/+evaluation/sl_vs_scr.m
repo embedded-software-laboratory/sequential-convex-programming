@@ -1,6 +1,8 @@
 function sim_result = sl_vs_scr(has_changed)
     
-    if (nargin==0) has_changed=false; end
+    if (nargin==0) 
+        has_changed=false;
+    end
     scenarios = run(true);
     scenario = scenarios(31);
     scenario.outputPath = '../results/sl_vs_scr/';
