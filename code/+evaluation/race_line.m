@@ -39,18 +39,22 @@ function sim_result = race_line(has_changed)
     for i_vehicle = 1:n_vehicles
         % Path
         indices_lap_2 = [sim_result.log.vehicles{i_vehicle}.lap_count] == 0;
+        % assumes 10 steps per simulation
+        n_steps_sim = 10;
+        assert(size(sim_result.log.vehicles{i_vehicle}(1).x_sim,2),n_steps_sim);
+        indices_lap_2_sim = logical(kron(indices_lap_2, ones(1,n_steps_sim)));
 %         i_last_1 = find([sim_result.log.vehicles{i_vehicle}.lap_count] == 0,1, 'last');
 %         indices_lap_2(i_last_1) = 1;
-        x_0_all = [sim_result.log.vehicles{i_vehicle}.x_0];
-        x_0 = x_0_all(:,indices_lap_2);
-        X = x_0(1, :);
-        Y = x_0(2, :);
+        x_all = horzcat(sim_result.log.vehicles{i_vehicle}.x_sim);
+        x = x_all(:,indices_lap_2_sim);
+        X = x(1, :);
+        Y = x(2, :);
         plot(X, Y, ...
             'Color', c(i_vehicle,:), ...
             'LineWidth', 0.5, ...
             'LineStyle', l(i_vehicle), ...
             'Marker', m(i_vehicle) ...
-            , 'MarkerIndices',1:10:length(Y) ...
+            , 'MarkerIndices',1:10*n_steps_sim:length(Y) ...
             , 'MarkerSize', 7 ...
         );
     end

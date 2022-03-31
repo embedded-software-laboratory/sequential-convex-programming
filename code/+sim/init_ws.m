@@ -7,6 +7,8 @@ for i = 1:length(cfg.scn.vhs)
     % controller-specifics
     ws.vhs{i}.controller_output = NaN;
     ws.vhs{i}.x_0 = cfg.scn.vhs{i}.x_start;
+    ws.vhs{i}.x_0_next = NaN;
+    ws.vhs{i}.x_sim = NaN;
     if cfg.scn.vhs{i}.isControlModelLinear && ~cfg.scn.vhs{i}.isSimulationModelLinear 
         % convert states from Single Track to Linear
         ws.vhs{i}.x_0_controller = model.vehicle.state_st2lin(ws.vhs{i}.x_0);
@@ -23,6 +25,7 @@ for i = 1:length(cfg.scn.vhs)
     ws.vhs{i}.X_controller_prev = ws.vhs{i}.X_controller;
     ws.vhs{i}.U_controller = repmat([0;0], 1, cfg.scn.vhs{i}.p.Hp);
     ws.vhs{i}.u_1 = ws.vhs{i}.U_controller(:, 1);
+    
 
     % lap-specific
     cp_x_0 = controller.track_SL.find_closest_checkpoint_index(...

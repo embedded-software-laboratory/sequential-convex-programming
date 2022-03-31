@@ -5,6 +5,9 @@ for v = 1:n_vhs
     % Save trajectory for convex constraint plots
     ws.vhs{v}.X_controller_prev = ws.vhs{v}.X_controller;
 
+    % update initial state
+    ws.vhs{v}.x_0 = ws.vhs{v}.x_0_next;
+
     % keep last state entry
     % X_{n-1} = X_{n} due to terminal constraint = standstill
     ws.vhs{v}.X_controller(:, 1:end-1) = ws.vhs{v}.X_controller(:, 2:end);

@@ -1,4 +1,4 @@
-function x_0 = simulate_ode(x_0, u_1, veh_cfg)
+function [x_0,x_sim] = simulate_ode(x_0, u_1, veh_cfg)
 % solve ode for individual vehicle with calculated inputs
 %   constant control input across simulation step
 %
@@ -29,9 +29,6 @@ if ~ismethod(veh_cfg.model_simulation, 'controller')
     % simulate
     [~, x_sim] = ode45(function_sim, dt_sim, x_0);%,...
         %odeset('RelTol',1e-8,'AbsTol',1e-8));
-
-    % extract new x_0
-    x_0 = x_sim(end,:)';
 else % if model has controller
     % execute controller at dt's of simulation
     for i = 2:length(dt_sim)
@@ -45,8 +42,9 @@ else % if model has controller
         %       2. expand `odeset` with `'Stats','on','OutputFcn',@odeplot`
         [~, x_sim] = ode45(function_sim, [dt_sim(i - 1) dt_sim(i)], x_0);%,...
             %odeset('RelTol',1e-4,'AbsTol',1e-4));
-        
-        % extract new x_0
-        x_0 = x_sim(end,:)';
     end
 end
+
+% extract new x_0
+x_0 = x_sim(end,:)';
+x_sim = x_sim(1:end-1,:)';

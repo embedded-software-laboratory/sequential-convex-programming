@@ -83,16 +83,6 @@ disp('#- Starting race loop -#')
         end
         
 
-        %% Log
-        if cfg.log.level >= cfg.log.LOG
-            % saving ws for vehicles seperately for easier access
-            log.lap{end + 1} = rmfield(ws, 'vhs');
-
-            for i = 1:length(cfg.scn.vhs)
-                log.vehicles{i}(end + 1) = ws.vhs{i};
-            end
-        end
-
         %% Visualization
         % Visualization plots x_0 (current state) of last time step and
         % predictions of Hp states x calculated in the current time step.
@@ -112,15 +102,6 @@ disp('#- Starting race loop -#')
             % multiple controllers), copy it's x_0 to other vehicles
             % (which are only to compare controllers at each step)
             if cfg.scn.is_main_vehicle_only && i > 1
-                % copy trajectory of main vehicle to other controllers
-                if ~cfg.scn.vhs{i}.isSimulationModelLinear
-                    ws.vhs{i}.x_0 = ws.vhs{1}.x_0;
-                    ws.vhs{i}.X_controller = ws.vhs{1}.X_controller;
-                else
-                    ws.vhs{i}.x_0 = model.vehicle.state_st2lin(ws.vhs{1}.x_0);
-                    ws.vhs{i}.X_controller = model.vehicle.state_st2lin(ws.vhs{1}.X_controller);
-                end
-                
                 % don't simulate
                 continue
             end
@@ -134,14 +115,45 @@ disp('#- Starting race loop -#')
             %   Single Track      Single Track
             if isSimLin && isCtrLin
                 % equals to controller output `ws.vhs{i}.x_0 = ws.vhs{i}.controller_output.x(:,1)`;
-                ws.vhs{i}.x_0 = ws.vhs{i}.x_0 + cfg.scn.vhs{i}.model_simulation.ode(ws.vhs{i}.x_0, ws.vhs{i}.u_1);
+                ws.vhs{i}.x_0_next = ws.vhs{i}.x_0 + cfg.scn.vhs{i}.model_simulation.ode(ws.vhs{i}.x_0, ws.vhs{i}.u_1);
+                ws.vhs{i}.x_sim = nan;
             elseif ~isSimLin && isCtrLin
-                ws.vhs{i}.x_0 = sim.simulate_ode(ws.vhs{i}.x_0, ws.vhs{i}.u_1, cfg.scn.vhs{i});
+                [ws.vhs{i}.x_0_next,ws.vhs{i}.x_sim] = sim.simulate_ode(ws.vhs{i}.x_0, ws.vhs{i}.u_1, cfg.scn.vhs{i});
             elseif ~isSimLin && ~isCtrLin
-                ws.vhs{i}.x_0 = sim.simulate_ode(ws.vhs{i}.x_0, ws.vhs{i}.u_1, cfg.scn.vhs{i});
+                [ws.vhs{i}.x_0_next,ws.vhs{i}.x_sim] = sim.simulate_ode(ws.vhs{i}.x_0, ws.vhs{i}.u_1, cfg.scn.vhs{i});
             else
                 % should never happen: why choose worse simulation model than controller?
                 error('Combination of controller and simulation vehicle model types not supported')
+            end
+        end
+
+
+
+        %% Log
+        if cfg.log.level >= cfg.log.LOG
+            % saving ws for vehicles seperately for easier access
+            log.lap{end + 1} = rmfield(ws, 'vhs');
+
+            for i = 1:length(cfg.scn.vhs)
+                log.vehicles{i}(end + 1) = ws.vhs{i};
+            end
+        end
+        
+        
+        %% Advance
+        for i = 1:length(cfg.scn.vhs)
+            % if only simulation for main vehicle ("equipped" with
+            % multiple controllers), copy it's x_0 to other vehicles
+            % (which are only to compare controllers at each step)
+            if cfg.scn.is_main_vehicle_only && i > 1
+                % copy trajectory of main vehicle to other controllers
+                if ~cfg.scn.vhs{i}.isSimulationModelLinear
+                    ws.vhs{i}.x_0_next = ws.vhs{1}.x_0_next;
+                    ws.vhs{i}.X_controller = ws.vhs{1}.X_controller;
+                else
+                    ws.vhs{i}.x_0_next = model.vehicle.state_st2lin(ws.vhs{1}.x_0_next);
+                    ws.vhs{i}.X_controller = model.vehicle.state_st2lin(ws.vhs{1}.X_controller);
+                end
             end
         end
         
@@ -162,7 +174,7 @@ disp('#- Starting race loop -#')
             end
         end
 
-        % enact user inputs
+        %% enact user inputs
         if cfg.plot.is_enabled
             if ctl_pause; disp('Pause...'); end
             while true % pseudo do..while loop
@@ -202,13 +214,13 @@ if exist('ME', 'var')
 end
 
 %% Evaluation
-% Run example evaluation scipts
-evaluation.plot_t_opts()
-evaluation.plot_track_with_speed()
+% % Run example evaluation scipts
+% evaluation.plot_t_opts()
+% evaluation.plot_track_with_speed()
 
-% export all currently open figures (especially for CodeOcean)
-utils.exportAllFigures(cfg);
-fprintf(2, 'Result files (graphics, figures, logs) were saved in "%s"\n', cfg.outputPath)
+% % export all currently open figures (especially for CodeOcean)
+% utils.exportAllFigures(cfg);
+% fprintf(2, 'Result files (graphics, figures, logs) were saved in "%s"\n', cfg.outputPath)
 end
 
 
