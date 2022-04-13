@@ -1,39 +1,16 @@
-Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning in Autonomous Vehicle Racing
----
-
-![GIF showing SCR and SL](https://raw.githubusercontent.com/embedded-software-laboratory/sequential-convex-programming/master/animation_SCR_vs_SL.gif)
-
-[Paper (not published yet)]()
-
+# Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning in Autonomous Vehicle Racing
+<!-- icons from https://simpleicons.org/ -->
+<!-- [![Paper](https://img.shields.io/badge/-Paper-00629B?logo=IEEE)]()  -->
+[![Repository](https://img.shields.io/badge/-GitHub-181717?logo=GitHub)](https://github.com/embedded-software-laboratory/sequential-convex-programming) 
+[![Video](https://img.shields.io/badge/-Video-FF0000?logo=YouTube)](https://youtu.be/7Iwh980JMCs) 
 [![Open in Code Ocean](https://codeocean.com/codeocean-assets/badge/open-in-code-ocean.svg)](https://codeocean.com/capsule/6818033/tree)
 
-[Watch Full Video on YouTube](https://youtu.be/21iETsolCNQ)
+![GIF showing SCR and SL](https://raw.githubusercontent.com/embedded-software-laboratory/sequential-convex-programming/master/animation_SCR_vs_SL.gif)
  
-[Explore on GitHub](https://github.com/embedded-software-laboratory/sequential-convex-programming)
+## Abstract
+Optimization problems for trajectory planning in autonomous vehicle racing are characterized by their nonlinearity and nonconvexity. Instead of solving these optimization problems, usually a convex approximation is solved instead to achieve a high update rate. We present a real-time-capable model predictive control (MPC) trajectory planner based on a nonlinear single-track vehicle model and Pacejka's magic tire formula for autonomous vehicle racing. After formulating the general nonconvex trajectory optimization problem, we form a convex approximation using sequential convex programming (SCP). The state of the art convexifies track constraints using sequential linearization (SL), which is a method of relaxing the constraints. Solutions to the relaxed optimization problem are not guaranteed to be feasible in the nonconvex optimization problem. We propose sequential convex restriction (SCR) as a method to convexify track constraints. SCR guarantees that resulting solutions are feasible in the nonconvex optimization problem. We show recursive feasibility of solutions to the restricted optimization problem. The MPC is evaluated on a scaled version of the Hockenheimring racing track in simulation. The results show that an MPC using SCR yields faster lap times than an MPC using SL, while still being real-time capable.
  
-# Abstract
-We present a real-time-capable Model Predictive Controller (MPC)
-based on a non-linear single-track vehicle model and Pacejka’s
-magic tire formula for autonomous racing applications. After 
-formulating the general non-convex trajectory optimization 
-problem, the model is linearized around estimated operating 
-points and the constraints are convexified using the Sequential
-Convex Programming (SCP) method. We use two different methods
-to convexify the non-convex track constraints, namely Sequential
-Linearization (SL) and Sequential Convex Restriction (SCR).
-SL, a method of relaxing the constraints, was introduced in our
-previous paper. SCR, a method of restricting the constraints,
-is introduced in this paper. We show the application of SCR to
-autonomous racing and prove that it does not interfere with
-recursive feasibility. We compare the predicted trajectory
-quality of the non-linear single-track model with the linear
-double integrator model from our previous paper. The MPC
-performance is evaluated on a scaled version of the Hockenheimring
-racing track. We show that an MPC with SCR yields faster lap times
-than an MPC with SL - for race starts as well as flying laps -
-while still being real-time capable.
- 
-# Instructions
+## Instructions
 0. clone or download this repo and open MATLAB in this folder
 1. open folder 'code' via ```cd code``` in MATLAB
 2. optional: choose a pre-configured scenario in file 'run.m'
@@ -41,10 +18,10 @@ while still being real-time capable.
     the next paragraph
 2. run the scenario via ```run()```
 
+## Paper Results Reproduction
+The script `code\+evaluation\paper.m` reproduces the simulation results. Afterwards, the results are available in the folder `results\`.
 ## Configuration
-In the folder 'code/+config', all configruations of scenarios and vehicles
-are stored. You can combine the building blocks to your likes or even
-create a completly new configuration
+In the folder 'code/+config', all configurations of scenarios and vehicles are stored. You can combine the building blocks to your likes or even create a completely new configuration
  
 ## Requirements
 - MATLAB 
@@ -53,22 +30,7 @@ create a completly new configuration
     - Statistics and Machine Learning Toolbox (required for evaluation only)
 - Solver
     - recommended IBM ILOG CPLEX Optimization Studio 12.10
-    - alternatively, MATLAB's 'quadprog' via 'Symbolic Math Toolbox'
+    - alternatively, MATLAB's `quadprog` via 'Symbolic Math Toolbox'
  
 tested on UNIX (Ubuntu 18.04 64-bit) and Windows 10 64-bit, MATLAB
 R2021a, R2019b, R2019a
- 
-## Miscellaneous
-- export large figures:
-```print('-painters', gcf, "filename.svg", '-dsvg')```
- 
-## TODOs
-- also search for 'FIXME' for issues to be fixed
-- use 'sim scale' to norm all other scales
-    - regularize states and inputs and their respective weights, scale models and track --> allows easy adaption to miniature and full-sized vehicle
-    - scale vehicle size (length/width) for correct vehicle avoidance
-- for usage of differing models for simulation/controller: improve acceleration controller (linear model inputs --> simulation inputs)
-- geometrical vehicle scaling is missing: values hard-coded in 'vehicle' config, better should be part of vehicle model parameters
-- smoke tests by running all scenarios automatically
-- track models should give available start positions & max number of vehicles
-- add acceleration limits to plot for linear model
