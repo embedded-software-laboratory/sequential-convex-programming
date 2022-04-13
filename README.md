@@ -34,3 +34,20 @@ In the folder 'code/+config', all configurations of scenarios and vehicles are s
  
 tested on UNIX (Ubuntu 18.04 64-bit) and Windows 10 64-bit, MATLAB
 R2021a, R2019b, R2019a
+
+## Acknowledgements
+This research is supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) within the Priority Program SPP 1835 Cooperative Interacting Automobiles and the Post Graduate Program GRK 1856 Integrated Energy Supply Modules for Roadbound E-Mobility.
+
+<!-- ## References
+
+<details>
+<summary>
+[1] P. Scheffe, M. V. A. Pedrosa, K. Flaßkamp and B. Alrifaee,
+"Receding Horizon Control Using Graph Search for Multi-Agent Trajectory Planning"
+</summary>
+<p>
+```
+bibtex
+```
+</p>
+</details> -->
