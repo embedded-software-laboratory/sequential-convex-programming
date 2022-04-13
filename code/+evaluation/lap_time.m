@@ -32,20 +32,29 @@ function sim_result = lap_time(has_changed)
     n_laps = sim_result.cfg.race.n_laps;
     t_lap = zeros(n_laps, n_vehicles);
     
+    fname_t_lap = [sim_result.cfg.outputPath, 't_lap.txt'];
+    delete(fname_t_lap);
+    fid = fopen(fname_t_lap, 'a');
     for i_vehicle = 1:n_vehicles
         % Lap Time
         if scenario.scn.vhs{i_vehicle}.approximation == scenario.scn.vhs{i_vehicle}.approximationSL
             convexification_method = "SL";
         else
             convexification_method = "SCR";
-        end
+        end        
         for i_lap = 1:n_laps
-            t_lap(i_lap,i_vehicle) = sum( ...
-                [sim_result.log.vehicles{i_vehicle}.lap_count] == i_lap-1) ...
-                * sim_result.cfg.scn.vhs{i_vehicle}.p.dt_controller;
+            correcting_first_lap = i_lap==1;
+            t_lap(i_lap,i_vehicle) = (...
+                    sum([sim_result.log.vehicles{i_vehicle}.lap_count] == i_lap-1) ...
+                    - correcting_first_lap ...
+                ) * sim_result.cfg.scn.vhs{i_vehicle}.p.dt_controller;
+            fprintf(fid, "Lap %i using %3s, t_lap: %f\n", ...
+                i_lap, convexification_method, t_lap(i_lap,i_vehicle)...
+            );
             fprintf("Lap %i using %3s, t_lap: %f\n", ...
                 i_lap, convexification_method, t_lap(i_lap,i_vehicle)...
             );
         end
     end
+    fclose(fid);
 end
