@@ -1,6 +1,6 @@
 # Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning in Autonomous Vehicle Racing
 <!-- icons from https://simpleicons.org/ -->
-<!-- [![Paper](https://img.shields.io/badge/-Paper-00629B?logo=IEEE)]()  -->
+[![Paper](https://img.shields.io/badge/-Paper-00629B?logo=IEEE)](https://doi.org/10.1109/TIV.2022.3168130) 
 [![Repository](https://img.shields.io/badge/-GitHub-181717?logo=GitHub)](https://github.com/embedded-software-laboratory/sequential-convex-programming) 
 [![Video](https://img.shields.io/badge/-Video-FF0000?logo=YouTube)](https://youtu.be/7Iwh980JMCs) 
 [![Open in Code Ocean](https://codeocean.com/codeocean-assets/badge/open-in-code-ocean.svg)](https://codeocean.com/capsule/6818033/tree)
@@ -38,16 +38,27 @@ R2021a, R2019b, R2019a
 ## Acknowledgements
 This research is supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) within the Priority Program SPP 1835 Cooperative Interacting Automobiles and the Post Graduate Program GRK 1856 Integrated Energy Supply Modules for Roadbound E-Mobility.
 
-<!-- ## References
+## Reference
 
 <details>
 <summary>
-[1] P. Scheffe, M. V. A. Pedrosa, K. Flaßkamp and B. Alrifaee,
-"Receding Horizon Control Using Graph Search for Multi-Agent Trajectory Planning"
+[1] P. Scheffe, T. Henneken, M. Kloock, B. Alrifaee.
+"Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning in Autonomous Vehicle Racing"
 </summary>
 <p>
+
 ```
-bibtex
+@ARTICLE{scheffe2022sequential,
+  author={Scheffe, Patrick and Henneken, Theodor Mario and Kloock, Maximilian and Alrifaee, Bassam},
+  journal={IEEE Transactions on Intelligent Vehicles},
+  title={Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning in Autonomous Vehicle Racing},
+  year={2022},
+  volume={},
+  number={},
+  pages={1-1},
+  doi={10.1109/TIV.2022.3168130}
+}
 ```
+
 </p>
-</details> -->
+</details>
