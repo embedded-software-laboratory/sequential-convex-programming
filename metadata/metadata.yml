@@ -1,16 +1,23 @@
 metadata_version: 1
 name: Sequential Convex Programming Methods for Real-time Optimal Trajectory Planning
   in Autonomous Vehicle Racing
-description: We present a real-time-capable Model Predictive Controller (MPC) based
-  on a single-track vehicle model and Pacejka’s magic tire formula for autonomous
-  racing applications. After constructing a non-convex trajectory optimization problem,
-  it is convexified using the Sequential Convex Programming (SCP) method. We use two
-  different methods for track discretization, namely Sequential Linearization (SL)
-  and Sequential Convex Restriction (SCR). SL was already introduced in our previous
-  paper. SCR is a new addition, introduced in detail and its recursive feasibility
-  proven. We show that a controller with SCR yields faster lap times - for race starts
-  as well as flying laps - while being real-time capable. A video showing the results
-  is available at \url{https://youtu.be/21iETsolCNQ}.
+description: Optimization problems for trajectory planning in autonomous vehicle racing
+  are characterized by their nonlinearity and nonconvexity. Instead of solving these
+  optimization problems, usually a convex approximation is solved instead to achieve
+  a high update rate. We present a real-time-capable model predictive control (MPC)
+  trajectory planner based on a nonlinear single-track vehicle model and Pacejka's
+  magic tire formula for autonomous vehicle racing. After formulating the general
+  nonconvex trajectory optimization problem, we form a convex approximation using
+  sequential convex programming (SCP). The state of the art convexifies track constraints
+  using sequential linearization (SL), which is a method of relaxing the constraints.
+  Solutions to the relaxed optimization problem are not guaranteed to be feasible
+  in the nonconvex optimization problem. We propose sequential convex restriction
+  (SCR) as a method to convexify track constraints. SCR guarantees that resulting
+  solutions are feasible in the nonconvex optimization problem. We show recursive
+  feasibility of solutions to the restricted optimization problem. The MPC is evaluated
+  on a scaled version of the Hockenheimring racing track in simulation. The results
+  show that an MPC using SCR yields faster lap times than an MPC using SL, while still
+  being real-time capable.
 tags:
 - autonomous-vehicle
 - autonomous-vehicle-racing
